@@ -1,0 +1,6 @@
+@InterRedBE_HostAddress = http://localhost:5118
+
+GET {{InterRedBE_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
