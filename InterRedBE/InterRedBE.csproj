@@ -20,9 +20,7 @@
   <ItemGroup>
     <Folder Include="BAL\Bao\" />
     <Folder Include="BAL\Services\" />
-    <Folder Include="DAL\Models\" />
     <Folder Include="DAL\Dao\" />
-    <Folder Include="DAL\Context\" />
     <Folder Include="DAL\Services\" />
   </ItemGroup>
 
