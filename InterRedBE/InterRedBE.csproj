@@ -18,9 +18,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="BAL\Bao\" />
-    <Folder Include="BAL\Services\" />
-    <Folder Include="DAL\Dao\" />
     <Folder Include="DAL\Services\" />
   </ItemGroup>
 
