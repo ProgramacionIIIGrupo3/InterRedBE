@@ -2,7 +2,7 @@
 {
     public class NodoCuadrupleLiga <T>(T dato) : NodoDobleLiga<T>(dato)
     {
-        public NodoCuadrupleLiga<T>? LigaArriba { get; set; } = null;
-        public NodoCuadrupleLiga<T>? LigaAbajo { get; set; } = null;
+        public NodoCuadrupleLiga<T>? LigaSuperior { get; set; } = null;
+        public NodoCuadrupleLiga<T>? LigaInferior { get; set; } = null;
     }
 }

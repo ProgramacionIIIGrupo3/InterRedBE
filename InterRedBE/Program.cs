@@ -3,6 +3,14 @@ using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
+//DAO DI
+builder.Services.AddHttpContextAccessor();
+
+
+
+////BAO DI
+
+
 // Add services to the container.
 
 builder.Services.AddControllers();

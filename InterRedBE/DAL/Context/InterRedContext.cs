@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using InterRedBE.DAL.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace InterRedBE.DAL.Context
 {
@@ -16,5 +17,22 @@ namespace InterRedBE.DAL.Context
         public DbSet<Models.Departamento> Departamento { get; set; }
         public DbSet<Models.Municipio> Municipio { get; set; }
 
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            base.OnModelCreating(modelBuilder);
+
+            // Relación uno-a-muchos entre Departamento y Municipio
+            modelBuilder.Entity<Departamento>()
+                .HasMany(d => d.Municipios)
+                .WithOne(m => m.Departamento)
+                .HasForeignKey(m => m.IdDepartamento);
+
+            // Relación uno-a-uno entre Departamento y su cabecera (Municipio)
+            modelBuilder.Entity<Departamento>()
+                .HasOne(d => d.Cabecera)
+                .WithOne()
+                .HasForeignKey<Departamento>(d => d.IdCabecera)
+                .OnDelete(DeleteBehavior.Restrict);
+        }
     }
 }

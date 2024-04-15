@@ -1,8 +1,8 @@
 ﻿using InterRedBE.DAL.Models;
 namespace InterRedBE.DAL.Dao
 {
-    public interface IDepartamentoServices
+    public interface IUsuarioDAO : ICRUD<Usuario>
     {
-        
+
     }
 }

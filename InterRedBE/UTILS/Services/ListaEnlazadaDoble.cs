@@ -3,12 +3,12 @@ using System.Collections;
 
 namespace InterRedBE.UTILS.Services
 {
-    public class ListaEnlazadaSimple<T> : IEnumerable<T>
+    public class ListaEnlazadaDoble<T> : IEnumerable<T>
     {
-        private Nodo<T>? PrimerNodo { get; set; }
-        private Nodo<T>? UltimoNodo { get; set; }
+        public NodoDobleLiga<T>? PrimerNodo { get; set; }
+        public NodoDobleLiga<T>? UltimoNodo { get; set; }
 
-        public ListaEnlazadaSimple()
+        public ListaEnlazadaDoble()
         {
             PrimerNodo = null;
             UltimoNodo = null;
@@ -22,7 +22,7 @@ namespace InterRedBE.UTILS.Services
         // Metodo para insertar un nodo al inicio de la lista
         public string InsertarAlInicio(T dato)
         {
-            Nodo<T> nuevoNodo = new(dato);
+            NodoDobleLiga<T> nuevoNodo = new(dato);
             if (ListaVacia())
             {
                 PrimerNodo = nuevoNodo;
@@ -31,6 +31,7 @@ namespace InterRedBE.UTILS.Services
             else
             {
                 nuevoNodo.LigaSiguiente = PrimerNodo;
+                PrimerNodo.LigaAnterior = nuevoNodo;
                 PrimerNodo = nuevoNodo;
             }
             return "Nodo insertado al inicio";
@@ -39,7 +40,7 @@ namespace InterRedBE.UTILS.Services
         // Metodo para insertar un nodo al final de la lista
         public string InsertarAlFinal(T dato)
         {
-            Nodo<T> nuevoNodo = new(dato);
+            NodoDobleLiga<T> nuevoNodo = new(dato);
             if (ListaVacia())
             {
                 PrimerNodo = nuevoNodo;
@@ -48,6 +49,7 @@ namespace InterRedBE.UTILS.Services
             else
             {
                 UltimoNodo.LigaSiguiente = nuevoNodo;
+                nuevoNodo.LigaAnterior = UltimoNodo;
                 UltimoNodo = nuevoNodo;
             }
             return "Nodo insertado al final";
@@ -56,7 +58,7 @@ namespace InterRedBE.UTILS.Services
         // Metodo para insertar un nodo antes de una posicion en especifico
         public string InsertarAntesDePosicionX(T dato, int posicion)
         {
-            Nodo<T> nuevoNodo = new(dato);
+            NodoDobleLiga<T> nuevoNodo = new(dato);
             if (ListaVacia())
             {
                 return "La lista esta vacia";
@@ -74,13 +76,13 @@ namespace InterRedBE.UTILS.Services
 
             else
             {
-                Nodo<T>? nodoActual = PrimerNodo;
-                Nodo<T>? nodoAnterior = null;
+                NodoDobleLiga<T>? nodoActual = PrimerNodo;
+                NodoDobleLiga<T>? nodoAnterior = null;
                 int contador = 2;
                 while (nodoActual != null && contador < posicion)
                 {
                     nodoAnterior = nodoActual;
-                    nodoActual = nodoActual.LigaSiguiente;
+                    nodoActual = (NodoDobleLiga<T>)nodoActual.LigaSiguiente;
                     contador++;
                 }
                 if (nodoActual == null)
@@ -91,6 +93,8 @@ namespace InterRedBE.UTILS.Services
                 {
                     nuevoNodo.LigaSiguiente = nodoActual;
                     nodoAnterior.LigaSiguiente = nuevoNodo;
+                    nodoActual.LigaAnterior = nuevoNodo;
+                    nuevoNodo.LigaAnterior = nodoAnterior;
                     return $"Nodo insertado antes de la posicion: {posicion}";
                 }
             }
@@ -99,7 +103,7 @@ namespace InterRedBE.UTILS.Services
         // Metodo para insertar un nodo despues de una posicion en especifico
         public string InsertarDespuesDePosicionX(T dato, int posicion)
         {
-            Nodo<T> nuevoNodo = new(dato);
+            NodoDobleLiga<T> nuevoNodo = new(dato);
             if (ListaVacia())
             {
                 return "La lista esta vacia";
@@ -110,11 +114,11 @@ namespace InterRedBE.UTILS.Services
                 return "La posicion especificada debe ser un numereo mayor a 0";
             }
 
-            Nodo<T>? nodoActual = PrimerNodo;
+            NodoDobleLiga<T>? nodoActual = PrimerNodo;
             int contador = 1;
             while (nodoActual != null && contador < posicion)
             {
-                nodoActual = nodoActual.LigaSiguiente;
+                nodoActual = (NodoDobleLiga<T>)nodoActual.LigaSiguiente;
                 contador++;
             }
 
@@ -126,6 +130,7 @@ namespace InterRedBE.UTILS.Services
             {
                 nuevoNodo.LigaSiguiente = nodoActual.LigaSiguiente;
                 nodoActual.LigaSiguiente = nuevoNodo;
+                nuevoNodo.LigaAnterior = nodoActual;
                 return $"Nodo insertado despues de la posicion: {posicion}";
             }
         }
@@ -133,7 +138,7 @@ namespace InterRedBE.UTILS.Services
         // Metodo para insertar un nodo en una posicion en especifico
         public string InsertarEnPosicionX(T dato, int posicion)
         {
-            Nodo<T> nuevoNodo = new(dato);
+            NodoDobleLiga<T> nuevoNodo = new(dato);
             if (ListaVacia())
             {
                 return "La lista esta vacia";
@@ -149,13 +154,13 @@ namespace InterRedBE.UTILS.Services
                 return InsertarAlInicio(dato);
             }
 
-            Nodo<T>? nodoActual = PrimerNodo;
-            Nodo<T>? nodoAnterior = null;
+            NodoDobleLiga<T>? nodoActual = PrimerNodo;
+            NodoDobleLiga<T>? nodoAnterior = null;
             int contador = 1;
             while (nodoActual != null && contador < posicion)
             {
                 nodoAnterior = nodoActual;
-                nodoActual = nodoActual.LigaSiguiente;
+                nodoActual = (NodoDobleLiga<T>)nodoActual.LigaSiguiente;
                 contador++;
             }
 
@@ -167,6 +172,8 @@ namespace InterRedBE.UTILS.Services
             {
                 nuevoNodo.LigaSiguiente = nodoActual;
                 nodoAnterior.LigaSiguiente = nuevoNodo;
+                nodoActual.LigaAnterior = nuevoNodo;
+                nuevoNodo.LigaAnterior = nodoAnterior;
                 return $"Nodo insertado en la posicion: {posicion}";
             }
         }
@@ -174,18 +181,18 @@ namespace InterRedBE.UTILS.Services
         // Metodo para Insertar un nodo antes de un dato en especifico
         public string InsertarAntesDeDatoX(T dato, T datoX)
         {
-            Nodo<T> nuevoNodo = new(dato);
+            NodoDobleLiga<T> nuevoNodo = new(dato);
             if (ListaVacia())
             {
                 return "La lista esta vacia";
             }
 
-            Nodo<T>? nodoActual = PrimerNodo;
-            Nodo<T>? nodoAnterior = null;
+            NodoDobleLiga<T>? nodoActual = PrimerNodo;
+            NodoDobleLiga<T>? nodoAnterior = null;
             while (nodoActual != null && !nodoActual.Dato.Equals(datoX))
             {
                 nodoAnterior = nodoActual;
-                nodoActual = nodoActual.LigaSiguiente;
+                nodoActual = (NodoDobleLiga<T>)nodoActual.LigaSiguiente;
             }
 
             if (nodoActual == null)
@@ -202,6 +209,8 @@ namespace InterRedBE.UTILS.Services
                 {
                     nuevoNodo.LigaSiguiente = nodoActual;
                     nodoAnterior.LigaSiguiente = nuevoNodo;
+                    nodoActual.LigaAnterior = nuevoNodo;
+                    nuevoNodo.LigaAnterior = nodoAnterior;
                     return $"Nodo insertado antes del dato: {datoX}";
                 }
             }
@@ -210,16 +219,16 @@ namespace InterRedBE.UTILS.Services
         // Metodo para Insertar un nodo despues de un dato en especifico
         public string InsertarDespuesDeDatoX(T dato, T datoX)
         {
-            Nodo<T> nuevoNodo = new(dato);
+            NodoDobleLiga<T> nuevoNodo = new(dato);
             if (ListaVacia())
             {
                 return "La lista esta vacia";
             }
 
-            Nodo<T>? nodoActual = PrimerNodo;
+            NodoDobleLiga<T>? nodoActual = PrimerNodo;
             while (nodoActual != null && !nodoActual.Dato.Equals(datoX))
             {
-                nodoActual = nodoActual.LigaSiguiente;
+                nodoActual = (NodoDobleLiga<T>)nodoActual.LigaSiguiente;
             }
 
             if (nodoActual == null)
@@ -230,6 +239,7 @@ namespace InterRedBE.UTILS.Services
             {
                 nuevoNodo.LigaSiguiente = nodoActual.LigaSiguiente;
                 nodoActual.LigaSiguiente = nuevoNodo;
+                nuevoNodo.LigaAnterior = nodoActual;
                 return $"Nodo insertado despues del dato: {datoX}";
             }
         }
@@ -249,10 +259,10 @@ namespace InterRedBE.UTILS.Services
             }
             else
             {
-                Nodo<T>? nodoTemporal;
-                nodoTemporal = PrimerNodo;
-                PrimerNodo = PrimerNodo.LigaSiguiente;
-                nodoTemporal = null;
+                NodoDobleLiga<T>? nodoEliminar = PrimerNodo;
+                PrimerNodo = (NodoDobleLiga<T>)PrimerNodo.LigaSiguiente;
+                PrimerNodo.LigaAnterior = null;
+                nodoEliminar = null;
             }
             return "¡Se ha eliminado el nodo al inicio!";
         }
@@ -272,15 +282,10 @@ namespace InterRedBE.UTILS.Services
             }
             else
             {
-                Nodo<T>? nodoActual = PrimerNodo;
-                while (nodoActual?.LigaSiguiente != UltimoNodo)
-                {
-                    nodoActual = nodoActual?.LigaSiguiente;
-                }
-
-                nodoActual.LigaSiguiente = null;
-                UltimoNodo = nodoActual;
-
+                NodoDobleLiga<T>? nodoEliminar = UltimoNodo;
+                UltimoNodo = (NodoDobleLiga<T>)UltimoNodo.LigaAnterior;
+                UltimoNodo.LigaSiguiente = null;
+                nodoEliminar = null;
             }
             return "¡Se ha eliminado el nodo al final!";
         }
@@ -303,13 +308,11 @@ namespace InterRedBE.UTILS.Services
                 return EliminarAlInicio();
             }
 
-            Nodo<T>? nodoActual = PrimerNodo;
-            Nodo<T>? nodoAnterior = null;
+            NodoDobleLiga<T>? nodoActual = PrimerNodo;
             int contador = 1;
             while (nodoActual != null && contador < posicion)
             {
-                nodoAnterior = nodoActual;
-                nodoActual = nodoActual.LigaSiguiente;
+                nodoActual = (NodoDobleLiga<T>)nodoActual.LigaSiguiente;
                 contador++;
             }
 
@@ -318,24 +321,18 @@ namespace InterRedBE.UTILS.Services
                 return "La posicion especificada esta fuera de rango";
             }
 
-            if (nodoAnterior != null)
-            {
-                nodoAnterior.LigaSiguiente = nodoActual.LigaSiguiente;
-                nodoActual = null;
-            }
-            else
-            {
-                PrimerNodo = nodoActual.LigaSiguiente;
-                nodoActual = null;
-            }
-
             if (nodoActual == UltimoNodo)
             {
-                UltimoNodo = nodoAnterior;
+                return EliminarAlFinal();
             }
 
-            return $"¡Se ha eliminado el nodo en la posicion: {posicion}!";
+            NodoDobleLiga<T>? nodoAnterior = (NodoDobleLiga<T>)nodoActual.LigaAnterior;
+            NodoDobleLiga<T>? nodoSiguiente = (NodoDobleLiga<T>)nodoActual.LigaSiguiente;
+            nodoAnterior.LigaSiguiente = nodoSiguiente;
+            nodoSiguiente.LigaAnterior = nodoAnterior;
+            nodoActual = null;
 
+            return $"¡Se ha eliminado el nodo en la posicion: {posicion}!";
         }
 
         // Metodo para eliminar un nodo antes de una posicion en especifico
@@ -356,15 +353,15 @@ namespace InterRedBE.UTILS.Services
                 return "No hay un nodo antes de la posicion 1";
             }
 
-            Nodo<T>? nodoActual = PrimerNodo;
-            Nodo<T>? nodoAnterior = null;
-            Nodo<T>? nodoAnteriorAnterior = null;
+            NodoDobleLiga<T>? nodoActual = PrimerNodo;
+            NodoDobleLiga<T>? nodoAnterior = null;
+            NodoDobleLiga<T>? nodoAnteriorAnterior = null;
             int contador = 1;
             while (nodoActual != null && contador < posicion)
             {
                 nodoAnteriorAnterior = nodoAnterior;
                 nodoAnterior = nodoActual;
-                nodoActual = nodoActual.LigaSiguiente;
+                nodoActual = (NodoDobleLiga<T>)nodoActual.LigaSiguiente;
                 contador++;
             }
 
@@ -378,7 +375,9 @@ namespace InterRedBE.UTILS.Services
                 return "No hay un nodo antes de la posicion especificada";
             }
 
-            nodoAnteriorAnterior.LigaSiguiente = nodoActual;
+            NodoDobleLiga<T>? nodoSiguiente = (NodoDobleLiga<T>)nodoAnterior.LigaSiguiente;
+            nodoAnteriorAnterior.LigaSiguiente = nodoSiguiente;
+            nodoSiguiente.LigaAnterior = nodoAnteriorAnterior;
             nodoAnterior = null;
 
             return $"¡Se ha eliminado el nodo antes de la posicion: {posicion}!";
@@ -397,11 +396,11 @@ namespace InterRedBE.UTILS.Services
                 return "La posicion especificada debe ser un numero mayor a 0";
             }
 
-            Nodo<T>? nodoActual = PrimerNodo;
+            NodoDobleLiga<T>? nodoActual = PrimerNodo;
             int contador = 1;
             while (nodoActual != null && contador < posicion)
             {
-                nodoActual = nodoActual.LigaSiguiente;
+                nodoActual = (NodoDobleLiga<T>)nodoActual.LigaSiguiente;
                 contador++;
             }
 
@@ -410,14 +409,16 @@ namespace InterRedBE.UTILS.Services
                 return "La posicion especificada esta fuera de rango";
             }
 
-            if (nodoActual.LigaSiguiente == null)
+            if (nodoActual == UltimoNodo)
             {
                 return "No hay un nodo despues de la posicion especificada";
             }
 
-            Nodo<T>? nodoTemporal = nodoActual.LigaSiguiente;
-            nodoActual.LigaSiguiente = nodoTemporal?.LigaSiguiente;
-            nodoTemporal = null;
+            NodoDobleLiga<T>? nodoSiguiente = (NodoDobleLiga<T>)nodoActual.LigaSiguiente;
+            NodoDobleLiga<T>? nodoSiguienteSiguiente = (NodoDobleLiga<T>)nodoSiguiente.LigaSiguiente;
+            nodoActual.LigaSiguiente = nodoSiguienteSiguiente;
+            nodoSiguienteSiguiente.LigaAnterior = nodoActual;
+            nodoSiguiente = null;
 
             return $"¡Se ha eliminado el nodo despues de la posicion: {posicion}!";
         }
@@ -430,14 +431,14 @@ namespace InterRedBE.UTILS.Services
                 return "La lista esta vacia";
             }
 
-            Nodo<T>? nodoActual = PrimerNodo;
-            Nodo<T>? nodoAnterior = null;
-            Nodo<T>? nodoAnteriorAnterior = null;
+            NodoDobleLiga<T>? nodoActual = PrimerNodo;
+            NodoDobleLiga<T>? nodoAnterior = null;
+            NodoDobleLiga<T>? nodoAnteriorAnterior = null;
             while (nodoActual != null && !nodoActual.Dato.Equals(datoX))
             {
                 nodoAnteriorAnterior = nodoAnterior;
                 nodoAnterior = nodoActual;
-                nodoActual = nodoActual.LigaSiguiente;
+                nodoActual = (NodoDobleLiga<T>)nodoActual.LigaSiguiente;
             }
 
             if (nodoActual == null)
@@ -450,7 +451,9 @@ namespace InterRedBE.UTILS.Services
                 return "No hay un nodo antes del dato especificado";
             }
 
-            nodoAnteriorAnterior.LigaSiguiente = nodoActual;
+            NodoDobleLiga<T>? nodoSiguiente = (NodoDobleLiga<T>)nodoAnterior.LigaSiguiente;
+            nodoAnteriorAnterior.LigaSiguiente = nodoSiguiente;
+            nodoSiguiente.LigaAnterior = nodoAnteriorAnterior;
             nodoAnterior = null;
 
             return $"¡Se ha eliminado el nodo antes del dato: {datoX}!";
@@ -464,10 +467,10 @@ namespace InterRedBE.UTILS.Services
                 return "La lista esta vacia";
             }
 
-            Nodo<T>? nodoActual = PrimerNodo;
+            NodoDobleLiga<T>? nodoActual = PrimerNodo;
             while (nodoActual != null && !nodoActual.Dato.Equals(datoX))
             {
-                nodoActual = nodoActual.LigaSiguiente;
+                nodoActual = (NodoDobleLiga<T>)nodoActual.LigaSiguiente;
             }
 
             if (nodoActual == null)
@@ -475,14 +478,16 @@ namespace InterRedBE.UTILS.Services
                 return "El dato especificado no se encuentra en la lista";
             }
 
-            if (nodoActual.LigaSiguiente == null)
+            if (nodoActual == UltimoNodo)
             {
                 return "No hay un nodo despues del dato especificado";
             }
 
-            Nodo<T>? nodoTemporal = nodoActual.LigaSiguiente;
-            nodoActual.LigaSiguiente = nodoTemporal?.LigaSiguiente;
-            nodoTemporal = null;
+            NodoDobleLiga<T>? nodoSiguiente = (NodoDobleLiga<T>)nodoActual.LigaSiguiente;
+            NodoDobleLiga<T>? nodoSiguienteSiguiente = (NodoDobleLiga<T>)nodoSiguiente.LigaSiguiente;
+            nodoActual.LigaSiguiente = nodoSiguienteSiguiente;
+            nodoSiguienteSiguiente.LigaAnterior = nodoActual;
+            nodoSiguiente = null;
 
             return $"¡Se ha eliminado el nodo despues del dato: {datoX}!";
         }
@@ -495,12 +500,12 @@ namespace InterRedBE.UTILS.Services
                 return "La lista esta vacia";
             }
 
-            Nodo<T>? nodoActual = PrimerNodo;
-            Nodo<T>? nodoAnterior = null;
+            NodoDobleLiga<T>? nodoActual = PrimerNodo;
+            NodoDobleLiga<T>? nodoAnterior = null;
             while (nodoActual != null && !nodoActual.Dato.Equals(datoX))
             {
                 nodoAnterior = nodoActual;
-                nodoActual = nodoActual.LigaSiguiente;
+                nodoActual = (NodoDobleLiga<T>)nodoActual.LigaSiguiente;
             }
 
             if (nodoActual == null)
@@ -508,21 +513,20 @@ namespace InterRedBE.UTILS.Services
                 return "El dato especificado no se encuentra en la lista";
             }
 
-            if (nodoAnterior != null)
+            if (nodoAnterior == null)
             {
-                nodoAnterior.LigaSiguiente = nodoActual.LigaSiguiente;
-                nodoActual = null;
-            }
-            else
-            {
-                PrimerNodo = nodoActual.LigaSiguiente;
-                nodoActual = null;
+                return EliminarAlInicio();
             }
 
             if (nodoActual == UltimoNodo)
             {
-                UltimoNodo = nodoAnterior;
+                return EliminarAlFinal();
             }
+
+            NodoDobleLiga<T>? nodoSiguiente = (NodoDobleLiga<T>)nodoActual.LigaSiguiente;
+            nodoAnterior.LigaSiguiente = nodoSiguiente;
+            nodoSiguiente.LigaAnterior = nodoAnterior;
+            nodoActual = null;
 
             return $"¡Se ha eliminado el dato: {datoX}!";
         }
@@ -535,10 +539,10 @@ namespace InterRedBE.UTILS.Services
                 return "La lista esta vacia";
             }
 
-            Nodo<T>? nodoActual = PrimerNodo;
+            NodoDobleLiga<T>? nodoActual = PrimerNodo;
             while (nodoActual != null && !nodoActual.Dato.Equals(dato))
             {
-                nodoActual = nodoActual.LigaSiguiente;
+                nodoActual = (NodoDobleLiga<T>)nodoActual.LigaSiguiente;
             }
 
             if (nodoActual == null)
@@ -559,13 +563,13 @@ namespace InterRedBE.UTILS.Services
                 return "La lista esta vacia";
             }
 
-            Nodo<T>? nodoActual = PrimerNodo;
-            Nodo<T>? nodoSiguiente = null;
+            NodoDobleLiga<T>? nodoActual = PrimerNodo;
+            NodoDobleLiga<T>? nodoSiguiente = null;
             T datoTemporal;
 
             while (nodoActual != null)
             {
-                nodoSiguiente = nodoActual.LigaSiguiente;
+                nodoSiguiente = (NodoDobleLiga<T>)nodoActual.LigaSiguiente;
                 while (nodoSiguiente != null)
                 {
                     if (Comparer.Default.Compare(nodoActual.Dato, nodoSiguiente.Dato) > 0)
@@ -574,23 +578,22 @@ namespace InterRedBE.UTILS.Services
                         nodoActual.Dato = nodoSiguiente.Dato;
                         nodoSiguiente.Dato = datoTemporal;
                     }
-                    nodoSiguiente = nodoSiguiente.LigaSiguiente;
+                    nodoSiguiente = (NodoDobleLiga<T>)nodoSiguiente.LigaSiguiente;
                 }
-                nodoActual = nodoActual.LigaSiguiente;
+                nodoActual = (NodoDobleLiga<T>)nodoActual.LigaSiguiente;
             }
 
             return "¡La lista ha sido ordenada de forma ascendente!";
         }
 
-
         // Metodo para recorrar la lista con IEnumerator
         public IEnumerator<T> GetEnumerator()
         {
-            Nodo<T>? nodoActual = PrimerNodo;
+            NodoDobleLiga<T>? nodoActual = PrimerNodo;
             while (nodoActual != null)
             {
                 yield return nodoActual.Dato;
-                nodoActual = nodoActual.LigaSiguiente;
+                nodoActual = (NodoDobleLiga<T>)nodoActual.LigaSiguiente;
             }
         }
 
@@ -599,17 +602,4 @@ namespace InterRedBE.UTILS.Services
             return GetEnumerator();
         }
     }
-
-
-
-   
-
-
-
-
-
-
 }
-
-
-
