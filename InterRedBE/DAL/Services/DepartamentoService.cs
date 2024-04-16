@@ -8,11 +8,11 @@ namespace InterRedBE.DAL.Services
 {
     public class DepartamentoService : IDepartamentoDAO
     {
-        public readonly InterRedContext context;
+        public readonly InterRedContext _context;
 
         public DepartamentoService(InterRedContext context)
         {
-            this.context = context;
+            _context = context;
         }
 
         public Task<OperationResponse<Departamento>> CreateOne(Departamento obj)
@@ -27,19 +27,19 @@ namespace InterRedBE.DAL.Services
 
         public OperationResponse<ListaEnlazadaDoble<Departamento>> GetAll()
         {
-            var listadepartamento = new ListaEnlazadaDoble<Departamento>();
-            var departamentos = this.context.Departamento.ToList();
+            var listaDepartamentos = new ListaEnlazadaDoble<Departamento>();
+            var departamentos = _context.Departamento.ToList();
 
             if (departamentos.Count == 0)
             {
-                return new OperationResponse<ListaEnlazadaDoble<Departamento>>(0, "No se encontraron los Departamentos", null);
+                return new OperationResponse<ListaEnlazadaDoble<Departamento>>(0, "No se encontraron los Departamentos",null);
             }
             foreach (var departamento in departamentos)
             {
-                listadepartamento.InsertarAlFinal(departamento);
+                listaDepartamentos.InsertarAlFinal(departamento);
             }
 
-            return new OperationResponse<ListaEnlazadaDoble<Departamento>>(1, "Departamentos Encontrados Correctamente", listadepartamento);
+            return new OperationResponse<ListaEnlazadaDoble<Departamento>>(1, "Departamentos Encontrados Correctamente", listaDepartamentos);
         }
 
         public Task<OperationResponse<Departamento>> UpdateOne(Departamento obj)

@@ -27,7 +27,15 @@ namespace InterRedBE.BAL.Services
 
         public OperationResponse<ListaEnlazadaDoble<Departamento>> GetAll()
         {
-            return _departamentoDAO.GetAll();
+            try
+            {
+                return _departamentoDAO.GetAll();
+            }
+            catch (Exception ex)
+            {
+                return new OperationResponse<ListaEnlazadaDoble< Departamento >> (0, ex.Message, null);
+            }
+            
         }
 
         public Task<OperationResponse<Departamento>> UpdateOne(Departamento obj)
