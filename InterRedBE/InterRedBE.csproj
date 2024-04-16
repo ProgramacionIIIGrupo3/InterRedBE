@@ -23,7 +23,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Folder Include="BAL\Services\" />
+    <Folder Include="Controllers\Admin\" />
     <Folder Include="Controllers\User\" />
+    <Folder Include="DAL\Services\" />
   </ItemGroup>
 
 </Project>
