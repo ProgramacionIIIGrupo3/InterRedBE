@@ -1,14 +1,20 @@
+using InterRedBE.BAL.Bao;
+using InterRedBE.BAL.Services;
 using InterRedBE.DAL.Context;
+using InterRedBE.DAL.Dao;
+using InterRedBE.DAL.Services;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
 //DAO DI
 builder.Services.AddHttpContextAccessor();
+builder.Services.AddScoped<IDepartamentoDAO, DepartamentoService>();
 
 
 
 ////BAO DI
+builder.Services.AddScoped<IDepartamentoBAO, DepartamentoBAOService>();
 
 
 // Add services to the container.
