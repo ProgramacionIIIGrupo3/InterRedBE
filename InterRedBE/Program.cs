@@ -1,8 +1,8 @@
 using InterRedBE.BAL.Bao;
-//using InterRedBE.BAL.Services;
+using InterRedBE.BAL.Services;
 using InterRedBE.DAL.Context;
 using InterRedBE.DAL.Dao;
-//using InterRedBE.DAL.Services;
+using InterRedBE.DAL.Services;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 
@@ -10,12 +10,13 @@ var builder = WebApplication.CreateBuilder(args);
 
 //DAO DI
 builder.Services.AddHttpContextAccessor();
-//builder.Services.AddScoped<IUsuarioDAO, UsuarioService>();
+builder.Services.AddScoped<IMunicipioDAO, MunicipioService>();
 
 
 
 ////BAO DI
 //builder.Services.AddScoped<IUsuarioBAO, UsuarioBAOService>();
+builder.Services.AddScoped<IMunicipioBAO, MunicipioBAOService>();
 
 
 // Add services to the container.

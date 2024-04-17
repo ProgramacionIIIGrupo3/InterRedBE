@@ -7,7 +7,7 @@ using InterRedBE.UTILS.Services;
 
 namespace InterRedBE.DAL.Services
 {
-    public class MunicipioService : IMunicipioBAO
+    public class MunicipioService : IMunicipioDAO
     {
         public readonly InterRedContext _context;
 
