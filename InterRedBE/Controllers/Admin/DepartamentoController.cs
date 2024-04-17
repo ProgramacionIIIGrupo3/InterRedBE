@@ -1,4 +1,5 @@
 ﻿using InterRedBE.BAL.Bao;
+using InterRedBE.DAL.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -33,6 +34,37 @@ namespace InterRedBE.Controllers.Admin
         {
             return Ok(_departamentoBAO.GetOneInt(id));
         }
-         
+
+        [HttpPost]
+        public async Task<IActionResult> CreateOne([FromBody] Departamento departamento)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            try
+            {
+                var result = await _departamentoBAO.CreateOne(departamento);
+
+                
+                if (result.Data != null)
+                {
+                    
+                    return CreatedAtAction(nameof(GetOne), new { id = result.Data.Id }, result.Data);
+                }
+                else
+                {
+                    
+                    return BadRequest(result.Message);
+                }
+            }
+            catch (Exception ex)
+            {
+               
+                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+            }
+        }
+
     }
 }

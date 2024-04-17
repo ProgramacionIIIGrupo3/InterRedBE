@@ -15,9 +15,18 @@ namespace InterRedBE.DAL.Services
             _context = context;
         }
 
-        public Task<OperationResponse<Departamento>> CreateOne(Departamento obj)
+        public async Task<OperationResponse<Departamento>> CreateOne(Departamento obj)
         {
-            throw new NotImplementedException();
+            try
+            {
+                _context.Departamento.Add(obj);
+                await _context.SaveChangesAsync();
+                return new OperationResponse<Departamento>(1, "Departamento creado exitosamente", obj);
+            }
+            catch (Exception ex)
+            {
+                return new OperationResponse<Departamento>(0, ex.Message, null);
+            }
         }
 
         public Task<OperationResponse<int>> DeleteOne(int id)

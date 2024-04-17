@@ -15,10 +15,11 @@ namespace InterRedBE.BAL.Services
             _departamentoDAO = departamentoDAO;
         }
 
-        public Task<OperationResponse<Departamento>> CreateOne(Departamento obj)
+        public async Task<OperationResponse<Departamento>> CreateOne(Departamento obj)
         {
-            throw new NotImplementedException();
+            return await _departamentoDAO.CreateOne(obj);
         }
+
 
         public Task<OperationResponse<int>> DeleteOne(int id)
         {
