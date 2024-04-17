@@ -29,6 +29,7 @@ namespace InterRedBE.DAL.Services
         {
             var listaDepartamentos = new ListaEnlazadaDoble<Departamento>();
             var departamentos = _context.Departamento.ToList();
+                
 
             if (departamentos.Count == 0)
             {
@@ -40,6 +41,19 @@ namespace InterRedBE.DAL.Services
             }
 
             return new OperationResponse<ListaEnlazadaDoble<Departamento>>(1, "Departamentos Encontrados Correctamente", listaDepartamentos);
+        }
+
+        public async Task<OperationResponse<Departamento>> GetOne(int id)
+        {
+            var departamentos = _context.Departamento.FirstOrDefault(ts=>ts.Id==id);
+            if (departamentos != null )
+            {
+                return new OperationResponse<Departamento>(1, "Departamento Encontrado Correctamente",departamentos);
+            }
+            else
+            {
+                return  new OperationResponse<Departamento>(0, "Departamento no encontrado",null);
+            }
         }
 
         public Task<OperationResponse<Departamento>> UpdateOne(Departamento obj)

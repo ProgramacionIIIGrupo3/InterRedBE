@@ -20,7 +20,7 @@ namespace InterRedBE.Controllers.Admin
         {
             try
             {
-                return Ok(_departamentoBAO.GetAll);
+                return Ok(_departamentoBAO.GetAll());
             }
             catch (SystemException ex)
             {
@@ -28,5 +28,11 @@ namespace InterRedBE.Controllers.Admin
             }
             
         }
+        [HttpGet("{id}")]
+        public IActionResult GetOne (int id)
+        {
+            return Ok(_departamentoBAO.GetOneInt(id));
+        }
+         
     }
 }

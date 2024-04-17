@@ -38,6 +38,18 @@ namespace InterRedBE.BAL.Services
             
         }
 
+        public async Task <OperationResponse<Departamento>> GetOneInt(int id)
+        {
+            try
+            {
+                return await _departamentoDAO.GetOne( id);
+            }
+            catch (Exception ex)
+            {
+                return  new OperationResponse<Departamento>(0, ex.Message, null);
+            }
+        }
+
         public Task<OperationResponse<Departamento>> UpdateOne(Departamento obj)
         {
             throw new NotImplementedException();
