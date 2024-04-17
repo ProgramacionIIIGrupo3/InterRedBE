@@ -1,5 +1,6 @@
 ﻿using InterRedBE.BAL.Bao;
 using InterRedBE.DAL.Dao;
+using InterRedBE.DAL.DTO;
 using InterRedBE.DAL.Models;
 using InterRedBE.UTILS;
 using InterRedBE.UTILS.Services;
@@ -55,5 +56,6 @@ namespace InterRedBE.BAL.Services
         {
             throw new NotImplementedException();
         }
+
     }
 }

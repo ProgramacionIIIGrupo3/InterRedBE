@@ -1,8 +1,10 @@
 ﻿using InterRedBE.DAL.Context;
 using InterRedBE.DAL.Dao;
+using InterRedBE.DAL.DTO;
 using InterRedBE.DAL.Models;
 using InterRedBE.UTILS;
 using InterRedBE.UTILS.Services;
+using Microsoft.Data.SqlClient;
 
 namespace InterRedBE.DAL.Services
 {
@@ -25,6 +27,26 @@ namespace InterRedBE.DAL.Services
             }
             catch (Exception ex)
             {
+                // Registrar la excepción interna
+                var innerException = ex.InnerException;
+                while (innerException != null)
+                {
+                    Console.WriteLine($"Inner Exception Message: {innerException.Message}");
+                    Console.WriteLine($"Inner Exception Type: {innerException.GetType().FullName}");
+                    Console.WriteLine($"Inner Exception Stack Trace: {innerException.StackTrace}");
+
+                    // Verificar si la excepción interna es una excepción de SQL
+                    if (innerException is SqlException sqlException)
+                    {
+                        Console.WriteLine($"SQL Exception Number: {sqlException.Number}");
+                        Console.WriteLine($"SQL Exception Message: {sqlException.Message}");
+                        Console.WriteLine($"SQL Exception Line Number: {sqlException.LineNumber}");
+                        Console.WriteLine($"SQL Exception Procedure: {sqlException.Procedure}");
+                    }
+
+                    innerException = innerException.InnerException;
+                }
+
                 return new OperationResponse<Departamento>(0, ex.Message, null);
             }
         }
@@ -69,5 +91,7 @@ namespace InterRedBE.DAL.Services
         {
             throw new NotImplementedException();
         }
+
+
     }
 }
