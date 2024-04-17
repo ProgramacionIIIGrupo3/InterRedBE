@@ -22,9 +22,16 @@ namespace InterRedBE.BAL.Services
         }
 
 
-        public Task<OperationResponse<int>> DeleteOne(int id)
+        public async Task<OperationResponse<int>> DeleteOne(int id)
         {
-            throw new NotImplementedException();
+            try
+            {
+                return await _departamentoDAO.DeleteOne(id);
+            }
+            catch (Exception ex)
+            {
+                return new OperationResponse<int>(0, ex.Message, 0);
+            }
         }
 
         public OperationResponse<ListaEnlazadaDoble<Departamento>> GetAll()
@@ -52,9 +59,16 @@ namespace InterRedBE.BAL.Services
             }
         }
 
-        public Task<OperationResponse<Departamento>> UpdateOne(Departamento obj)
+        public async Task<OperationResponse<Departamento>> UpdateOne(Departamento obj)
         {
-            throw new NotImplementedException();
+            try
+            {
+                return await _departamentoDAO.UpdateOne(obj);
+            }
+            catch (Exception ex)
+            {
+                return new OperationResponse<Departamento>(0, ex.Message, null);
+            }
         }
 
     }

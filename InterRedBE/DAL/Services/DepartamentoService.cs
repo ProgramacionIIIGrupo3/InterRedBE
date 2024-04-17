@@ -51,10 +51,29 @@ namespace InterRedBE.DAL.Services
             }
         }
 
-        public Task<OperationResponse<int>> DeleteOne(int id)
+        public async Task<OperationResponse<int>> DeleteOne(int id)
         {
-            throw new NotImplementedException();
+            try
+            {
+                var departamento = await _context.Departamento.FindAsync(id);
+
+                if (departamento == null)
+                {
+                    return new OperationResponse<int>(0, "El departamento no existe", 0);
+                }
+
+                _context.Departamento.Remove(departamento);
+                await _context.SaveChangesAsync();
+
+                return new OperationResponse<int>(1, "Departamento eliminado correctamente", id);
+            }
+            catch (Exception ex)
+            {
+                return new OperationResponse<int>(0, ex.Message, 0);
+            }
         }
+
+
 
         public OperationResponse<ListaEnlazadaDoble<Departamento>> GetAll()
         {
@@ -87,9 +106,32 @@ namespace InterRedBE.DAL.Services
             }
         }
 
-        public Task<OperationResponse<Departamento>> UpdateOne(Departamento obj)
+        public async Task<OperationResponse<Departamento>> UpdateOne(Departamento obj)
         {
-            throw new NotImplementedException();
+            try
+            {
+                var departamentoExistente = _context.Departamento.FirstOrDefault(d => d.Id == obj.Id);
+
+                if (departamentoExistente == null)
+                {
+                    return new OperationResponse<Departamento>(0, "El departamento no existe", null);
+                }
+
+                departamentoExistente.Nombre = obj.Nombre;
+                departamentoExistente.Descripcion = obj.Descripcion;
+                departamentoExistente.Imagen = obj.Imagen;
+                departamentoExistente.Poblacion = obj.Poblacion;
+                departamentoExistente.IdCabecera = obj.IdCabecera;
+
+                _context.Departamento.Update(departamentoExistente);
+                await _context.SaveChangesAsync();
+
+                return new OperationResponse<Departamento>(1, "Departamento actualizado exitosamente", departamentoExistente);
+            }
+            catch (Exception ex)
+            {
+                return new OperationResponse<Departamento>(0, ex.Message, null);
+            }
         }
 
 
