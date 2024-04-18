@@ -6,7 +6,7 @@
         public string Nombre { get; set; }
         public string Descripcion { get; set; }
         public string? Imagen { get; set; }
-        public int IdMunicipio { get; set; }
-        public int IdDepartamento { get; set; }
+        public int? IdMunicipio { get; set; }
+        public int? IdDepartamento { get; set; }
     }
 }

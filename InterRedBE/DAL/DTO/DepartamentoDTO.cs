@@ -7,6 +7,6 @@
         public string Descripcion { get; set; }
         public string? Imagen { get; set; }
         public int Poblacion { get; set; }
-        public int IdCabecera { get; set; }
+        public int? IdCabecera { get; set; }
     }
 }
