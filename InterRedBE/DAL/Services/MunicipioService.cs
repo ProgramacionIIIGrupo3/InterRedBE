@@ -48,24 +48,26 @@ namespace InterRedBE.DAL.Services
         {
             try
             {
-                // Buscar el municipio en la base de datos por su ID.
-                var municipio = await _context.Municipio.FindAsync(id);
-                if (municipio == null)
+                
+                var municipioAEliminar = _context.Municipio.FirstOrDefault(m => m.Id == id);
+
+                if (municipioAEliminar == null)
                 {
-                    // Si el municipio no se encuentra, se devuelve una respuesta con un mensaje de error.
-                    return new OperationResponse<int>(0, "Municipio no encontrado.", 0);
+
+                    return new OperationResponse<int>(0, "No se encontro el municipio");
                 }
 
-                // Eliminar el municipio del contexto y guardar los cambios en la base de datos.
-                _context.Municipio.Remove(municipio);
+               
+                 _context.Municipio.Remove(municipioAEliminar);
                 await _context.SaveChangesAsync();
-                // Devolver una respuesta exitosa con el ID del municipio eliminado.
-                return new OperationResponse<int>(1, "Municipio eliminado con éxito.", id);
+
+                
+                return new OperationResponse<int>(1, "Municipio eliminado exitosamente.", municipioAEliminar.Id);
             }
             catch (Exception ex)
             {
-                // Si ocurre un error durante la eliminación, se devuelve una respuesta con el mensaje de error.
-                return new OperationResponse<int>(0, ex.Message, 0);
+                
+                return new OperationResponse<int>(0, ex.Message);
             }
         }
 
@@ -98,7 +100,7 @@ namespace InterRedBE.DAL.Services
         {
             try
             {
-                var municipioActualizar = _context.Municipio.FirstOrDefault(d=>d.Id==obj.Id);
+                var municipioActualizar =  _context.Municipio.FirstOrDefault(d=>d.Id==obj.Id);
                 if(municipioActualizar == null)
                 {
                    return new OperationResponse<Municipio>(0, "No se encontro", null);
@@ -109,7 +111,7 @@ namespace InterRedBE.DAL.Services
                 municipioActualizar.Poblacion=obj.Poblacion;
                 municipioActualizar.IdDepartamento = obj.IdDepartamento;
 
-                _context.Municipio.Update(municipioActualizar);
+                 _context.Municipio.Update(municipioActualizar);
                 await _context.SaveChangesAsync();
                 return new OperationResponse<Municipio>(1, "Si se actualizo", municipioActualizar);
 
