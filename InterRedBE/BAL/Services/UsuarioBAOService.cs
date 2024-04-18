@@ -69,6 +69,9 @@ namespace InterRedBE.BAL.Services
             }
         }
 
-     
+        Task<OperationResponse<Usuario>> ICatalogoBAO<Usuario>.GetOneInt(int id)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

@@ -53,9 +53,16 @@ namespace InterRedBE.BAL.Services
 
         }
 
-        public OperationResponse<Municipio> GetOneInt(int id)
+        public async Task<OperationResponse<Municipio>> GetOneInt(int id)
         {
-            throw new NotImplementedException();
+            try
+            {
+                return await _municipioDAO.GetOne(id);
+            }
+            catch (Exception ex)
+            {
+                return new OperationResponse<Municipio>(0, ex.Message, null);
+            }
         }
 
         public async Task<OperationResponse<Municipio>> UpdateOne(Municipio obj)
@@ -70,6 +77,6 @@ namespace InterRedBE.BAL.Services
             }
         }
 
-
+       
     }
 }

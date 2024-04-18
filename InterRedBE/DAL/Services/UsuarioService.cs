@@ -91,6 +91,11 @@ namespace InterRedBE.DAL.Services
             }
         }
 
+        public Task<OperationResponse<Usuario>> GetOne(int id)
+        {
+            throw new NotImplementedException();
+        }
+
         // Método asíncrono para actualizar un usuario existente.
         public async Task<OperationResponse<Usuario>> UpdateOne(Usuario obj)
         {

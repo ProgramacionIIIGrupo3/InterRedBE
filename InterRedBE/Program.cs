@@ -11,11 +11,11 @@ var builder = WebApplication.CreateBuilder(args);
 //DAO DI
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddScoped<IMunicipioDAO, MunicipioService>();
-
+builder.Services.AddScoped<IUsuarioDAO, UsuarioService>();
 
 
 ////BAO DI
-//builder.Services.AddScoped<IUsuarioBAO, UsuarioBAOService>();
+builder.Services.AddScoped<IUsuarioBAO, UsuarioBAOService>();
 builder.Services.AddScoped<IMunicipioBAO, MunicipioBAOService>();
 
 

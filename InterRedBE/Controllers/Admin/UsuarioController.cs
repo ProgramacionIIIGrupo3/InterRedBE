@@ -42,6 +42,7 @@ namespace InterRedBE.Controllers.Admin
         //    }
         //}
 
+        [HttpDelete("{id}")]
         public IActionResult DeleteOne(int id)
         {
             try
@@ -54,17 +55,18 @@ namespace InterRedBE.Controllers.Admin
             }
         }
 
-        //public IActionResult UpdateOne( Usuario)
-        //{
-        //    try
-        //    {
-        //        return Ok(_usuarioBAO.UpdateOne());
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
-        //    }
-        //}
+        [HttpPut("{id}")]
+        public IActionResult UpdateOne(int id, [FromBody] Usuario usuario)
+        {
+            try
+            {
+                return Ok(_usuarioBAO.UpdateOne(usuario));
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+            }
+        }
 
 
     }

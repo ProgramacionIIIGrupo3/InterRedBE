@@ -10,7 +10,7 @@ namespace InterRedBE.BAL.Bao
         Task<OperationResponse<T>> UpdateOne(T obj);
         Task<OperationResponse<int>> DeleteOne(int id);
         OperationResponse<ListaEnlazadaDoble<T>> GetAll();
-        OperationResponse<T> GetOneInt(int id);
+        Task<OperationResponse<T>> GetOneInt(int id);
         //OperationResponse<T> GetOne(string id);
         //OperationResponse<ListaEnlazadaDoble<T>> GetFiltered(string id);
 

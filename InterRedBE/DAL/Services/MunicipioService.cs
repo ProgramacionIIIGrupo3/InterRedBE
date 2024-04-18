@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
+using Microsoft.Extensions.Logging.Abstractions;
 
 namespace InterRedBE.DAL.Services
 {
@@ -26,29 +27,20 @@ namespace InterRedBE.DAL.Services
         // Método asíncrono para crear un nuevo municipio en la base de datos.
         public async Task<OperationResponse<Municipio>> CreateOne(Municipio obj)
         {
-           throw new NotImplementedException();
-            //// Convertir el nombre del departamento a su ID correspondiente antes de guardar el municipio.
-            //var departamento = await _context.Departamento.FirstOrDefaultAsync(d => d.Nombre == obj.NombreDepartamento);
-            //if (departamento == null)
-            //{
-            //    // Si no se encuentra el departamento, se devuelve una respuesta con un mensaje de error.
-            //    return new OperationResponse<Municipio>(0, "Departamento no encontrado.", null);
-            //}
-            //obj.IdDepartamento = departamento.Id;
+            try
+            {
+                _context.Municipio.Add(obj);
+                await _context.SaveChangesAsync();
+                return new OperationResponse<Municipio>(1, "Felicidades Municipio encontrado", obj);
 
-            //try
-            //{
-            //    // Agregar el municipio al contexto y guardar los cambios en la base de datos.
-            //    _context.Municipio.Add(obj);
-            //    await _context.SaveChangesAsync();
-            //    // Devolver una respuesta exitosa con el municipio creado.
-            //    return new OperationResponse<Municipio>(1, "Municipio creado con éxito.", obj);
-            //}
-            //catch (Exception ex)
-            //{
-            //    // Si ocurre un error durante el guardado, se devuelve una respuesta con el mensaje de error.
-            //    return new OperationResponse<Municipio>(0, ex.Message, null);
-            //}
+            }
+            catch (Exception ex)
+            {
+                return new OperationResponse<Municipio>(0, ex.Message, null);
+            }
+           
+
+
         }
 
         // Método asíncrono para eliminar un municipio existente por su ID.
@@ -104,53 +96,34 @@ namespace InterRedBE.DAL.Services
         // Método asíncrono para actualizar un municipio existente en la base de datos.
         public async Task<OperationResponse<Municipio>> UpdateOne(Municipio obj)
         {
-            throw new NotImplementedException();
-            //// Convertir el nombre del departamento a su ID correspondiente antes de actualizar el municipio.
-            //var departamento = await _context.Departamento.FirstOrDefaultAsync(d => d.Nombre == obj.NombreDepartamento);
-            //if (departamento == null)
-            //{
-            //    // Si no se encuentra el departamento, se devuelve una respuesta con un mensaje de error.
-            //    return new OperationResponse<Municipio>(0, "Departamento no encontrado.", null);
-            //}
-            //obj.IdDepartamento = departamento.Id;
+            try
+            {
+                var municipioActualizar = _context.Municipio.FirstOrDefault(d=>d.Id==obj.Id);
+                if(municipioActualizar == null)
+                {
+                   return new OperationResponse<Municipio>(0, "No se encontro", null);
 
-            //try
-            //{
-            //    // Buscar el municipio existente en la base de datos por su ID.
-            //    var municipioExistente = await _context.Municipio.FindAsync(obj.Id);
-            //    if (municipioExistente == null)
-            //    {
-            //        // Si el municipio no se encuentra, se devuelve una respuesta con un mensaje de error.
-            //        return new OperationResponse<Municipio>(0, "Municipio no encontrado.", null);
-            //    }
+                }
+                municipioActualizar.Nombre = obj.Nombre;
+                municipioActualizar.Descripcion = obj.Descripcion;
+                municipioActualizar.Poblacion=obj.Poblacion;
+                municipioActualizar.IdDepartamento = obj.IdDepartamento;
 
-            //    // Actualizar los datos del municipio en el contexto y guardar los cambios en la base de datos.
-            //    _context.Entry(municipioExistente).CurrentValues.SetValues(obj);
-            //    await _context.SaveChangesAsync();
-            //    // Devolver una respuesta exitosa con el municipio actualizado.
-            //    return new OperationResponse<Municipio>(1, "Municipio actualizado con éxito.", obj);
-            //}
-            //catch (DbUpdateConcurrencyException ex)
-            //{
-            //    // Si ocurre un error de concurrencia durante la actualización, se devuelve una respuesta con el mensaje de error.
-            //    if (!_context.Municipio.Any(e => e.Id == obj.Id))
-            //    {
-            //        return new OperationResponse<Municipio>(0, "Municipio no encontrado.", null);
-            //    }
-            //    else
-            //    {
-            //        throw;
-            //    }
-            //}
-            //catch (Exception ex)
-            //{
-            //    // Si ocurre un error durante la actualización, se devuelve una respuesta con el mensaje de error.
-            //    return new OperationResponse<Municipio>(0, ex.Message, null);
-            //}
+                _context.Municipio.Update(municipioActualizar);
+                await _context.SaveChangesAsync();
+                return new OperationResponse<Municipio>(1, "Si se actualizo", municipioActualizar);
+
+
+            }
+            catch (Exception ex)
+            {
+                return new OperationResponse<Municipio>(0, ex.Message, null);
+            }
+
         }
 
         // Método asíncrono para obtener un municipio por su ID.
-        public async Task<OperationResponse<Municipio>> GetOneById(int id)
+        public async Task<OperationResponse<Municipio>> GetOne(int id)
         {
             try
             {
