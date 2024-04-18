@@ -10,12 +10,19 @@ var builder = WebApplication.CreateBuilder(args);
 
 //DAO DI
 builder.Services.AddHttpContextAccessor();
+builder.Services.AddScoped<IDepartamentoDAO, DepartamentoService>();
+builder.Services.AddScoped<ILugarTuristicoDAO, LugarTuristicoService>();
 builder.Services.AddScoped<IUsuarioDAO, UsuarioService>();
 
 
 
+
 ////BAO DI
+builder.Services.AddScoped<IDepartamentoBAO, DepartamentoBAOService>();
+builder.Services.AddScoped<ILugarTuristicoBAO, LugarTuristicoBAOService>();
+
 builder.Services.AddScoped<IUsuarioBAO, UsuarioBAOService>();
+
 
 
 // Add services to the container.
