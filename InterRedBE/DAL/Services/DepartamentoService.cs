@@ -8,132 +8,161 @@ using Microsoft.Data.SqlClient;
 
 namespace InterRedBE.DAL.Services
 {
+    
     public class DepartamentoService : IDepartamentoDAO
     {
+        // Contexto de la base de datos
         public readonly InterRedContext _context;
 
+        // Constructor que recibe el contexto de la base de datos
         public DepartamentoService(InterRedContext context)
         {
             _context = context;
         }
 
+        // Método para crear un nuevo departamento 
         public async Task<OperationResponse<Departamento>> CreateOne(Departamento obj)
         {
             try
             {
+                // Agregar el nuevo departamento al contexto y guardar los cambios en la base de datos
                 _context.Departamento.Add(obj);
                 await _context.SaveChangesAsync();
+                // Devolver una respuesta exitosa con el departamento creado
                 return new OperationResponse<Departamento>(1, "Departamento creado exitosamente", obj);
             }
             catch (Exception ex)
             {
-                // Registrar la excepción interna
-                var innerException = ex.InnerException;
-                while (innerException != null)
-                {
-                    Console.WriteLine($"Inner Exception Message: {innerException.Message}");
-                    Console.WriteLine($"Inner Exception Type: {innerException.GetType().FullName}");
-                    Console.WriteLine($"Inner Exception Stack Trace: {innerException.StackTrace}");
-
-                    // Verificar si la excepción interna es una excepción de SQL
-                    if (innerException is SqlException sqlException)
-                    {
-                        Console.WriteLine($"SQL Exception Number: {sqlException.Number}");
-                        Console.WriteLine($"SQL Exception Message: {sqlException.Message}");
-                        Console.WriteLine($"SQL Exception Line Number: {sqlException.LineNumber}");
-                        Console.WriteLine($"SQL Exception Procedure: {sqlException.Procedure}");
-                    }
-
-                    innerException = innerException.InnerException;
-                }
-
+                // Manejar cualquier excepción que ocurra durante la creación y devolver una respuesta de error
                 return new OperationResponse<Departamento>(0, ex.Message, null);
             }
         }
 
+        // Método para eliminar un departamento 
         public async Task<OperationResponse<int>> DeleteOne(int id)
         {
             try
             {
+                // Buscar el departamento por su ID
                 var departamento = await _context.Departamento.FindAsync(id);
 
+                // Verificar si el departamento existe
                 if (departamento == null)
                 {
+                    // Si no existe, devolver un mensaje de error
                     return new OperationResponse<int>(0, "El departamento no existe", 0);
                 }
 
+                // Eliminar el departamento del contexto y guardar los cambios en la base de datos
                 _context.Departamento.Remove(departamento);
                 await _context.SaveChangesAsync();
 
+                // Devolver una respuesta exitosa con el ID del departamento eliminado
                 return new OperationResponse<int>(1, "Departamento eliminado correctamente", id);
             }
             catch (Exception ex)
             {
+                // Manejar cualquier excepción que ocurra durante la eliminación y devolver una respuesta de error
                 return new OperationResponse<int>(0, ex.Message, 0);
             }
         }
 
-
-
+        // Método para obtener todos los departamentos 
         public OperationResponse<ListaEnlazadaDoble<Departamento>> GetAll()
         {
-            var listaDepartamentos = new ListaEnlazadaDoble<Departamento>();
-            var departamentos = _context.Departamento.ToList();
-                
-
-            if (departamentos.Count == 0)
+            try
             {
-                return new OperationResponse<ListaEnlazadaDoble<Departamento>>(0, "No se encontraron los Departamentos",null);
-            }
-            foreach (var departamento in departamentos)
-            {
-                listaDepartamentos.InsertarAlFinal(departamento);
-            }
+                // Obtener todos los departamentos de la base de datos
+                var departamentos = _context.Departamento.ToList();
 
-            return new OperationResponse<ListaEnlazadaDoble<Departamento>>(1, "Departamentos Encontrados Correctamente", listaDepartamentos);
+                // Verificar si se encontraron departamentos
+                if (departamentos.Count == 0)
+                {
+                    // Si no se encontraron, devolver un mensaje de error
+                    return new OperationResponse<ListaEnlazadaDoble<Departamento>>(0, "No se encontraron los Departamentos", null);
+                }
+
+                // Crear una lista enlazada doble para almacenar los departamentos
+                var listaDepartamentos = new ListaEnlazadaDoble<Departamento>();
+
+                // Insertar cada departamento en la lista enlazada
+                foreach (var departamento in departamentos)
+                {
+                    listaDepartamentos.InsertarAlFinal(departamento);
+                }
+
+                // Devolver una respuesta exitosa con la lista de departamentos encontrados
+                return new OperationResponse<ListaEnlazadaDoble<Departamento>>(1, "Departamentos Encontrados Correctamente", listaDepartamentos);
+            }
+            catch (Exception ex)
+            {
+                // Manejar cualquier excepción que ocurra durante la obtención de los departamentos y devolver una respuesta de error
+                return new OperationResponse<ListaEnlazadaDoble<Departamento>>(0, ex.Message, null);
+            }
         }
 
+        // Método para obtener un departamento 
         public async Task<OperationResponse<Departamento>> GetOne(int id)
         {
-            var departamentos = _context.Departamento.FirstOrDefault(ts=>ts.Id==id);
-            if (departamentos != null )
+            try
             {
-                return new OperationResponse<Departamento>(1, "Departamento Encontrado Correctamente",departamentos);
+                // Buscar el departamento por su ID
+                var departamento = _context.Departamento.FirstOrDefault(ts => ts.Id == id);
+
+                // Verificar si se encontró el departamento
+                if (departamento != null)
+                {
+                    // Si se encontró, devolver una respuesta exitosa con el departamento encontrado
+                    return new OperationResponse<Departamento>(1, "Departamento Encontrado Correctamente", departamento);
+                }
+                else
+                {
+                    // Si no se encontró, devolver un mensaje de error
+                    return new OperationResponse<Departamento>(0, "Departamento no encontrado", null);
+                }
             }
-            else
+            catch (Exception ex)
             {
-                return  new OperationResponse<Departamento>(0, "Departamento no encontrado",null);
+                // Manejar cualquier excepción que ocurra durante la obtención del departamento y devolver una respuesta de error
+                return new OperationResponse<Departamento>(0, ex.Message, null);
             }
         }
 
+        // Método para actualizar un departamento 
         public async Task<OperationResponse<Departamento>> UpdateOne(Departamento obj)
         {
             try
             {
+                // Buscar el departamento existente por su ID
                 var departamentoExistente = _context.Departamento.FirstOrDefault(d => d.Id == obj.Id);
 
+                // Verificar si el departamento existe
                 if (departamentoExistente == null)
                 {
+                    // Si no existe, devolver un mensaje de error
                     return new OperationResponse<Departamento>(0, "El departamento no existe", null);
                 }
 
+                // Actualizar los datos del departamento existente con los datos del objeto proporcionado
                 departamentoExistente.Nombre = obj.Nombre;
                 departamentoExistente.Descripcion = obj.Descripcion;
                 departamentoExistente.Imagen = obj.Imagen;
                 departamentoExistente.Poblacion = obj.Poblacion;
                 departamentoExistente.IdCabecera = obj.IdCabecera;
 
+                // Actualizar el departamento en el contexto y guardar los cambios en la base de datos
                 _context.Departamento.Update(departamentoExistente);
                 await _context.SaveChangesAsync();
 
+                // Devolver una respuesta exitosa con el departamento actualizado
                 return new OperationResponse<Departamento>(1, "Departamento actualizado exitosamente", departamentoExistente);
             }
             catch (Exception ex)
             {
+                // Manejar cualquier excepción que ocurra durante la actualización y devolver una respuesta de error
                 return new OperationResponse<Departamento>(0, ex.Message, null);
             }
         }
-
-
     }
 }
+

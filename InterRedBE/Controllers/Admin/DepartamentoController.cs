@@ -10,6 +10,7 @@ namespace InterRedBE.Controllers.Admin
     [ApiController]
     public class DepartamentoController : ControllerBase
     {
+        // Inyección de dependencia para el acceso a operaciones de departamento
         public readonly IDepartamentoBAO _departamentoBAO;
 
         public DepartamentoController(IDepartamentoBAO departamentoBAO)
@@ -17,6 +18,7 @@ namespace InterRedBE.Controllers.Admin
             _departamentoBAO = departamentoBAO;
         }
 
+        // Método para obtener todos los departamentos
         [HttpGet]
         public IActionResult GetAll()
         {
@@ -30,13 +32,13 @@ namespace InterRedBE.Controllers.Admin
             }
         }
 
+        // Método para obtener un departamento específico por ID
         [HttpGet("{id}")]
         public async Task<IActionResult> GetOneInt(int id)
         {
             try
             {
                 var result = await _departamentoBAO.GetOneInt(id);
-
                 if (result.Data != null)
                 {
                     return Ok(result.Data);
@@ -52,6 +54,7 @@ namespace InterRedBE.Controllers.Admin
             }
         }
 
+        // Método para crear un nuevo departamento
         [HttpPost]
         public async Task<IActionResult> CreateOne([FromBody] DepartamentoDTO departamentoViewModel)
         {
@@ -62,9 +65,9 @@ namespace InterRedBE.Controllers.Admin
 
             try
             {
-                // Mapear el view model a la entidad Departamento
                 var departamento = new Departamento
                 {
+                    // Asignación de propiedades desde el DTO al modelo
                     Nombre = departamentoViewModel.Nombre,
                     Descripcion = departamentoViewModel.Descripcion,
                     Imagen = departamentoViewModel.Imagen,
@@ -73,7 +76,6 @@ namespace InterRedBE.Controllers.Admin
                 };
 
                 var result = await _departamentoBAO.CreateOne(departamento);
-
                 if (result.Data != null)
                 {
                     return StatusCode(StatusCodes.Status201Created, result.Data);
@@ -88,6 +90,8 @@ namespace InterRedBE.Controllers.Admin
                 return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
             }
         }
+
+        // Método para actualizar un departamento existente
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateOne(int id, [FromBody] DepartamentoDTO departamentoDTO)
         {
@@ -98,7 +102,6 @@ namespace InterRedBE.Controllers.Admin
 
             try
             {
-                // Mapear el DTO a la entidad Departamento
                 var departamento = new Departamento
                 {
                     Id = id,
@@ -110,7 +113,6 @@ namespace InterRedBE.Controllers.Admin
                 };
 
                 var result = await _departamentoBAO.UpdateOne(departamento);
-
                 if (result.Data != null)
                 {
                     return Ok(result.Data);
@@ -125,31 +127,31 @@ namespace InterRedBE.Controllers.Admin
                 return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
             }
         }
+
+        // Método para eliminar un departamento por ID
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteOne(int id)
         {
             try
             {
                 var result = await _departamentoBAO.DeleteOne(id);
-
                 if (result.Code == 1)
                 {
-                    return Ok(result.Message); // Devolver un código 200 OK si se elimina correctamente
+                    return Ok(result.Message);
                 }
                 else if (result.Code == 0)
                 {
-                    return NotFound(result.Message); // Devolver un código 404 Not Found si el departamento no existe
+                    return NotFound(result.Message);
                 }
                 else
                 {
-                    return BadRequest(result.Message); // Devolver un código 400 Bad Request para cualquier otro caso
+                    return BadRequest(result.Message);
                 }
             }
             catch (Exception ex)
             {
-                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message); // Devolver un código 500 Internal Server Error si ocurre un error inesperado
+                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
             }
         }
-
     }
 }
