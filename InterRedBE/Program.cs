@@ -3,6 +3,7 @@ using InterRedBE.BAL.Services;
 using InterRedBE.DAL.Context;
 using InterRedBE.DAL.Dao;
 using InterRedBE.DAL.Services;
+using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -11,12 +12,17 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddScoped<IDepartamentoDAO, DepartamentoService>();
 builder.Services.AddScoped<ILugarTuristicoDAO, LugarTuristicoService>();
+builder.Services.AddScoped<IUsuarioDAO, UsuarioService>();
+
 
 
 
 ////BAO DI
 builder.Services.AddScoped<IDepartamentoBAO, DepartamentoBAOService>();
 builder.Services.AddScoped<ILugarTuristicoBAO, LugarTuristicoBAOService>();
+
+builder.Services.AddScoped<IUsuarioBAO, UsuarioBAOService>();
+
 
 
 // Add services to the container.
