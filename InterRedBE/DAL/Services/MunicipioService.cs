@@ -26,37 +26,29 @@ namespace InterRedBE.DAL.Services
         // Método asíncrono para crear un nuevo municipio en la base de datos.
         public async Task<OperationResponse<Municipio>> CreateOne(Municipio obj)
         {
-            // Validación del objeto Municipio usando DataAnnotations.
-            var validationResults = new List<ValidationResult>();
-            var validationContext = new ValidationContext(obj);
-            if (!Validator.TryValidateObject(obj, validationContext, validationResults, true))
-            {
-                // Si la validación falla, se devuelve una respuesta con los errores.
-                return new OperationResponse<Municipio>(0, "Validación fallida: " + string.Join(", ", validationResults.Select(s => s.ErrorMessage)), null);
-            }
+           throw new NotImplementedException();
+            //// Convertir el nombre del departamento a su ID correspondiente antes de guardar el municipio.
+            //var departamento = await _context.Departamento.FirstOrDefaultAsync(d => d.Nombre == obj.NombreDepartamento);
+            //if (departamento == null)
+            //{
+            //    // Si no se encuentra el departamento, se devuelve una respuesta con un mensaje de error.
+            //    return new OperationResponse<Municipio>(0, "Departamento no encontrado.", null);
+            //}
+            //obj.IdDepartamento = departamento.Id;
 
-            // Convertir el nombre del departamento a su ID correspondiente antes de guardar el municipio.
-            var departamento = await _context.Departamento.FirstOrDefaultAsync(d => d.Nombre == obj.NombreDepartamento);
-            if (departamento == null)
-            {
-                // Si no se encuentra el departamento, se devuelve una respuesta con un mensaje de error.
-                return new OperationResponse<Municipio>(0, "Departamento no encontrado.", null);
-            }
-            obj.IdDepartamento = departamento.Id;
-
-            try
-            {
-                // Agregar el municipio al contexto y guardar los cambios en la base de datos.
-                _context.Municipio.Add(obj);
-                await _context.SaveChangesAsync();
-                // Devolver una respuesta exitosa con el municipio creado.
-                return new OperationResponse<Municipio>(1, "Municipio creado con éxito.", obj);
-            }
-            catch (Exception ex)
-            {
-                // Si ocurre un error durante el guardado, se devuelve una respuesta con el mensaje de error.
-                return new OperationResponse<Municipio>(0, ex.Message, null);
-            }
+            //try
+            //{
+            //    // Agregar el municipio al contexto y guardar los cambios en la base de datos.
+            //    _context.Municipio.Add(obj);
+            //    await _context.SaveChangesAsync();
+            //    // Devolver una respuesta exitosa con el municipio creado.
+            //    return new OperationResponse<Municipio>(1, "Municipio creado con éxito.", obj);
+            //}
+            //catch (Exception ex)
+            //{
+            //    // Si ocurre un error durante el guardado, se devuelve una respuesta con el mensaje de error.
+            //    return new OperationResponse<Municipio>(0, ex.Message, null);
+            //}
         }
 
         // Método asíncrono para eliminar un municipio existente por su ID.
@@ -112,57 +104,49 @@ namespace InterRedBE.DAL.Services
         // Método asíncrono para actualizar un municipio existente en la base de datos.
         public async Task<OperationResponse<Municipio>> UpdateOne(Municipio obj)
         {
-            // Validación del objeto Municipio usando DataAnnotations.
-            var validationResults = new List<ValidationResult>();
-            var validationContext = new ValidationContext(obj);
-            if (!Validator.TryValidateObject(obj, validationContext, validationResults, true))
-            {
-                // Si la validación falla, se devuelve una respuesta con los errores.
-                return new OperationResponse<Municipio>(0, "Validación fallida: " + string.Join(", ", validationResults.Select(s => s.ErrorMessage)), null);
-            }
+            throw new NotImplementedException();
+            //// Convertir el nombre del departamento a su ID correspondiente antes de actualizar el municipio.
+            //var departamento = await _context.Departamento.FirstOrDefaultAsync(d => d.Nombre == obj.NombreDepartamento);
+            //if (departamento == null)
+            //{
+            //    // Si no se encuentra el departamento, se devuelve una respuesta con un mensaje de error.
+            //    return new OperationResponse<Municipio>(0, "Departamento no encontrado.", null);
+            //}
+            //obj.IdDepartamento = departamento.Id;
 
-            // Convertir el nombre del departamento a su ID correspondiente antes de actualizar el municipio.
-            var departamento = await _context.Departamento.FirstOrDefaultAsync(d => d.Nombre == obj.NombreDepartamento);
-            if (departamento == null)
-            {
-                // Si no se encuentra el departamento, se devuelve una respuesta con un mensaje de error.
-                return new OperationResponse<Municipio>(0, "Departamento no encontrado.", null);
-            }
-            obj.IdDepartamento = departamento.Id;
+            //try
+            //{
+            //    // Buscar el municipio existente en la base de datos por su ID.
+            //    var municipioExistente = await _context.Municipio.FindAsync(obj.Id);
+            //    if (municipioExistente == null)
+            //    {
+            //        // Si el municipio no se encuentra, se devuelve una respuesta con un mensaje de error.
+            //        return new OperationResponse<Municipio>(0, "Municipio no encontrado.", null);
+            //    }
 
-            try
-            {
-                // Buscar el municipio existente en la base de datos por su ID.
-                var municipioExistente = await _context.Municipio.FindAsync(obj.Id);
-                if (municipioExistente == null)
-                {
-                    // Si el municipio no se encuentra, se devuelve una respuesta con un mensaje de error.
-                    return new OperationResponse<Municipio>(0, "Municipio no encontrado.", null);
-                }
-
-                // Actualizar los datos del municipio en el contexto y guardar los cambios en la base de datos.
-                _context.Entry(municipioExistente).CurrentValues.SetValues(obj);
-                await _context.SaveChangesAsync();
-                // Devolver una respuesta exitosa con el municipio actualizado.
-                return new OperationResponse<Municipio>(1, "Municipio actualizado con éxito.", obj);
-            }
-            catch (DbUpdateConcurrencyException ex)
-            {
-                // Si ocurre un error de concurrencia durante la actualización, se devuelve una respuesta con el mensaje de error.
-                if (!_context.Municipio.Any(e => e.Id == obj.Id))
-                {
-                    return new OperationResponse<Municipio>(0, "Municipio no encontrado.", null);
-                }
-                else
-                {
-                    throw;
-                }
-            }
-            catch (Exception ex)
-            {
-                // Si ocurre un error durante la actualización, se devuelve una respuesta con el mensaje de error.
-                return new OperationResponse<Municipio>(0, ex.Message, null);
-            }
+            //    // Actualizar los datos del municipio en el contexto y guardar los cambios en la base de datos.
+            //    _context.Entry(municipioExistente).CurrentValues.SetValues(obj);
+            //    await _context.SaveChangesAsync();
+            //    // Devolver una respuesta exitosa con el municipio actualizado.
+            //    return new OperationResponse<Municipio>(1, "Municipio actualizado con éxito.", obj);
+            //}
+            //catch (DbUpdateConcurrencyException ex)
+            //{
+            //    // Si ocurre un error de concurrencia durante la actualización, se devuelve una respuesta con el mensaje de error.
+            //    if (!_context.Municipio.Any(e => e.Id == obj.Id))
+            //    {
+            //        return new OperationResponse<Municipio>(0, "Municipio no encontrado.", null);
+            //    }
+            //    else
+            //    {
+            //        throw;
+            //    }
+            //}
+            //catch (Exception ex)
+            //{
+            //    // Si ocurre un error durante la actualización, se devuelve una respuesta con el mensaje de error.
+            //    return new OperationResponse<Municipio>(0, ex.Message, null);
+            //}
         }
 
         // Método asíncrono para obtener un municipio por su ID.

@@ -2,7 +2,8 @@
 
 namespace InterRedBE.BAL.Bao
 {
-    public interface IUsuarioBAO : ICatalogoBAO<Usuario>  
+    public interface IUsuarioBAO : ICatalogoBAO<Usuario>
     {
+
     }
 }

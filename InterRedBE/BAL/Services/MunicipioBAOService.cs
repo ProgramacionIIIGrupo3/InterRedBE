@@ -15,14 +15,28 @@ namespace InterRedBE.BAL.Services
             _municipioDAO = municipioDAO;
         }
 
-        public Task<OperationResponse<Municipio>> CreateOne(Municipio obj)
+        public async Task<OperationResponse<Municipio>> CreateOne(Municipio obj)
         {
-            throw new NotImplementedException();
+            try
+            {
+                return await _municipioDAO.CreateOne(obj);
+            }
+            catch (Exception ex)
+            {
+                return new OperationResponse<Municipio>(0, ex.Message, null);
+            }
         }
 
-        public Task<OperationResponse<int>> DeleteOne(int id)
+        public async Task<OperationResponse<int>> DeleteOne(int id)
         {
-            throw new NotImplementedException();
+            try
+            {
+                return await _municipioDAO.DeleteOne(id);
+            }
+            catch (Exception ex)
+            {
+                return new OperationResponse<int>(0, ex.Message);
+            }
         }
 
         public OperationResponse<ListaEnlazadaDoble<Municipio>> GetAll()
@@ -36,7 +50,7 @@ namespace InterRedBE.BAL.Services
                 return new OperationResponse<ListaEnlazadaDoble<Municipio>>(0, ex.Message, null);
             }
 
-            
+
         }
 
         public OperationResponse<Municipio> GetOneInt(int id)
@@ -44,9 +58,18 @@ namespace InterRedBE.BAL.Services
             throw new NotImplementedException();
         }
 
-        public Task<OperationResponse<Municipio>> UpdateOne(Municipio obj)
+        public async Task<OperationResponse<Municipio>> UpdateOne(Municipio obj)
         {
-            throw new NotImplementedException();
+            try
+            {
+                return await _municipioDAO.UpdateOne(obj);
+            }
+            catch (Exception ex)
+            {
+                return new OperationResponse<Municipio>(0, ex.Message, null);
+            }
         }
+
+
     }
 }
