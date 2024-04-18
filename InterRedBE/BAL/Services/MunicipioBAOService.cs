@@ -39,6 +39,11 @@ namespace InterRedBE.BAL.Services
             
         }
 
+        public OperationResponse<Municipio> GetOneInt(int id)
+        {
+            throw new NotImplementedException();
+        }
+
         public Task<OperationResponse<Municipio>> UpdateOne(Municipio obj)
         {
             throw new NotImplementedException();
