@@ -48,26 +48,26 @@ namespace InterRedBE.DAL.Services
         {
             try
             {
-                
                 var municipioAEliminar = _context.Municipio.FirstOrDefault(m => m.Id == id);
-
                 if (municipioAEliminar == null)
                 {
-
-                    return new OperationResponse<int>(0, "No se encontro el municipio");
+                    return new OperationResponse<int>(0, "No se encontró el municipio");
                 }
 
-               
-                 _context.Municipio.Remove(municipioAEliminar);
+                _context.Municipio.Remove(municipioAEliminar);
                 await _context.SaveChangesAsync();
-
-                
                 return new OperationResponse<int>(1, "Municipio eliminado exitosamente.", municipioAEliminar.Id);
+            }
+            catch (DbUpdateException dbEx)
+            {
+                // Captura excepciones específicas de la actualización de la base de datos para obtener más detalles
+                var errorMessage = dbEx.InnerException?.Message ?? dbEx.Message;
+                return new OperationResponse<int>(0, $"Error al guardar los cambios en la base de datos: {errorMessage}");
             }
             catch (Exception ex)
             {
-                
-                return new OperationResponse<int>(0, ex.Message);
+                // Captura cualquier otra excepción general
+                return new OperationResponse<int>(0, $"Error inesperado: {ex.Message}");
             }
         }
 

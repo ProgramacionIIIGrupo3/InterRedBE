@@ -61,11 +61,13 @@ namespace InterRedBE.Controllers.Admin
         }
 
         [HttpDelete("{id}")]
-        public IActionResult DeleteOne(int id)
+        public async Task<IActionResult> DeleteOne(int id)
         {
             try
             {
-                return Ok(_municipioBAO.DeleteOne(id));
+                // Asegúrate de usar `await` aquí para esperar la tarea
+                var result = await _municipioBAO.DeleteOne(id);
+                return Ok(result);
             }
             catch (Exception ex)
             {
@@ -73,7 +75,9 @@ namespace InterRedBE.Controllers.Admin
             }
         }
 
-        [HttpGet("{id}")]
+   
+
+    [HttpGet("{id}")]
 
         public async Task<IActionResult> GetOneInt(int id)
         {
