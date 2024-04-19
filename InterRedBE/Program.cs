@@ -12,12 +12,16 @@ var builder = WebApplication.CreateBuilder(args);
 
 //DAO DI
 builder.Services.AddHttpContextAccessor();
+builder.Services.AddScoped<IDepartamentoDAO, DepartamentoService>();
+builder.Services.AddScoped<ILugarTuristicoDAO, LugarTuristicoService>();
 builder.Services.AddScoped<IMunicipioDAO, MunicipioService>();
 builder.Services.AddScoped<IUsuarioDAO, UsuarioService>();
 builder.Services.AddScoped<ILoginDAO, LoginService>();
 
 
 ////BAO DI
+builder.Services.AddScoped<IDepartamentoBAO, DepartamentoBAOService>();
+builder.Services.AddScoped<ILugarTuristicoBAO, LugarTuristicoBAOService>();
 builder.Services.AddScoped<IUsuarioBAO, UsuarioBAOService>();
 builder.Services.AddScoped<IMunicipioBAO, MunicipioBAOService>();
 builder.Services.AddScoped<ILoginBAO, LoginBAOService>();
