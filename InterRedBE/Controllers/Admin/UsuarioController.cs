@@ -67,12 +67,31 @@ namespace InterRedBE.Controllers.Admin
         //    }
         //}
 
-        [HttpDelete("{id}")]
-        public IActionResult DeleteOne(int id)
+        //[HttpDelete("{id}")]
+        //public IActionResult DeleteOne(int id)
+        //{
+        //    try
+        //    {
+        //        return Ok(_usuarioBAO.DeleteOne(id));
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+        //    }
+        //}
+
+        [HttpPut("{id}")]
+        public async Task<IActionResult> UpdateOne(int id, [FromBody] Usuario usuario)
         {
+            if (id != usuario.Id)
+            {
+                return BadRequest("No se encuentra el usuario.");
+            }
+
             try
             {
-                return Ok(_usuarioBAO.DeleteOne(id));
+                var result = await _usuarioBAO.UpdateOne(usuario);
+                return Ok(result);
             }
             catch (Exception ex)
             {
@@ -80,18 +99,6 @@ namespace InterRedBE.Controllers.Admin
             }
         }
 
-        [HttpPut("{id}")]
-        public IActionResult UpdateOne(int id, [FromBody] Usuario usuario)
-        {
-            try
-            {
-                return Ok(_usuarioBAO.UpdateOne(usuario));
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
-            }
-        }
 
 
     }

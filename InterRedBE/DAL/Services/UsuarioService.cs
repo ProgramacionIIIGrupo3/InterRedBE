@@ -101,39 +101,45 @@ namespace InterRedBE.DAL.Services
         {
             try
             {
-                // Se busca el usuario en la base de datos por su ID.
                 var usuarioExistente = _context.Usuario.FirstOrDefault(d => d.Id == obj.Id);
                 if (usuarioExistente == null)
                 {
-                    // Si el usuario no se encuentra, se devuelve una respuesta con un mensaje de error.
                     return new OperationResponse<Usuario>(0, "Usuario no encontrado.", null);
                 }
 
-                // Si el usuario existe, se actualizan sus datos en el contexto y se guarda el cambio en la base de datos.
+                // Si se proporciona una nueva contraseña, hashearla antes de guardarla
+                if (!string.IsNullOrEmpty(obj.Contrasena) && obj.Contrasena != usuarioExistente.Contrasena)
+                {
+                    var passwordHasher = new PasswordHasher();
+                    obj.Contrasena = passwordHasher.HashPassword(obj, obj.Contrasena);
+                }
+                else
+                {
+                    // Mantener la contraseña antigua si la nueva es nula o vacía
+                    obj.Contrasena = usuarioExistente.Contrasena;
+                }
+
+                // Actualizar otros campos, pero asegurarse de que la contraseña ya está tratada
                 _context.Entry(usuarioExistente).CurrentValues.SetValues(obj);
                 await _context.SaveChangesAsync();
-                // Se devuelve una respuesta exitosa con el usuario actualizado.
+
                 return new OperationResponse<Usuario>(1, "Usuario actualizado con éxito.", obj);
             }
             catch (DbUpdateConcurrencyException ex)
             {
-                // Si ocurre un error de concurrencia durante la actualización, se devuelve una respuesta con el mensaje de error.
                 if (!_context.Usuario.Any(e => e.Id == obj.Id))
                 {
                     return new OperationResponse<Usuario>(0, "Usuario no encontrado.", null);
                 }
-                else
-                {
-                    throw;
-                }
+                throw;
             }
             catch (Exception ex)
             {
-                // Si ocurre un error durante la actualización, se devuelve una respuesta con el mensaje de error.
                 return new OperationResponse<Usuario>(0, ex.Message, null);
             }
-
-
         }
+
+
+  
     }
 }
