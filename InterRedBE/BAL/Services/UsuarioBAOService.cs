@@ -15,14 +15,28 @@ namespace InterRedBE.BAL.Services
             _usuarioDAO = usuarioDAO;
         }
 
-        public Task<OperationResponse<Usuario>> CreateOne(Usuario obj)
+        public async Task<OperationResponse<Usuario>> CreateOne(Usuario obj)
         {
-            throw new NotImplementedException();
+            try
+            {
+                return await _usuarioDAO.CreateOne(obj);
+            }
+            catch (Exception ex)
+            {
+                return new OperationResponse<Usuario>(0, ex.Message, null);
+            }
         }
 
-        public Task<OperationResponse<int>> DeleteOne(int id)
+        public async Task<OperationResponse<int>> DeleteOne(int id)
         {
-            throw new NotImplementedException();
+            try
+            {
+                return await _usuarioDAO.DeleteOne(id);
+            }
+            catch (Exception ex)
+            {
+                return new OperationResponse<int>(0, ex.Message);
+            }
         }
 
         public OperationResponse<ListaEnlazadaDoble<Usuario>> GetAll()
@@ -35,10 +49,27 @@ namespace InterRedBE.BAL.Services
             {
                 return new OperationResponse<ListaEnlazadaDoble<Usuario>>(0, ex.Message, null);
             }
-            
         }
 
-        public Task<OperationResponse<Usuario>> UpdateOne(Usuario obj)
+        public OperationResponse<Usuario> GetOneInt(int id)
+        {
+            //No toques :D
+            throw new NotImplementedException();
+        }
+
+        public async Task<OperationResponse<Usuario>> UpdateOne(Usuario obj)
+        {
+            try
+            {
+                return await _usuarioDAO.UpdateOne(obj);
+            }
+            catch (Exception ex)
+            {
+                return new OperationResponse<Usuario>(0, ex.Message, null);
+            }
+        }
+
+        Task<OperationResponse<Usuario>> ICatalogoBAO<Usuario>.GetOneInt(int id)
         {
             throw new NotImplementedException();
         }

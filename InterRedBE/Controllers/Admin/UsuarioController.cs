@@ -1,5 +1,6 @@
-﻿using InterRedBE.BAL.Bao;
+using InterRedBE.BAL.Bao;
 using InterRedBE.DAL.Models;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity.Data;
 using Microsoft.AspNetCore.Mvc;
 
@@ -34,17 +35,65 @@ namespace InterRedBE.Controllers.Admin
 
 
         [HttpGet]
+
         public IActionResult GetAll()
         {
             try
             {
                 return Ok(_usuarioBAO.GetAll());
             }
-            catch (System.Exception ex)
+            catch (Exception ex)
             {
                 return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
             }
-
         }
+
+        //public IActionResult CreateOne(int id) 
+        //{
+        //    try
+        //    {
+        //        return Ok(_usuarioBAO.CreateOne(id));
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+        //    }
+        //}
+
+        [HttpDelete("{id}")]
+        public IActionResult DeleteOne(int id)
+        {
+            try
+            {
+                return Ok(_usuarioBAO.DeleteOne(id));
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+            }
+        }
+
+        [HttpPut("{id}")]
+        public IActionResult UpdateOne(int id, [FromBody] Usuario usuario)
+        {
+            try
+            {
+                return Ok(_usuarioBAO.UpdateOne(usuario));
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+            }
+        }
+
+
     }
 }
+
+
+
+
+
+
+
+
