@@ -1,4 +1,4 @@
-﻿using InterRedBE.DAL.Models;
+using InterRedBE.DAL.Models;
 using InterRedBE.UTILS;
 using InterRedBE.UTILS.Services;
 
