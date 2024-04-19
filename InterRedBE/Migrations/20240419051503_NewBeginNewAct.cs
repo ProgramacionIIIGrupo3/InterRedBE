@@ -5,7 +5,7 @@
 namespace InterRedBE.Migrations
 {
     /// <inheritdoc />
-    public partial class LugarTuristico : Migration
+    public partial class NewBeginNewAct : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)

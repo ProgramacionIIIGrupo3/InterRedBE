@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace InterRedBE.Migrations
 {
     [DbContext(typeof(InterRedContext))]
-    [Migration("20240418225550_masnulo")]
-    partial class masnulo
+    [Migration("20240419051503_NewBeginNewAct")]
+    partial class NewBeginNewAct
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -96,7 +96,7 @@ namespace InterRedBE.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<int>("DepartamentoId")
+                    b.Property<int?>("DepartamentoId")
                         .HasColumnType("int");
 
                     b.Property<string>("Descripcion")
@@ -112,7 +112,7 @@ namespace InterRedBE.Migrations
                     b.Property<string>("Imagen")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("MunicipioId")
+                    b.Property<int?>("MunicipioId")
                         .HasColumnType("int");
 
                     b.Property<string>("Nombre")
@@ -122,6 +122,10 @@ namespace InterRedBE.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("DepartamentoId");
+
+                    b.HasIndex("IdDepartamento");
+
+                    b.HasIndex("IdMunicipio");
 
                     b.HasIndex("MunicipioId");
 
@@ -226,17 +230,23 @@ namespace InterRedBE.Migrations
 
             modelBuilder.Entity("InterRedBE.DAL.Models.LugarTuristico", b =>
                 {
-                    b.HasOne("InterRedBE.DAL.Models.Departamento", "Departamento")
+                    b.HasOne("InterRedBE.DAL.Models.Departamento", null)
                         .WithMany("LugaresTuristicos")
-                        .HasForeignKey("DepartamentoId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("DepartamentoId");
+
+                    b.HasOne("InterRedBE.DAL.Models.Departamento", "Departamento")
+                        .WithMany()
+                        .HasForeignKey("IdDepartamento")
+                        .OnDelete(DeleteBehavior.SetNull);
 
                     b.HasOne("InterRedBE.DAL.Models.Municipio", "Municipio")
+                        .WithMany()
+                        .HasForeignKey("IdMunicipio")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.HasOne("InterRedBE.DAL.Models.Municipio", null)
                         .WithMany("LugaresTuristicos")
-                        .HasForeignKey("MunicipioId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("MunicipioId");
 
                     b.Navigation("Departamento");
 
