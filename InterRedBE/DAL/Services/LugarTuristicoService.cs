@@ -5,6 +5,7 @@ using InterRedBE.DAL.Models;
 using InterRedBE.UTILS;
 using InterRedBE.UTILS.Services;
 using Microsoft.Data.SqlClient;
+using Microsoft.EntityFrameworkCore;
 
 namespace InterRedBE.DAL.Services
 {
@@ -161,6 +162,64 @@ namespace InterRedBE.DAL.Services
             {
                 // Manejar cualquier excepción que ocurra durante la actualización y devolver una respuesta de error
                 return new OperationResponse<LugarTuristico>(0, ex.Message, null);
+            }
+        }
+
+        public OperationResponse<ListaEnlazadaDoble<LugarTuristico>> GetTop10Visitas()
+        {
+            try
+            {
+                // Obtener todos los lugares turísticos de la base de datos, incluyendo las visitas relacionadas
+                var lugaresTuristicos = _context.LugarTuristico.Include(lt => lt.Visitas).ToList();
+
+                // Ordenar los lugares turísticos por la cantidad de visitas en orden descendente
+                var lugaresOrdenados = lugaresTuristicos.OrderByDescending(lt => lt.Visitas.Count).ToList();
+
+                // Crear una nueva instancia de ListaEnlazadaDoble<LugarTuristico>
+                var top10 = new ListaEnlazadaDoble<LugarTuristico>();
+
+                // Insertar cada lugar turístico en la lista enlazada doble
+                foreach (var lugarTuristico in lugaresOrdenados.Take(10))
+                {
+                    top10.InsertarAlFinal(lugarTuristico);
+                }
+
+                // Devolver una respuesta exitosa con los 10 lugares turísticos con más visitas
+                return new OperationResponse<ListaEnlazadaDoble<LugarTuristico>>(1, "Top 10 Lugares Turísticos con Más Visitas", top10);
+            }
+            catch (Exception ex)
+            {
+                // Manejar cualquier excepción que ocurra durante la obtención de los lugares turísticos y devolver una respuesta de error
+                return new OperationResponse<ListaEnlazadaDoble<LugarTuristico>>(0, ex.Message, null);
+            }
+        }
+
+        public OperationResponse<ListaEnlazadaDoble<LugarTuristico>> GetTop10ByRating()
+        {
+            try
+            {
+                // Obtener todos los lugares turísticos de la base de datos, incluyendo las calificaciones relacionadas
+                var lugaresTuristicos = _context.LugarTuristico.Include(lt => lt.Calificaciones).ToList();
+
+                // Ordenar los lugares turísticos por la calificación promedio en orden descendente
+                var lugaresOrdenados = lugaresTuristicos.OrderByDescending(lt => lt.Calificaciones.Average(c => Convert.ToDouble(c.Puntuacion))).ToList();
+
+                // Crear una nueva instancia de ListaEnlazadaDoble<LugarTuristico>
+                var top10 = new ListaEnlazadaDoble<LugarTuristico>();
+
+                // Insertar los primeros 10 lugares turísticos en la lista enlazada doble
+                foreach (var lugarTuristico in lugaresOrdenados.Take(10))
+                {
+                    top10.InsertarAlFinal(lugarTuristico);
+                }
+
+                // Devolver una respuesta exitosa con los 10 lugares turísticos mejor calificados
+                return new OperationResponse<ListaEnlazadaDoble<LugarTuristico>>(1, "Top 10 Lugares Turísticos Mejor Calificados", top10);
+            }
+            catch (Exception ex)
+            {
+                // Manejar cualquier excepción que ocurra durante la obtención de los lugares turísticos y devolver una respuesta de error
+                return new OperationResponse<ListaEnlazadaDoble<LugarTuristico>>(0, ex.Message, null);
             }
         }
     }
