@@ -91,16 +91,18 @@ namespace InterRedBE.BAL.Services
              return new OperationResponse<ListaEnlazadaDoble<LugarTuristico>>(0, ex.Message, null);
            }
        }
-      public OperationResponse<ListaEnlazadaDoble<LugarTuristico>> GetTop10ByRating()
+        public OperationResponse<ListaEnlazadaDoble<LugarTuristicoConPromedioDTO>> GetTop10ByRating()
         {
-        try
-        {
-            return _lugarTuristicoDAO.GetTop10ByRating();
+            try
+            {
+
+                return _lugarTuristicoDAO.GetTop10ByRating();
+            }
+            catch (Exception ex)
+            {
+
+                return new OperationResponse<ListaEnlazadaDoble<LugarTuristicoConPromedioDTO>>(0, ex.Message, null);
+            }
         }
-        catch (Exception ex)
-        {
-         return new OperationResponse<ListaEnlazadaDoble<LugarTuristico>>(0, ex.Message, null);
-        }
-      }
     }
 }
