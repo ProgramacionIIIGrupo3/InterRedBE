@@ -22,19 +22,33 @@ namespace InterRedBE.DAL.Context
         {
             base.OnModelCreating(modelBuilder);
 
-            // Relación uno-a-muchos entre Departamento y Municipio
+            // Configuración existente para Departamento y Municipio
             modelBuilder.Entity<Departamento>()
                 .HasMany(d => d.Municipios)
                 .WithOne(m => m.Departamento)
                 .HasForeignKey(m => m.IdDepartamento);
 
-            // Relación uno-a-uno entre Departamento y su cabecera (Municipio)
             modelBuilder.Entity<Departamento>()
                 .HasOne(d => d.Cabecera)
                 .WithOne()
                 .HasForeignKey<Departamento>(d => d.IdCabecera)
                 .OnDelete(DeleteBehavior.Restrict);
+
+            // Agregar configuración para LugarTuristico
+            modelBuilder.Entity<LugarTuristico>()
+                .HasOne(l => l.Municipio)
+                .WithMany() 
+                .HasForeignKey(l => l.IdMunicipio)
+                .OnDelete(DeleteBehavior.SetNull); 
+
+            modelBuilder.Entity<LugarTuristico>()
+                .HasOne(l => l.Departamento)
+                .WithMany() 
+                .HasForeignKey(l => l.IdDepartamento)
+                .OnDelete(DeleteBehavior.SetNull); 
+
         }
+
 
     }
 }
