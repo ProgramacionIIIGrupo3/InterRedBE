@@ -5,6 +5,8 @@ using InterRedBE.DAL.Dao;
 using InterRedBE.DAL.Services;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
+using FluentValidation.AspNetCore;
+using InterRedBE.DAL.DTO;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -23,7 +25,10 @@ builder.Services.AddScoped<ILoginBAO, LoginBAOService>();
 
 // Add services to the container.
 
-builder.Services.AddControllers();
+builder.Services.AddControllers()
+    .AddFluentValidation(fv => fv.RegisterValidatorsFromAssemblyContaining<LoginDTO>());
+
+
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
