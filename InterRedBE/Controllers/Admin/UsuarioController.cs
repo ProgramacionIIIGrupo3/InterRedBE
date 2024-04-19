@@ -1,4 +1,5 @@
 using InterRedBE.BAL.Bao;
+using InterRedBE.DAL.DTO;
 using InterRedBE.DAL.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity.Data;
@@ -20,8 +21,14 @@ namespace InterRedBE.Controllers.Admin
         }
 
         [HttpPost("login")]
-        public async Task<IActionResult> Login([FromBody] Usuario login)
+        public async Task<IActionResult> Login([FromBody] LoginDTO login)
         {
+
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
             if (await _loginBAO.VerifyUser(login.Correo, login.Contrasena))
             {
                 // Autenticación exitosa, puede devolver un token JWT u otro indicador de sesión
@@ -60,12 +67,31 @@ namespace InterRedBE.Controllers.Admin
         //    }
         //}
 
-        [HttpDelete("{id}")]
-        public IActionResult DeleteOne(int id)
+        //[HttpDelete("{id}")]
+        //public IActionResult DeleteOne(int id)
+        //{
+        //    try
+        //    {
+        //        return Ok(_usuarioBAO.DeleteOne(id));
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+        //    }
+        //}
+
+        [HttpPut("{id}")]
+        public async Task<IActionResult> UpdateOne(int id, [FromBody] Usuario usuario)
         {
+            if (id != usuario.Id)
+            {
+                return BadRequest("No se encuentra el usuario.");
+            }
+
             try
             {
-                return Ok(_usuarioBAO.DeleteOne(id));
+                var result = await _usuarioBAO.UpdateOne(usuario);
+                return Ok(result);
             }
             catch (Exception ex)
             {
@@ -73,18 +99,6 @@ namespace InterRedBE.Controllers.Admin
             }
         }
 
-        [HttpPut("{id}")]
-        public IActionResult UpdateOne(int id, [FromBody] Usuario usuario)
-        {
-            try
-            {
-                return Ok(_usuarioBAO.UpdateOne(usuario));
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
-            }
-        }
 
 
     }
