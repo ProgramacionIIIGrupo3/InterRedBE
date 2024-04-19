@@ -175,10 +175,10 @@ namespace InterRedBE.DAL.Services
                 // Ordenar los lugares turísticos por la cantidad de visitas en orden descendente
                 var lugaresOrdenados = lugaresTuristicos.OrderByDescending(lt => lt.Visitas.Count).ToList();
 
-                // Crear una nueva instancia de ListaEnlazadaDoble<LugarTuristico>
+                
                 var top10 = new ListaEnlazadaDoble<LugarTuristico>();
 
-                // Insertar cada lugar turístico en la lista enlazada doble
+                // Insertar cada lugar turístico 
                 foreach (var lugarTuristico in lugaresOrdenados.Take(10))
                 {
                     top10.InsertarAlFinal(lugarTuristico);
