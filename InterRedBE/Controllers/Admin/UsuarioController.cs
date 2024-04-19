@@ -1,4 +1,6 @@
 ﻿using InterRedBE.BAL.Bao;
+using InterRedBE.DAL.Models;
+using Microsoft.AspNetCore.Identity.Data;
 using Microsoft.AspNetCore.Mvc;
 
 namespace InterRedBE.Controllers.Admin
@@ -8,11 +10,28 @@ namespace InterRedBE.Controllers.Admin
     public class UsuarioController : ControllerBase
     {
         public readonly IUsuarioBAO _usuarioBAO;
+        public readonly ILoginBAO _loginBAO;
 
-        public UsuarioController(IUsuarioBAO usuarioBAO)
+        public UsuarioController(IUsuarioBAO usuarioBAO, ILoginBAO loginBAO)
         {
             _usuarioBAO = usuarioBAO;
+            _loginBAO = loginBAO;
         }
+
+        [HttpPost("login")]
+        public async Task<IActionResult> Login([FromBody] Usuario login)
+        {
+            if (await _loginBAO.VerifyUser(login.Correo, login.Contrasena))
+            {
+                // Autenticación exitosa, puede devolver un token JWT u otro indicador de sesión
+                return Ok("Login exitoso.");
+            }
+            else
+            {
+                return Unauthorized("Credenciales inválidas.");
+            }
+        }
+
 
         [HttpGet]
         public IActionResult GetAll()
