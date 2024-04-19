@@ -11,11 +11,14 @@ var builder = WebApplication.CreateBuilder(args);
 //DAO DI
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddScoped<IUsuarioDAO, UsuarioService>();
+builder.Services.AddScoped<ILoginDAO, LoginService>();
 
 
 
 ////BAO DI
 builder.Services.AddScoped<IUsuarioBAO, UsuarioBAOService>();
+builder.Services.AddScoped<ILoginBAO, LoginBAOService>();
+
 
 
 // Add services to the container.
