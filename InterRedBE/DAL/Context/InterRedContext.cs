@@ -1,4 +1,5 @@
 ﻿using InterRedBE.DAL.Models;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
 namespace InterRedBE.DAL.Context
@@ -34,5 +35,6 @@ namespace InterRedBE.DAL.Context
                 .HasForeignKey<Departamento>(d => d.IdCabecera)
                 .OnDelete(DeleteBehavior.Restrict);
         }
+
     }
 }

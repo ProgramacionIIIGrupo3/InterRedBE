@@ -4,6 +4,7 @@ using InterRedBE.DAL.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace InterRedBE.Migrations
 {
     [DbContext(typeof(InterRedContext))]
-    partial class InterRedContextModelSnapshot : ModelSnapshot
+    [Migration("20240418225415_masnulos")]
+    partial class masnulos
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -37,7 +40,7 @@ namespace InterRedBE.Migrations
                     b.Property<int?>("IdLugarTuristico")
                         .HasColumnType("int");
 
-                    b.Property<int>("LugarTuristicoId")
+                    b.Property<int?>("LugarTuristicoId")
                         .HasColumnType("int");
 
                     b.Property<string>("Puntuacion")
@@ -93,7 +96,7 @@ namespace InterRedBE.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<int>("DepartamentoId")
+                    b.Property<int?>("DepartamentoId")
                         .HasColumnType("int");
 
                     b.Property<string>("Descripcion")
@@ -109,7 +112,7 @@ namespace InterRedBE.Migrations
                     b.Property<string>("Imagen")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("MunicipioId")
+                    b.Property<int?>("MunicipioId")
                         .HasColumnType("int");
 
                     b.Property<string>("Nombre")
@@ -190,7 +193,7 @@ namespace InterRedBE.Migrations
                     b.Property<int?>("IdLugarTuristico")
                         .HasColumnType("int");
 
-                    b.Property<int>("LugarTuristicoId")
+                    b.Property<int?>("LugarTuristicoId")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
@@ -204,9 +207,7 @@ namespace InterRedBE.Migrations
                 {
                     b.HasOne("InterRedBE.DAL.Models.LugarTuristico", "LugarTuristico")
                         .WithMany("Calificaciones")
-                        .HasForeignKey("LugarTuristicoId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("LugarTuristicoId");
 
                     b.Navigation("LugarTuristico");
                 });
@@ -225,15 +226,11 @@ namespace InterRedBE.Migrations
                 {
                     b.HasOne("InterRedBE.DAL.Models.Departamento", "Departamento")
                         .WithMany("LugaresTuristicos")
-                        .HasForeignKey("DepartamentoId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("DepartamentoId");
 
                     b.HasOne("InterRedBE.DAL.Models.Municipio", "Municipio")
                         .WithMany("LugaresTuristicos")
-                        .HasForeignKey("MunicipioId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("MunicipioId");
 
                     b.Navigation("Departamento");
 
@@ -253,9 +250,7 @@ namespace InterRedBE.Migrations
                 {
                     b.HasOne("InterRedBE.DAL.Models.LugarTuristico", "LugarTuristico")
                         .WithMany("Visitas")
-                        .HasForeignKey("LugarTuristicoId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("LugarTuristicoId");
 
                     b.Navigation("LugarTuristico");
                 });
