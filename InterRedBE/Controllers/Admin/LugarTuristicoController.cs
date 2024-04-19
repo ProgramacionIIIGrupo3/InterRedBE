@@ -72,8 +72,8 @@ namespace InterRedBE.Controllers.Admin
                     Nombre = lugarTuristicoViewModel.Nombre,
                     Descripcion = lugarTuristicoViewModel.Descripcion,
                     Imagen = lugarTuristicoViewModel.Imagen,
-                    IdMunicipio = lugarTuristicoViewModel.IdMunicipio ?? 0,
-                    IdDepartamento = lugarTuristicoViewModel.IdDepartamento ?? 0
+                    IdMunicipio = lugarTuristicoViewModel.IdMunicipio,
+                    IdDepartamento = lugarTuristicoViewModel.IdDepartamento
                 };
 
                 var result = await _lugarTuristicoBAO.CreateOne(lugarTuristico);
@@ -110,8 +110,8 @@ namespace InterRedBE.Controllers.Admin
                     Nombre = lugarTuristicoDTO.Nombre,
                     Descripcion = lugarTuristicoDTO.Descripcion,
                     Imagen = lugarTuristicoDTO.Imagen,
-                    IdMunicipio = lugarTuristicoDTO.IdMunicipio ?? 0,
-                    IdDepartamento = lugarTuristicoDTO.IdDepartamento ?? 0
+                    IdMunicipio = lugarTuristicoDTO.IdMunicipio,
+                    IdDepartamento = lugarTuristicoDTO.IdDepartamento
                 };
 
                 var result = await _lugarTuristicoBAO.UpdateOne(lugarTuristico);
