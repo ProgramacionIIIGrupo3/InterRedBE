@@ -11,14 +11,14 @@ namespace InterRedBE.Controllers.User
     [ApiController]
     public class DepartamentoController : ControllerBase
     {
-        
+
         public readonly IDepartamentoBAO _departamentoBAO;
 
         public DepartamentoController(IDepartamentoBAO departamentoBAO)
         {
             _departamentoBAO = departamentoBAO;
         }
-    }
+    
 
     [HttpGet]
     public IActionResult GetAll()
@@ -54,4 +54,7 @@ namespace InterRedBE.Controllers.User
         }
     }
 
+
+
+    }
 }
