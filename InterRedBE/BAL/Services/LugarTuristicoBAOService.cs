@@ -80,7 +80,7 @@ namespace InterRedBE.BAL.Services
                 return new OperationResponse<LugarTuristico>(0, ex.Message, null);
             }
         }
-       public OperationResponse<ListaEnlazadaDoble<LugarTuristico>> GetTop10Visitas()
+        public OperationResponse<ListaEnlazadaDoble<LugarTuristicoConVisitasDTO>> GetTop10Visitas()
         {
            try
            {
@@ -88,7 +88,7 @@ namespace InterRedBE.BAL.Services
            }
            catch (Exception ex)
            {
-             return new OperationResponse<ListaEnlazadaDoble<LugarTuristico>>(0, ex.Message, null);
+             return new OperationResponse<ListaEnlazadaDoble<LugarTuristicoConVisitasDTO>>(0, ex.Message, null);
            }
        }
         public OperationResponse<ListaEnlazadaDoble<LugarTuristicoConPromedioDTO>> GetTop10ByRating()
