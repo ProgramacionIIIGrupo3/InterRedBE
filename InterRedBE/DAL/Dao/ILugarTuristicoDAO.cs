@@ -7,7 +7,7 @@ namespace InterRedBE.DAL.Dao
 {
     public interface ILugarTuristicoDAO : ICRUD<LugarTuristico>
     {
-        public OperationResponse<ListaEnlazadaDoble<LugarTuristico>> GetTop10Visitas();
+        public OperationResponse<ListaEnlazadaDoble<LugarTuristicoConVisitasDTO>> GetTop10Visitas();
         public OperationResponse<ListaEnlazadaDoble<LugarTuristicoConPromedioDTO>> GetTop10ByRating();
 
     }
