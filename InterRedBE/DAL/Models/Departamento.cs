@@ -11,5 +11,7 @@
         public virtual Municipio Cabecera { get; set; }
         public virtual ICollection<Municipio> Municipios { get; set; }
         public virtual ICollection<LugarTuristico> LugaresTuristicos { get; set; }
+        public virtual ICollection<Ruta> RutasInicio { get; set; }
+        public virtual ICollection<Ruta> RutasFin { get; set; }
     }
 }
