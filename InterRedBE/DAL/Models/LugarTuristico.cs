@@ -16,8 +16,5 @@ namespace InterRedBE.DAL.Models
         [JsonIgnore]
         public virtual ICollection<Visita> Visitas { get; set; }
         public virtual ICollection<Calificacion> Calificaciones { get; set; }
-
-
-
     }
 }
