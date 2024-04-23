@@ -17,24 +17,54 @@ namespace InterRedBE.DAL.Context
         public DbSet<Models.Usuario> Usuario { get; set; }
         public DbSet<Models.Departamento> Departamento { get; set; }
         public DbSet<Models.Municipio> Municipio { get; set; }
+        public DbSet<Models.Ruta> Ruta { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
 
-            // Relación uno-a-muchos entre Departamento y Municipio
+            // Configuración existente para Departamento y Municipio
             modelBuilder.Entity<Departamento>()
                 .HasMany(d => d.Municipios)
                 .WithOne(m => m.Departamento)
                 .HasForeignKey(m => m.IdDepartamento);
 
-            // Relación uno-a-uno entre Departamento y su cabecera (Municipio)
             modelBuilder.Entity<Departamento>()
                 .HasOne(d => d.Cabecera)
                 .WithOne()
                 .HasForeignKey<Departamento>(d => d.IdCabecera)
                 .OnDelete(DeleteBehavior.Restrict);
+
+            // Agregar configuración para LugarTuristico
+            modelBuilder.Entity<LugarTuristico>()
+                .HasOne(l => l.Municipio)
+                .WithMany() 
+                .HasForeignKey(l => l.IdMunicipio)
+                .OnDelete(DeleteBehavior.SetNull); 
+
+            modelBuilder.Entity<LugarTuristico>()
+                .HasOne(l => l.Departamento)
+                .WithMany() 
+                .HasForeignKey(l => l.IdDepartamento)
+                .OnDelete(DeleteBehavior.SetNull);
+
+            // Configuración para la relación de Ruta con DepartamentoInicio
+            modelBuilder.Entity<Ruta>()
+                .HasOne(r => r.DepartamentoInicio)
+                .WithMany(d => d.RutasInicio)
+                .HasForeignKey(r => r.IdDepartamentoInicio)
+                .OnDelete(DeleteBehavior.Restrict); 
+
+            // Configuración para la relación de Ruta con DepartamentoFin
+            modelBuilder.Entity<Ruta>()
+                .HasOne(r => r.DepartamentoFin)
+                .WithMany(d => d.RutasFin)
+                .HasForeignKey(r => r.IdDepartamentoFin)
+                .OnDelete(DeleteBehavior.Restrict); 
+
+
         }
+
 
     }
 }

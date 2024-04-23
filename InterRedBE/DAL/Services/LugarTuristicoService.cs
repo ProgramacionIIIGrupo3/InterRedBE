@@ -5,6 +5,7 @@ using InterRedBE.DAL.Models;
 using InterRedBE.UTILS;
 using InterRedBE.UTILS.Services;
 using Microsoft.Data.SqlClient;
+using Microsoft.EntityFrameworkCore;
 
 namespace InterRedBE.DAL.Services
 {
@@ -163,5 +164,76 @@ namespace InterRedBE.DAL.Services
                 return new OperationResponse<LugarTuristico>(0, ex.Message, null);
             }
         }
+
+        public OperationResponse<ListaEnlazadaDoble<LugarTuristicoConVisitasDTO>> GetTop10Visitas()
+        {
+            try
+            {
+                // Obtener todos los lugares turísticos de la base de datos, incluyendo las visitas relacionadas
+                var lugaresTuristicos = _context.LugarTuristico.Include(lt => lt.Visitas).ToList();
+
+                // Ordenar los lugares turísticos por la cantidad de visitas en orden descendente y mapear a DTO
+                var lugaresConVisitas = lugaresTuristicos.Select(lt => new LugarTuristicoConVisitasDTO
+                {
+                    LugarTuristico = lt,
+                    CantidadVisitas = lt.Visitas.Count
+                })
+                .OrderByDescending(dto => dto.CantidadVisitas)
+                .ToList();
+
+                // Crear una nueva instancia de ListaEnlazadaDoble<LugarTuristicoConVisitasDTO>
+                var top10 = new ListaEnlazadaDoble<LugarTuristicoConVisitasDTO>();
+
+                // Insertar los primeros 10 lugares turísticos en la lista enlazada doble
+                foreach (var dto in lugaresConVisitas.Take(10))
+                {
+                    top10.InsertarAlFinal(dto);
+                }
+
+                // Devolver una respuesta exitosa con los 10 lugares turísticos con más visitas
+                return new OperationResponse<ListaEnlazadaDoble<LugarTuristicoConVisitasDTO>>(1, "Top 10 Lugares Turísticos con Más Visitas", top10);
+            }
+            catch (Exception ex)
+            {
+                // Manejar cualquier excepción que ocurra durante la obtención de los lugares turísticos y devolver una respuesta de error
+                return new OperationResponse<ListaEnlazadaDoble<LugarTuristicoConVisitasDTO>>(0, ex.Message, null);
+            }
+        }
+
+        public OperationResponse<ListaEnlazadaDoble<LugarTuristicoConPromedioDTO>> GetTop10ByRating()
+        {
+            try
+            {
+                // Obtener todos los lugares turísticos de la base de datos, incluyendo las calificaciones relacionadas
+                var lugaresTuristicos = _context.LugarTuristico.Include(lt => lt.Calificaciones).ToList();
+
+                // Ordenar los lugares turísticos por la calificación promedio en orden descendente y mapear a DTO
+                var lugaresConPromedio = lugaresTuristicos.Select(lt => new LugarTuristicoConPromedioDTO
+                {
+                    LugarTuristico = lt,
+                    PromedioCalificaciones = lt.Calificaciones.Any() ? lt.Calificaciones.Average(c => Convert.ToDouble(c.Puntuacion)) : 0
+                })
+                .OrderByDescending(dto => dto.PromedioCalificaciones)
+                .ToList();
+
+                // Crear una nueva instancia de ListaEnlazadaDoble<LugarTuristicoConPromedioDTO>
+                var top10 = new ListaEnlazadaDoble<LugarTuristicoConPromedioDTO>();
+
+                // Insertar los primeros 10 lugares turísticos en la lista enlazada doble
+                foreach (var dto in lugaresConPromedio.Take(10))
+                {
+                    top10.InsertarAlFinal(dto);
+                }
+
+                // Devolver una respuesta exitosa con los 10 lugares turísticos mejor calificados
+                return new OperationResponse<ListaEnlazadaDoble<LugarTuristicoConPromedioDTO>>(1, "Top 10 Lugares Turísticos Mejor Calificados", top10);
+            }
+            catch (Exception ex)
+            {
+                // Manejar cualquier excepción que ocurra durante la obtención de los lugares turísticos y devolver una respuesta de error
+                return new OperationResponse<ListaEnlazadaDoble<LugarTuristicoConPromedioDTO>>(0, ex.Message, null);
+            }
+        }
+
     }
 }

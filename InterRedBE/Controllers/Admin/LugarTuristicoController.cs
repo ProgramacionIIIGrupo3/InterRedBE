@@ -55,80 +55,98 @@ namespace InterRedBE.Controllers.Admin
             }
         }
 
-        // Método para crear un lugar turístico
+        // Método para crear un nuevo lugar turístico con imagen
         [HttpPost]
-        public async Task<IActionResult> CreateOne([FromBody] LugarTuristicoDTO lugarTuristicoViewModel)
+        public async Task<IActionResult> Create([FromForm] LugarTuristicoDTO lugarTuristicoDTO)
         {
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
 
-            try
+            if (lugarTuristicoDTO.ImagenFile == null || lugarTuristicoDTO.ImagenFile.Length == 0)
             {
-                var lugarTuristico = new LugarTuristico
-                {
-                    // Asignación de propiedades desde DTO
-                    Nombre = lugarTuristicoViewModel.Nombre,
-                    Descripcion = lugarTuristicoViewModel.Descripcion,
-                    Imagen = lugarTuristicoViewModel.Imagen,
-                    IdMunicipio = lugarTuristicoViewModel.IdMunicipio ?? 0,
-                    IdDepartamento = lugarTuristicoViewModel.IdDepartamento ?? 0
-                };
-
-                var result = await _lugarTuristicoBAO.CreateOne(lugarTuristico);
-                if (result.Data != null)
-                {
-                    return StatusCode(StatusCodes.Status201Created, result.Data);
-                }
-                else
-                {
-                    return BadRequest(result.Message);
-                }
+                return BadRequest("An image file is required.");
             }
-            catch (Exception ex)
+
+            var fileName = Path.GetFileName(lugarTuristicoDTO.ImagenFile.FileName);
+            var filePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/images", fileName);
+            using (var stream = new FileStream(filePath, FileMode.Create))
             {
-                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+                await lugarTuristicoDTO.ImagenFile.CopyToAsync(stream);
+            }
+
+            lugarTuristicoDTO.Imagen = Path.Combine("/images", fileName);
+
+            var lugarTuristico = new LugarTuristico
+            {
+                Nombre = lugarTuristicoDTO.Nombre,
+                Descripcion = lugarTuristicoDTO.Descripcion,
+                Imagen = lugarTuristicoDTO.Imagen,
+                IdMunicipio = lugarTuristicoDTO.IdMunicipio,
+                IdDepartamento = lugarTuristicoDTO.IdDepartamento
+            };
+
+            // Suponiendo que tienes una lógica de negocio similar (BAO) para LugarTuristico
+            var result = await _lugarTuristicoBAO.CreateOne(lugarTuristico);
+            if (result.Data != null)
+            {
+                return StatusCode(StatusCodes.Status201Created, result.Data);
+            }
+            else
+            {
+                return BadRequest(result.Message);
             }
         }
 
-        // Método para actualizar un lugar turístico
+        // Método para actualizar un lugar turístico existente con la opción de actualizar la imagen
         [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateOne(int id, [FromBody] LugarTuristicoDTO lugarTuristicoDTO)
+        public async Task<IActionResult> Update(int id, [FromForm] LugarTuristicoDTO lugarTuristicoDTO)
         {
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
 
-            try
+            var lugarTuristicoExistente = await _lugarTuristicoBAO.GetOneInt(id);
+            if (lugarTuristicoExistente == null || lugarTuristicoExistente.Data == null)
             {
-                var lugarTuristico = new LugarTuristico
-                {
-                    // Actualización de entidad con datos del DTO
-                    Id = id,
-                    Nombre = lugarTuristicoDTO.Nombre,
-                    Descripcion = lugarTuristicoDTO.Descripcion,
-                    Imagen = lugarTuristicoDTO.Imagen,
-                    IdMunicipio = lugarTuristicoDTO.IdMunicipio ?? 0,
-                    IdDepartamento = lugarTuristicoDTO.IdDepartamento ?? 0
-                };
-
-                var result = await _lugarTuristicoBAO.UpdateOne(lugarTuristico);
-                if (result.Data != null)
-                {
-                    return Ok(result.Data);
-                }
-                else
-                {
-                    return BadRequest(result.Message);
-                }
+                return NotFound($"LugarTuristico with Id = {id} not found.");
             }
-            catch (Exception ex)
+
+            if (lugarTuristicoDTO.ImagenFile != null && lugarTuristicoDTO.ImagenFile.Length > 0)
             {
-                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+                var fileName = Path.GetFileName(lugarTuristicoDTO.ImagenFile.FileName);
+                var filePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/images", fileName);
+                using (var stream = new FileStream(filePath, FileMode.Create))
+                {
+                    await lugarTuristicoDTO.ImagenFile.CopyToAsync(stream);
+                }
+                lugarTuristicoDTO.Imagen = Path.Combine("/images", fileName);
+            }
+            else
+            {
+                lugarTuristicoDTO.Imagen = lugarTuristicoExistente.Data.Imagen;
+            }
+
+            LugarTuristico updatedLugarTuristico = lugarTuristicoExistente.Data;
+            updatedLugarTuristico.Nombre = lugarTuristicoDTO.Nombre;
+            updatedLugarTuristico.Descripcion = lugarTuristicoDTO.Descripcion;
+            updatedLugarTuristico.Imagen = lugarTuristicoDTO.Imagen;
+            updatedLugarTuristico.IdMunicipio = lugarTuristicoDTO.IdMunicipio;
+            updatedLugarTuristico.IdDepartamento = lugarTuristicoDTO.IdDepartamento;
+
+            var result = await _lugarTuristicoBAO.UpdateOne(updatedLugarTuristico);
+            if (result.Data != null)
+            {
+                return Ok(result.Data);
+            }
+            else
+            {
+                return BadRequest(result.Message);
             }
         }
+
 
         // Método para eliminar un lugar turístico
         [HttpDelete("{id}")]

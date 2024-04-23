@@ -1,4 +1,5 @@
 ﻿using Microsoft.CodeAnalysis.CSharp.Syntax;
+using System.Text.Json.Serialization;
 
 namespace InterRedBE.DAL.Models
 {
@@ -12,10 +13,8 @@ namespace InterRedBE.DAL.Models
         public int? IdDepartamento { get; set; }
         public virtual Municipio Municipio { get; set; }
         public virtual Departamento Departamento { get; set; }
+        [JsonIgnore]
         public virtual ICollection<Visita> Visitas { get; set; }
         public virtual ICollection<Calificacion> Calificaciones { get; set; }
-
-
-
     }
 }

@@ -113,7 +113,7 @@ namespace InterRedBE.Controllers.Admin
                     Nombre = municipioDTO.Nombre,
                     Descripcion = municipioDTO.Descripcion,
                     Poblacion = municipioDTO.Poblacion,
-                    IdDepartamento = municipioDTO.IdDepartamento,
+                    IdDepartamento = municipioDTO.IdDepartamento
                 };
                 var result = await _municipioBAO.UpdateOne(municipio);
                 

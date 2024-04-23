@@ -54,79 +54,100 @@ namespace InterRedBE.Controllers.Admin
             }
         }
 
-        // Método para crear un nuevo departamento
         [HttpPost]
-        public async Task<IActionResult> CreateOne([FromBody] DepartamentoDTO departamentoViewModel)
+        public async Task<IActionResult> CreateOne([FromForm] DepartamentoDTO departamentoDTO)
         {
+            departamentoDTO.Imagen = null;
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
 
-            try
+            if (departamentoDTO.ImagenFile == null || departamentoDTO.ImagenFile.Length == 0)
             {
-                var departamento = new Departamento
-                {
-                    // Asignación de propiedades desde el DTO al modelo
-                    Nombre = departamentoViewModel.Nombre,
-                    Descripcion = departamentoViewModel.Descripcion,
-                    Imagen = departamentoViewModel.Imagen,
-                    Poblacion = departamentoViewModel.Poblacion,
-                    IdCabecera = departamentoViewModel.IdCabecera
-                };
-
-                var result = await _departamentoBAO.CreateOne(departamento);
-                if (result.Data != null)
-                {
-                    return StatusCode(StatusCodes.Status201Created, result.Data);
-                }
-                else
-                {
-                    return BadRequest(result.Message);
-                }
+                return BadRequest("An image file is required.");
             }
-            catch (Exception ex)
+
+            var fileName = Path.GetFileName(departamentoDTO.ImagenFile.FileName);
+            var filePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/images", fileName);
+            using (var stream = new FileStream(filePath, FileMode.Create))
             {
-                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+                await departamentoDTO.ImagenFile.CopyToAsync(stream);
+            }
+
+            // Aquí es donde se genera la URL de la imagen que se guardará en la base de datos
+            departamentoDTO.Imagen = Path.Combine("/images", fileName);
+
+            var departamento = new Departamento
+            {
+                Nombre = departamentoDTO.Nombre,
+                Descripcion = departamentoDTO.Descripcion,
+                Imagen = departamentoDTO.Imagen,
+                Poblacion = departamentoDTO.Poblacion,
+                IdCabecera = departamentoDTO.IdCabecera
+            };
+
+            var result = await _departamentoBAO.CreateOne(departamento);
+            if (result.Data != null)
+            {
+                return StatusCode(StatusCodes.Status201Created, result.Data);
+            }
+            else
+            {
+                return BadRequest(result.Message);
             }
         }
+
+
 
         // Método para actualizar un departamento existente
         [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateOne(int id, [FromBody] DepartamentoDTO departamentoDTO)
+        public async Task<IActionResult> UpdateOne(int id, [FromForm] DepartamentoDTO departamentoDTO)
         {
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
 
-            try
+            var departamentoExistente = await _departamentoBAO.GetOneInt(id);
+            if (departamentoExistente == null || departamentoExistente.Data == null)
             {
-                var departamento = new Departamento
-                {
-                    Id = id,
-                    Nombre = departamentoDTO.Nombre,
-                    Descripcion = departamentoDTO.Descripcion,
-                    Imagen = departamentoDTO.Imagen,
-                    Poblacion = departamentoDTO.Poblacion,
-                    IdCabecera = departamentoDTO.IdCabecera
-                };
-
-                var result = await _departamentoBAO.UpdateOne(departamento);
-                if (result.Data != null)
-                {
-                    return Ok(result.Data);
-                }
-                else
-                {
-                    return BadRequest(result.Message);
-                }
+                return NotFound($"Departamento with Id = {id} not found.");
             }
-            catch (Exception ex)
+
+            if (departamentoDTO.ImagenFile != null && departamentoDTO.ImagenFile.Length > 0)
             {
-                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+                var fileName = Path.GetFileName(departamentoDTO.ImagenFile.FileName);
+                var filePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/images", fileName);
+                using (var stream = new FileStream(filePath, FileMode.Create))
+                {
+                    await departamentoDTO.ImagenFile.CopyToAsync(stream);
+                }
+                departamentoDTO.Imagen = Path.Combine("/images", fileName); // Se genera la ruta de la imagen
+            }
+            else
+            {
+                departamentoDTO.Imagen = departamentoExistente.Data.Imagen; // Mantener la imagen existente si no se sube una nueva
+            }
+
+            Departamento updatedDepartamento = departamentoExistente.Data;
+            updatedDepartamento.Nombre = departamentoDTO.Nombre;
+            updatedDepartamento.Descripcion = departamentoDTO.Descripcion;
+            updatedDepartamento.Imagen = departamentoDTO.Imagen;
+            updatedDepartamento.Poblacion = departamentoDTO.Poblacion;
+            updatedDepartamento.IdCabecera = departamentoDTO.IdCabecera;
+
+            var result = await _departamentoBAO.UpdateOne(updatedDepartamento);
+            if (result.Data != null)
+            {
+                return Ok(result.Data);
+            }
+            else
+            {
+                return BadRequest(result.Message);
             }
         }
+
 
         // Método para eliminar un departamento por ID
         [HttpDelete("{id}")]
