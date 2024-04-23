@@ -1,5 +1,6 @@
 ﻿using InterRedBE.BAL.Bao;
 using InterRedBE.DAL.Dao;
+using InterRedBE.DAL.DTO;
 using InterRedBE.DAL.Models;
 using InterRedBE.UTILS;
 using InterRedBE.UTILS.Services;
@@ -76,7 +77,17 @@ namespace InterRedBE.BAL.Services
                 return new OperationResponse<Municipio>(0, ex.Message, null);
             }
         }
+        public async Task<OperationResponse<ListaEnlazadaDoble<MunicipioDTO>>> GetByDepartamentoId(int idDepartamento)
+        {
+            try
+            {
+                return await _municipioDAO.GetByDepartamentoId(idDepartamento);
+            }
+            catch (Exception ex)
+            {
+                return new OperationResponse<ListaEnlazadaDoble<MunicipioDTO>>(0, ex.Message, null);
+            }
+        }
 
-       
     }
 }
