@@ -1,6 +1,7 @@
 ﻿using InterRedBE.UTILS;
 using InterRedBE.UTILS.Services;
 using System.Threading.Tasks;
+
 namespace InterRedBE.DAL.Dao
 {
     public interface ICalificacionDAO<Calificacion> 
