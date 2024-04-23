@@ -17,6 +17,7 @@ namespace InterRedBE.DAL.Context
         public DbSet<Models.Usuario> Usuario { get; set; }
         public DbSet<Models.Departamento> Departamento { get; set; }
         public DbSet<Models.Municipio> Municipio { get; set; }
+        public DbSet<Models.Ruta> Ruta { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -45,7 +46,22 @@ namespace InterRedBE.DAL.Context
                 .HasOne(l => l.Departamento)
                 .WithMany() 
                 .HasForeignKey(l => l.IdDepartamento)
-                .OnDelete(DeleteBehavior.SetNull); 
+                .OnDelete(DeleteBehavior.SetNull);
+
+            // Configuración para la relación de Ruta con DepartamentoInicio
+            modelBuilder.Entity<Ruta>()
+                .HasOne(r => r.DepartamentoInicio)
+                .WithMany(d => d.RutasInicio)
+                .HasForeignKey(r => r.IdDepartamentoInicio)
+                .OnDelete(DeleteBehavior.Restrict); 
+
+            // Configuración para la relación de Ruta con DepartamentoFin
+            modelBuilder.Entity<Ruta>()
+                .HasOne(r => r.DepartamentoFin)
+                .WithMany(d => d.RutasFin)
+                .HasForeignKey(r => r.IdDepartamentoFin)
+                .OnDelete(DeleteBehavior.Restrict); 
+
 
         }
 
