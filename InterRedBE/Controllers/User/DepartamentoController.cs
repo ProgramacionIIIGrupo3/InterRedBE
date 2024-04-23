@@ -5,20 +5,20 @@
 //using Microsoft.AspNetCore.Http;
 //using Microsoft.AspNetCore.Mvc;
 
-//namespace InterRedBE.Controllers.User
-//{
-//    [Route("api/user/[controller]")]
-//    [ApiController]
-//    public class DepartamentoController : ControllerBase
-//    {
-        
-//        public readonly IDepartamentoBAO _departamentoBAO;
+namespace InterRedBE.Controllers.User
+{
+    [Route("api/user/[controller]")]
+    [ApiController]
+    public class DepartamentoController : ControllerBase
+    {
 
-//        public DepartamentoController(IDepartamentoBAO departamentoBAO)
-//        {
-//            _departamentoBAO = departamentoBAO;
-//        }
-//    }
+        public readonly IDepartamentoBAO _departamentoBAO;
+
+        public DepartamentoController(IDepartamentoBAO departamentoBAO)
+        {
+            _departamentoBAO = departamentoBAO;
+        }
+
 
 //    [HttpGet]
 //    public IActionResult GetAll()
@@ -54,4 +54,7 @@
 //        }
 //    }
 
-//}
+
+    }
+}
+
