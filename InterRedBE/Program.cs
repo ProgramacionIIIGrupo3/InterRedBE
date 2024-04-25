@@ -6,6 +6,7 @@ using InterRedBE.DAL.Dao;
 using InterRedBE.DAL.DTO;
 using InterRedBE.DAL.Services;
 using Microsoft.EntityFrameworkCore;
+using System.Text.Json.Serialization; // Asegúrate de tener esta directiva para acceder a ReferenceHandler
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -16,6 +17,7 @@ builder.Services.AddScoped<ILugarTuristicoDAO, LugarTuristicoService>();
 builder.Services.AddScoped<IMunicipioDAO, MunicipioService>();
 builder.Services.AddScoped<IUsuarioDAO, UsuarioService>();
 builder.Services.AddScoped<ILoginDAO, LoginService>();
+builder.Services.AddScoped<IRuta, RutaService>();
 
 // BAO DI
 builder.Services.AddScoped<IDepartamentoBAO, DepartamentoBAOService>();
@@ -23,10 +25,16 @@ builder.Services.AddScoped<ILugarTuristicoBAO, LugarTuristicoBAOService>();
 builder.Services.AddScoped<IUsuarioBAO, UsuarioBAOService>();
 builder.Services.AddScoped<IMunicipioBAO, MunicipioBAOService>();
 builder.Services.AddScoped<ILoginBAO, LoginBAOService>();
+builder.Services.AddScoped<IRutaBAO, RutaBAOService>();
 
 // Add services to the container.
 builder.Services.AddControllers()
-    .AddFluentValidation(fv => fv.RegisterValidatorsFromAssemblyContaining<LoginDTO>());
+    .AddFluentValidation(fv => fv.RegisterValidatorsFromAssemblyContaining<LoginDTO>())
+    .AddJsonOptions(options =>
+    {
+        options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.Preserve; // Manejar referencias cíclicas
+        options.JsonSerializerOptions.WriteIndented = true; // Hacer la salida del JSON más legible
+    });
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
@@ -48,7 +56,7 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
-app.UseStaticFiles(); 
+app.UseStaticFiles();
 
 app.UseRouting();
 
@@ -57,4 +65,3 @@ app.UseAuthorization();
 app.MapControllers();
 
 app.Run();
-
