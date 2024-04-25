@@ -5,7 +5,7 @@ namespace InterRedBE.BAL.Bao
 {
     public interface IRutaBAO
     {
-        Task<(ListaEnlazadaDoble<Departamento>, double)> EncontrarRutaAsync(int idDepartamentoInicio, int idDepartamentoFin);
+        Task<List<(ListaEnlazadaDoble<Departamento>, double)>> EncontrarTodasLasRutasAsync(int idDepartamentoInicio, int idDepartamentoFin, int numeroDeRutas = 5);
 
 
     }

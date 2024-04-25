@@ -1,8 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
+using System.Linq;
 using InterRedBE.BAL.Bao;
-using InterRedBE.DAL.DTO; // Asegúrate de incluir tu DTO
-using InterRedBE.UTILS.Services; // Si es necesario
+using InterRedBE.DAL.DTO;
 
 namespace InterRedBE.Controllers
 {
@@ -18,37 +18,41 @@ namespace InterRedBE.Controllers
         }
 
         [HttpGet("ruta/{idInicio}/{idFin}")]
-        public async Task<IActionResult> GetRuta(int idInicio, int idFin)
+        public async Task<IActionResult> GetRuta(int idInicio, int idFin, [FromQuery] int numeroDeRutas = 5)
         {
             try
             {
-                var (camino, distanciaTotal) = await _rutaBAOService.EncontrarRutaAsync(idInicio, idFin);
+                var todasLasRutas = await _rutaBAOService.EncontrarTodasLasRutasAsync(idInicio, idFin, numeroDeRutas);
 
-                if (camino != null && !camino.ListaVacia())
+                if (todasLasRutas != null && todasLasRutas.Count > 0)
                 {
-                    var ruta = camino.Select(departamento => new DepartamentoRutaDTO
+                    var rutas = todasLasRutas.Select(ruta =>
                     {
-                        Id = departamento.Id,
-                        Nombre = departamento.Nombre
+                        var caminoDTO = ruta.Item1.Select(departamento => new DepartamentoRutaDTO
+                        {
+                            Id = departamento.Id,
+                            Nombre = departamento.Nombre
+                        }).ToList();
+
+                        return new
+                        {
+                            Ruta = caminoDTO,
+                            DistanciaTotal = ruta.Item2
+                        };
                     }).ToList();
 
-                    var resultado = new
-                    {
-                        Ruta = ruta,
-                        DistanciaTotal = distanciaTotal
-                    };
-
-                    return Ok(resultado);
+                    return Ok(new { Rutas = rutas });
                 }
                 else
                 {
-                    return NotFound("No se encontró una ruta entre los departamentos especificados.");
+                    return NotFound("No se encontraron rutas entre los departamentos especificados.");
                 }
             }
             catch (Exception ex)
             {
-                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+                return StatusCode(StatusCodes.Status500InternalServerError, "Error al procesar la solicitud: " + ex.Message);
             }
         }
     }
 }
+   
