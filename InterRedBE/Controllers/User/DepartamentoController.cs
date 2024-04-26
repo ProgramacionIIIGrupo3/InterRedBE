@@ -1,9 +1,9 @@
-﻿//using InterRedBE.BAL.Bao;
-//using InterRedBE.DAL.Dao;
-//using InterRedBE.DAL.DTO;
-//using InterRedBE.DAL.Models;
-//using Microsoft.AspNetCore.Http;
-//using Microsoft.AspNetCore.Mvc;
+﻿using InterRedBE.BAL.Bao;
+using InterRedBE.DAL.Dao;
+using InterRedBE.DAL.DTO;
+using InterRedBE.DAL.Models;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 
 namespace InterRedBE.Controllers.User
 {
