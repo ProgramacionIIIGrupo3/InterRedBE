@@ -75,11 +75,6 @@ namespace InterRedBE.UTILS.Services
             }
         }
 
-        // Aquí podrías incluir más métodos según lo que necesites en tu aplicación, como métodos para:
-        // - Eliminar un nodo.
-        // - Buscar un camino entre dos nodos.
-        // - Imprimir la lista o representarla visualmente.
-        // - Etc.
     }
 
 }
