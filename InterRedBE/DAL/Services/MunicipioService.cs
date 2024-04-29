@@ -9,6 +9,7 @@ using Microsoft.EntityFrameworkCore;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using Microsoft.Extensions.Logging.Abstractions;
+using InterRedBE.DAL.DTO;
 
 namespace InterRedBE.DAL.Services
 {
@@ -148,6 +149,41 @@ namespace InterRedBE.DAL.Services
                 return new OperationResponse<Municipio>(0, ex.Message, null);
             }
         }
+        public async Task<OperationResponse<ListaEnlazadaDoble<MunicipioDTO>>> GetByDepartamentoId(int idDepartamento)
+        {
+            try
+            {
+                var municipios = _context.Municipio
+                    .Where(m => m.IdDepartamento == idDepartamento)
+                    .Select(m => new MunicipioDTO
+                    {
+                        Id = m.Id,
+                        Nombre = m.Nombre,
+                        Descripcion = m.Descripcion,
+                        Poblacion = m.Poblacion,
+                        IdDepartamento = m.IdDepartamento
+                    })
+                    .ToList();
+
+                if (municipios.Count == 0)
+                {
+                    return new OperationResponse<ListaEnlazadaDoble<MunicipioDTO>>(0, "No se encontraron municipios para el departamento especificado", null);
+                }
+
+                var listaMunicipios = new ListaEnlazadaDoble<MunicipioDTO>();
+                foreach (var municipio in municipios)
+                {
+                    listaMunicipios.InsertarAlFinal(municipio);
+                }
+
+                return new OperationResponse<ListaEnlazadaDoble<MunicipioDTO>>(1, "Municipios encontrados correctamente", listaMunicipios);
+            }
+            catch (Exception ex)
+            {
+                return new OperationResponse<ListaEnlazadaDoble<MunicipioDTO>>(0, ex.Message, null);
+            }
+        }
+
     }
 }
 

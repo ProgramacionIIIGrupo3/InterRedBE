@@ -5,7 +5,18 @@ using InterRedBE.DAL.Context;
 using InterRedBE.DAL.Dao;
 using InterRedBE.DAL.DTO;
 using InterRedBE.DAL.Services;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
+using System.Text.Json.Serialization; 
+using Microsoft.OpenApi.Models;
+using Serilog;
+using Serilog.Events;
+using InterRedBE.AUTH.Aao;
+using InterRedBE.AUTH.Service;
+
+
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -16,6 +27,7 @@ builder.Services.AddScoped<ILugarTuristicoDAO, LugarTuristicoService>();
 builder.Services.AddScoped<IMunicipioDAO, MunicipioService>();
 builder.Services.AddScoped<IUsuarioDAO, UsuarioService>();
 builder.Services.AddScoped<ILoginDAO, LoginService>();
+builder.Services.AddScoped<IRuta, RutaService>();
 
 // BAO DI
 builder.Services.AddScoped<IDepartamentoBAO, DepartamentoBAOService>();
@@ -23,14 +35,47 @@ builder.Services.AddScoped<ILugarTuristicoBAO, LugarTuristicoBAOService>();
 builder.Services.AddScoped<IUsuarioBAO, UsuarioBAOService>();
 builder.Services.AddScoped<IMunicipioBAO, MunicipioBAOService>();
 builder.Services.AddScoped<ILoginBAO, LoginBAOService>();
+builder.Services.AddScoped<IRutaBAO, RutaBAOService>();
+
+// AAO DI
+builder.Services.AddScoped<IJwtAAO, JwtService>();
 
 // Add services to the container.
 builder.Services.AddControllers()
-    .AddFluentValidation(fv => fv.RegisterValidatorsFromAssemblyContaining<LoginDTO>());
+    .AddFluentValidation(fv => fv.RegisterValidatorsFromAssemblyContaining<LoginDTO>())
+    .AddJsonOptions(options =>
+    {
+        options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.Preserve; // Manejar referencias cíclicas
+        options.JsonSerializerOptions.WriteIndented = true; // Hacer la salida del JSON más legible
+    });
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
+
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer(options =>
+    {
+        options.RequireHttpsMetadata = false;
+        options.SaveToken = true;
+        options.TokenValidationParameters = new TokenValidationParameters
+        ()
+        {
+            ValidateIssuer = true,
+            ValidateAudience = true,
+            ValidateLifetime = true,
+            ValidateIssuerSigningKey = true,
+
+            ValidIssuer = builder.Configuration[key: "Jwt:Issuer"],
+            ValidAudience = builder.Configuration[key: "Jwt:Issuer"],
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration[key: "Jwt:Key"]))
+        };
+    });
+
+
 builder.Services.AddSwaggerGen();
+
+
+
 
 // Register DbContext with SQL Server
 builder.Services.AddDbContext<InterRedContext>(options =>
@@ -48,13 +93,13 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
-app.UseStaticFiles(); 
+app.UseStaticFiles();
 
 app.UseRouting();
 
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
 
 app.Run();
-
