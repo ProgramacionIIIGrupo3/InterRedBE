@@ -23,38 +23,50 @@ namespace InterRedBE.Controllers.User
 //    [HttpGet]
 //    public IActionResult GetAll()
 //    {
-//        try
-//        {
-//            return Ok(_departamentoBAO.GetAll());
-//        }
-//        catch (Exception ex)
-//        {
-//            return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
-//        }
-//    }
 
-//    [HttpGet("{id}")]
-//    public async Task<IActionResult> GetOneInt(int id)
-//    {
-//        try
+//        public readonly IDepartamentoBAO _departamentoBAO;
+
+//        public DepartamentoController(IDepartamentoBAO departamentoBAO)
 //        {
-//            var result = await _departamentoBAO.GetOneInt(id);
-//            if (result.Data != null)
-//            {
-//                return Ok(result.Data);
-//            }
-//            else
-//            {
-//                return NotFound(result.Message);
-//            }
+//            _departamentoBAO = departamentoBAO;
 //        }
-//        catch (Exception ex)
-//        {
-//            return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
-//        }
-//    }
 
 
-    }
+////    [HttpGet]
+////    public IActionResult GetAll()
+////    {
+////        try
+////        {
+////            return Ok(_departamentoBAO.GetAll());
+////        }
+////        catch (Exception ex)
+////        {
+////            return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+////        }
+////    }
+
+////    [HttpGet("{id}")]
+////    public async Task<IActionResult> GetOneInt(int id)
+////    {
+////        try
+////        {
+////            var result = await _departamentoBAO.GetOneInt(id);
+////            if (result.Data != null)
+////            {
+////                return Ok(result.Data);
+////            }
+////            else
+////            {
+////                return NotFound(result.Message);
+////            }
+////        }
+////        catch (Exception ex)
+////        {
+////            return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+////        }
+////    }
+
+
+   }
 }
 

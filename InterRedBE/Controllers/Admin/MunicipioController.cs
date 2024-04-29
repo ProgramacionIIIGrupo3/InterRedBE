@@ -134,5 +134,26 @@ namespace InterRedBE.Controllers.Admin
             }
         }
 
+        [HttpGet("departamento/{idDepartamento}")]
+        public async Task<IActionResult> GetByDepartamentoId(int idDepartamento)
+        {
+            try
+            {
+                var result = await _municipioBAO.GetByDepartamentoId(idDepartamento);
+                if (result.Data != null)
+                {
+                    return Ok(result.Data);
+                }
+                else
+                {
+                    return NotFound(result.Message);
+                }
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+            }
+        }
+
     }
 }
