@@ -1,15 +1,27 @@
-﻿////using InterRedBE.BAL.Bao;
-////using InterRedBE.DAL.Dao;
-////using InterRedBE.DAL.DTO;
-////using InterRedBE.DAL.Models;
-////using Microsoft.AspNetCore.Http;
-////using Microsoft.AspNetCore.Mvc;
+﻿using InterRedBE.BAL.Bao;
+using InterRedBE.DAL.Dao;
+using InterRedBE.DAL.DTO;
+using InterRedBE.DAL.Models;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 
-//namespace InterRedBE.Controllers.User
-//{
-//    [Route("api/user/[controller]")]
-//    [ApiController]
-//    public class DepartamentoController : ControllerBase
+namespace InterRedBE.Controllers.User
+{
+    [Route("api/user/[controller]")]
+    [ApiController]
+    public class DepartamentoController : ControllerBase
+    {
+
+        public readonly IDepartamentoBAO _departamentoBAO;
+
+        public DepartamentoController(IDepartamentoBAO departamentoBAO)
+        {
+            _departamentoBAO = departamentoBAO;
+        }
+
+
+//    [HttpGet]
+//    public IActionResult GetAll()
 //    {
 
 //        public readonly IDepartamentoBAO _departamentoBAO;
@@ -55,6 +67,6 @@
 ////    }
 
 
-//    }
-//}
+   }
+}
 

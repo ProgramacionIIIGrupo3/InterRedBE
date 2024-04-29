@@ -1,9 +1,18 @@
+using InterRedBE.AUTH.Aao;
+using InterRedBE.AUTH.Service;
 using InterRedBE.BAL.Bao;
+using InterRedBE.DAL.Context;
 using InterRedBE.DAL.DTO;
 using InterRedBE.DAL.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity.Data;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
+using System.Text;
 
 namespace InterRedBE.Controllers.Admin
 {
@@ -13,11 +22,17 @@ namespace InterRedBE.Controllers.Admin
     {
         public readonly IUsuarioBAO _usuarioBAO;
         public readonly ILoginBAO _loginBAO;
+        public readonly IConfiguration _config;
+        public readonly InterRedContext _interRedContext;
+        private readonly IJwtAAO _jwtAAO;
 
-        public UsuarioController(IUsuarioBAO usuarioBAO, ILoginBAO loginBAO)
+        public UsuarioController(IUsuarioBAO usuarioBAO, ILoginBAO loginBAO, IConfiguration config, InterRedContext interRedContext, IJwtAAO jwtAAO)
         {
             _usuarioBAO = usuarioBAO;
             _loginBAO = loginBAO;
+            _config = config;
+            _interRedContext = interRedContext;
+            _jwtAAO = jwtAAO;
         }
 
         [HttpPost("login")]
@@ -31,8 +46,9 @@ namespace InterRedBE.Controllers.Admin
 
             if (await _loginBAO.VerifyUser(login.Correo, login.Contrasena))
             {
-                // Autenticación exitosa, puede devolver un token JWT u otro indicador de sesión
-                return Ok("Login exitoso.");
+                var user = await _interRedContext.Usuario.FirstOrDefaultAsync(u => u.Correo == login.Correo);
+                var token = _jwtAAO.GenerateToken(user);
+                return Ok(new { Token = token });
             }
             else
             {
@@ -42,7 +58,7 @@ namespace InterRedBE.Controllers.Admin
 
 
         [HttpGet]
-
+        [Authorize]
         public IActionResult GetAll()
         {
             try
@@ -80,7 +96,9 @@ namespace InterRedBE.Controllers.Admin
         //    }
         //}
 
+
         [HttpPut("{id}")]
+        [Authorize]
         public async Task<IActionResult> UpdateOne(int id, [FromBody] Usuario usuario)
         {
             if (id != usuario.Id)
