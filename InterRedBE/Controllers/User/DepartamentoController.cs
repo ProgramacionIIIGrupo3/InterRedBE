@@ -20,51 +20,39 @@ namespace InterRedBE.Controllers.User
         }
 
 
-//    [HttpGet]
-//    public IActionResult GetAll()
-//    {
+        [HttpGet]
+        public IActionResult GetAll()
+        {
+            try
+            {
+                return Ok(_departamentoBAO.GetAll());
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+            }
+        }
 
-//        public readonly IDepartamentoBAO _departamentoBAO;
-
-//        public DepartamentoController(IDepartamentoBAO departamentoBAO)
-//        {
-//            _departamentoBAO = departamentoBAO;
-//        }
-
-
-////    [HttpGet]
-////    public IActionResult GetAll()
-////    {
-////        try
-////        {
-////            return Ok(_departamentoBAO.GetAll());
-////        }
-////        catch (Exception ex)
-////        {
-////            return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
-////        }
-////    }
-
-////    [HttpGet("{id}")]
-////    public async Task<IActionResult> GetOneInt(int id)
-////    {
-////        try
-////        {
-////            var result = await _departamentoBAO.GetOneInt(id);
-////            if (result.Data != null)
-////            {
-////                return Ok(result.Data);
-////            }
-////            else
-////            {
-////                return NotFound(result.Message);
-////            }
-////        }
-////        catch (Exception ex)
-////        {
-////            return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
-////        }
-////    }
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetOneInt(int id)
+        {
+            try
+            {
+                var result = await _departamentoBAO.GetOneInt(id);
+                if (result.Data != null)
+                {
+                    return Ok(result.Data);
+                }
+                else
+                {
+                    return NotFound(result.Message);
+                }
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+            }
+        }
 
 
    }
