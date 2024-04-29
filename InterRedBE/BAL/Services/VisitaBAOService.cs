@@ -10,10 +10,12 @@ namespace InterRedBE.BAL.Services
     public class VisitaBAOService : IVisitaBAO<Visita>
     {
         private readonly IVisistaDAO<Visita> _visitaDAO;
+        private readonly IValidator<Visita> _validator;
 
-        public VisitaBAOService(IVisistaDAO<Visita> calificacionDAO)
+        public VisitaBAOService(IVisistaDAO<Visita> visitaDAO, IValidator<Visita> validator)
         {
-            //_visitaDAO = visitaDAO;
+           _visitaDAO = visitaDAO;
+           _validator = validator;
         }
 
         public Task<OperationResponse<Visita>> CreateOne(Visita obj)
