@@ -2,6 +2,6 @@
 {
     public interface ILoginDAO
     {
-        public Task<bool> VerifyUser (string email, string password);
+        public Task<bool> VerifyUser (string nombreUsuario, string password);
     }
 }
