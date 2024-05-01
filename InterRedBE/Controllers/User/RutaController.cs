@@ -5,6 +5,7 @@ using InterRedBE.BAL.Bao;
 using InterRedBE.DAL.DTO;
 using InterRedBE.UTILS.Services;
 using InterRedBE.DAL.Models;
+using InterRedBE.BAL.Services;
 
 namespace InterRedBE.Controllers
 {
@@ -57,5 +58,20 @@ namespace InterRedBE.Controllers
                 return StatusCode(StatusCodes.Status500InternalServerError, "Error al procesar la solicitud: " + ex.Message);
             }
         }
+        [HttpGet("top-lugares-cercanos")]
+        public async Task<IActionResult> ObtenerTopLugaresCercanos()
+        {
+            const int idDepartamentoGuatemala = 5;
+            var resultado = await _rutaBAOService.ObtenerTopLugaresCercanos(idDepartamentoGuatemala);
+            return Ok(resultado);
+        }
+        [HttpGet("top-lugares-lejanos")]
+        public async Task<IActionResult> ObtenerTopLugaresLejanos()
+        {
+            const int idDepartamentoGuatemala = 5;
+            var resultado = await _rutaBAOService.ObtenerTopLugaresLejanos(idDepartamentoGuatemala);
+            return Ok(resultado);
+        }
     }
+   
 }

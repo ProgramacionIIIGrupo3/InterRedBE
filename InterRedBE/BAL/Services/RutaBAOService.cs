@@ -5,6 +5,8 @@ using InterRedBE.DAL.Models;
 using InterRedBE.UTILS.Models;
 using InterRedBE.UTILS.Services;
 using System.Linq;
+using InterRedBE.DAL.Services;
+using InterRedBE.DAL.DTO;
 
 namespace InterRedBE.BAL.Services
 {
@@ -37,5 +39,57 @@ namespace InterRedBE.BAL.Services
             }
             return resultado;
         }
+        public async Task<ListaEnlazadaDoble<Departamento>> ObtenerTopLugaresCercanos(int idDepartamentoCapital)
+        {
+            var (redDepartamentos, distancias) = await _rutaService.CargarRutasAsync();
+            var departamentoCapital = redDepartamentos.Buscar(idDepartamentoCapital);
+
+            if (departamentoCapital == null)
+            {
+                return new ListaEnlazadaDoble<Departamento>();
+            }
+
+            var lugaresConDistancia = redDepartamentos.Vertices
+                .Where(v => v.Id != idDepartamentoCapital)
+                .Select(v => (Departamento: v.Valor, Distancia: redDepartamentos.CalcularDistancia(idDepartamentoCapital, v.Id, distancias)))
+                .OrderBy(x => x.Distancia)
+                .Take(10)
+                .ToList();
+
+            var resultado = new ListaEnlazadaDoble<Departamento>();
+            foreach (var lugar in lugaresConDistancia)
+            {
+                resultado.InsertarAlFinal(lugar.Departamento);
+            }
+
+            return resultado;
+
+            public async Task<ListaEnlazadaDoble<Departamento>> ObtenerTopLugaresLejanos(int idDepartamentoCapital)
+            {
+                var (redDepartamentos, distancias) = await _rutaService.CargarRutasAsync();
+                var departamentoCapital = redDepartamentos.Buscar(idDepartamentoCapital);
+
+                if (departamentoCapital == null)
+                {
+                    return new ListaEnlazadaDoble<Departamento>();
+                }
+
+                var lugaresConDistancia = redDepartamentos.Vertices
+                    .Where(v => v.Id != idDepartamentoCapital)
+                    .Select(v => (Departamento: v.Valor, Distancia: redDepartamentos.CalcularDistancia(idDepartamentoCapital, v.Id, distancias)))
+                    .OrderByDescending(x => x.Distancia)
+                    .Take(10)
+                    .ToList();
+
+                var resultado = new ListaEnlazadaDoble<Departamento>();
+                foreach (var lugar in lugaresConDistancia)
+                {
+                    resultado.InsertarAlFinal(lugar.Departamento);
+                }
+
+                return resultado;
+            }
+        }
     }
+       
 }
