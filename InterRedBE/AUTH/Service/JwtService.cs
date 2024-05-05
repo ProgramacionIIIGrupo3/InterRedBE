@@ -33,7 +33,7 @@ namespace InterRedBE.AUTH.Service
                     issuer: _config["Jwt:Issuer"],
                     audience: _config["Jwt:Audience"],
                     claims: claims,
-                    expires: DateTime.Now.AddDays(7),
+                    expires: DateTime.Now.AddDays(1),
                     signingCredentials: credentials
                 );
                 return new JwtSecurityTokenHandler().WriteToken(token);
