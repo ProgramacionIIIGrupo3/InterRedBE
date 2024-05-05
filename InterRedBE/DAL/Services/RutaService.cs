@@ -35,48 +35,7 @@ namespace InterRedBE.DAL.Services
 
             return (lista, distancias);
         }
-
-        public class ListaCuadruple<T>
-        {
-            private List<Vertice<T>> vertices = new List<Vertice<T>>();
-            private Dictionary<(int, int), List<int>> aristas = new Dictionary<(int, int), List<int>>();
-
-            public T? Buscar(int id)
-            {
-                var vertice = vertices.FirstOrDefault(v => v.Id == id);
-                return vertice?.Valor;
-            }
-
-            public IEnumerable<Vertice<T>> Vertices => vertices;
-
-            public double CalcularDistancia(int idInicio, int idFin, Dictionary<(int, int), double> distancias)
-            {
-                if (distancias.TryGetValue((idInicio, idFin), out double distancia))
-                {
-                    return distancia;
-                }
-
-                return double.PositiveInfinity;
-            }
-
-            public void AgregarNodoSiNoExiste(int id, T valor)
-            {
-                if (!vertices.Any(v => v.Id == id))
-                {
-                    vertices.Add(new Vertice<T> { Id = id, Valor = valor });
-                }
-            }
-
-            public void Conectar(int idInicio, int idFin, int peso)
-            {
-                if (!aristas.ContainsKey((idInicio, idFin)))
-                {
-                    aristas[(idInicio, idFin)] = new List<int>();
-                }
-
-                aristas[(idInicio, idFin)].Add(peso);
-            }
-        }
+      
     }
 
 }

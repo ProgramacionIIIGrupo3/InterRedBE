@@ -12,11 +12,13 @@ namespace InterRedBE.BAL.Services
 {
     public class RutaBAOService : IRutaBAO
     {
-        public readonly IRuta _rutaService;
+        private readonly IRuta _rutaService;
+        private readonly int _Id;
 
-        public RutaBAOService(IRuta ruta)
+        public RutaBAOService(IRuta rutaService, int Id)
         {
-            _rutaService = ruta;
+            _rutaService = rutaService;
+            _Id = Id;
         }
 
         public async Task<ListaEnlazadaDoble<(ListaEnlazadaDoble<Departamento>, double)>> EncontrarTodasLasRutasAsync(int idDepartamentoInicio, int idDepartamentoFin, int numeroDeRutas = 5)
@@ -39,57 +41,8 @@ namespace InterRedBE.BAL.Services
             }
             return resultado;
         }
-        public async Task<ListaEnlazadaDoble<Departamento>> ObtenerTopLugaresCercanos(int idDepartamentoCapital)
-        {
-            var (redDepartamentos, distancias) = await _rutaService.CargarRutasAsync();
-            var departamentoCapital = redDepartamentos.Buscar(idDepartamentoCapital);
+        
 
-            if (departamentoCapital == null)
-            {
-                return new ListaEnlazadaDoble<Departamento>();
-            }
-
-            var lugaresConDistancia = redDepartamentos.Vertices
-                .Where(v => v.Id != idDepartamentoCapital)
-                .Select(v => (Departamento: v.Valor, Distancia: redDepartamentos.CalcularDistancia(idDepartamentoCapital, v.Id, distancias)))
-                .OrderBy(x => x.Distancia)
-                .Take(10)
-                .ToList();
-
-            var resultado = new ListaEnlazadaDoble<Departamento>();
-            foreach (var lugar in lugaresConDistancia)
-            {
-                resultado.InsertarAlFinal(lugar.Departamento);
-            }
-
-            return resultado;
-
-            public async Task<ListaEnlazadaDoble<Departamento>> ObtenerTopLugaresLejanos(int idDepartamentoCapital)
-            {
-                var (redDepartamentos, distancias) = await _rutaService.CargarRutasAsync();
-                var departamentoCapital = redDepartamentos.Buscar(idDepartamentoCapital);
-
-                if (departamentoCapital == null)
-                {
-                    return new ListaEnlazadaDoble<Departamento>();
-                }
-
-                var lugaresConDistancia = redDepartamentos.Vertices
-                    .Where(v => v.Id != idDepartamentoCapital)
-                    .Select(v => (Departamento: v.Valor, Distancia: redDepartamentos.CalcularDistancia(idDepartamentoCapital, v.Id, distancias)))
-                    .OrderByDescending(x => x.Distancia)
-                    .Take(10)
-                    .ToList();
-
-                var resultado = new ListaEnlazadaDoble<Departamento>();
-                foreach (var lugar in lugaresConDistancia)
-                {
-                    resultado.InsertarAlFinal(lugar.Departamento);
-                }
-
-                return resultado;
-            }
-        }
     }
        
 }

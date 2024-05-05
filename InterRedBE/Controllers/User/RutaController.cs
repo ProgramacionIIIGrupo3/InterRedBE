@@ -6,6 +6,8 @@ using InterRedBE.DAL.DTO;
 using InterRedBE.UTILS.Services;
 using InterRedBE.DAL.Models;
 using InterRedBE.BAL.Services;
+using InterRedBE.DAL.Services;
+using InterRedBE.DAL.Context;
 
 namespace InterRedBE.Controllers
 {
@@ -13,11 +15,17 @@ namespace InterRedBE.Controllers
     [ApiController]
     public class RutaController : ControllerBase
     {
-        private readonly IRutaBAO _rutaBAOService;
+       private readonly IRutaBAO _rutaBAOService;
+        private readonly int _Id; // Asumimos que el ID de la ciudad capital es 5 (Guatemala)
 
-        public RutaController(IRutaBAO rutaBAOService)
+        public RutaController(IRutaBAO rutaBAOService, InterRedContext context)
         {
             _rutaBAOService = rutaBAOService;
+            _Id = 5; // ID de Guatemala
+
+            // Inicializar los servicios necesarios
+            var rutaService = new RutaService(context);
+            _rutaBAOService = new RutaBAOService(rutaService, _Id);
         }
 
         [HttpGet("ruta/{idInicio}/{idFin}")]
@@ -58,20 +66,26 @@ namespace InterRedBE.Controllers
                 return StatusCode(StatusCodes.Status500InternalServerError, "Error al procesar la solicitud: " + ex.Message);
             }
         }
-        [HttpGet("top-lugares-cercanos")]
-        public async Task<IActionResult> ObtenerTopLugaresCercanos()
+        [HttpGet("top10-cercanos")]
+        public async Task<IActionResult> GetTop10Cercanos()
         {
-            const int idDepartamentoGuatemala = 5;
-            var resultado = await _rutaBAOService.ObtenerTopLugaresCercanos(idDepartamentoGuatemala);
-            return Ok(resultado);
+            var todasLasRutas = await _rutaBAOService.EncontrarTodasLasRutasAsync(_Id, _Id, 10);
+            var top10Cercanos = todasLasRutas.Select(r => r.Item1.First().Nombre).ToList();
+
+            return Ok(top10Cercanos);
         }
-        [HttpGet("top-lugares-lejanos")]
-        public async Task<IActionResult> ObtenerTopLugaresLejanos()
+
+        [HttpGet("top10-lejanos")]
+        public async Task<IActionResult> GetTop10Lejanos()
         {
-            const int idDepartamentoGuatemala = 5;
-            var resultado = await _rutaBAOService.ObtenerTopLugaresLejanos(idDepartamentoGuatemala);
-            return Ok(resultado);
+            var todasLasRutas = await _rutaBAOService.EncontrarTodasLasRutasAsync(_Id, _Id, 10);
+            var top10Lejanos = todasLasRutas.Select(r => r.Item1.Last().Nombre).ToList();
+
+            return Ok(top10Lejanos);
         }
+
+
+
     }
-   
+
 }
