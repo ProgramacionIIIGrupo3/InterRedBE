@@ -15,10 +15,10 @@ namespace InterRedBE.BAL.Services
         private readonly IRuta _rutaService;
         private readonly int _Id;
 
-        public RutaBAOService(IRuta rutaService, int Id)
+        public RutaBAOService(IRuta rutaService)
         {
             _rutaService = rutaService;
-            _Id = Id;
+ 
         }
 
         public async Task<ListaEnlazadaDoble<(ListaEnlazadaDoble<Departamento>, double)>> EncontrarTodasLasRutasAsync(int idDepartamentoInicio, int idDepartamentoFin, int numeroDeRutas = 5)
