@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace InterRedBE.DAL.Services
 {
-    
+
     public class DepartamentoService : IDepartamentoDAO
     {
         // Contexto de la base de datos
@@ -164,33 +164,7 @@ namespace InterRedBE.DAL.Services
             }
         }
 
-        public async Task<OperationResponse<long>> ObtenerPoblacionDepartamento(int departamentoId)
-        {
-            try
-            {
-                // Obtener el departamento y cargar sus municipios relacionados
-                var departamento = await _context.Departamento
-                    .Include(d => d.Municipios)
-                    .FirstOrDefaultAsync(d => d.Id == departamentoId);
-
-                if (departamento == null)
-                {
-                    // Si el departamento no existe, devolver un mensaje de error
-                    return new OperationResponse<long>(0, $"No se encontró el departamento con ID {departamentoId}", 0);
-                }
-
-                // Sumar las poblaciones de los municipios relacionados
-                long poblacionTotal = departamento.Municipios.Sum(m => m.Poblacion);
-
-                // Devolver una respuesta exitosa con la población total del departamento
-                return new OperationResponse<long>(1, "Población del departamento obtenida correctamente", poblacionTotal);
-            }
-            catch (Exception ex)
-            {
-                // Manejar cualquier excepción que ocurra durante la obtención de la población y devolver una respuesta de error
-                return new OperationResponse<long>(0, ex.Message, 0);
-            }
-        }
     }
 }
+
 

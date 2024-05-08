@@ -39,18 +39,5 @@
         }
     }
 
-    public static class OperationResponseExtensions
-    {
-        public static OperationResult<T> ToOperationResult<T>(this OperationResponse<T> response)
-        {
-            if (response.Code == 200) // Éxito
-            {
-                return OperationResult<T>.Success(response.Data);
-            }
-            else
-            {
-                return OperationResult<T>.Failure(response.Message);
-            }
-        }
-    }
+
 }

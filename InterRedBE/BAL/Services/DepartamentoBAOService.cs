@@ -80,9 +80,6 @@ namespace InterRedBE.BAL.Services
                 return new OperationResponse<Departamento>(0, ex.Message, null);
             }
         }
-        public async Task<OperationResponse<long>> ObtenerPoblacionDepartamento(int departamentoId)
-        {
-            return await _departamentoDAO.ObtenerPoblacionDepartamento(departamentoId);
-        }
+
     }
 }

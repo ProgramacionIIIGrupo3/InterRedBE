@@ -6,7 +6,7 @@ namespace InterRedBE.DAL.Dao
 {
     public interface IDepartamentoDAO : ICRUD<Departamento>
     {
-        Task<OperationResponse<long>> ObtenerPoblacionDepartamento(int departamentoId);
+
     }
 }
 

@@ -16,7 +16,7 @@ namespace InterRedBE.Controllers
     public class RutaController : ControllerBase
     {
        private readonly IRutaBAO _rutaBAOService;
-        private readonly int _Id; // Asumimos que el ID de la ciudad capital es 5 (Guatemala)
+         private const int Id = 5;
 
         public RutaController(IRutaBAO rutaBAOService)
         {
@@ -62,34 +62,27 @@ namespace InterRedBE.Controllers
                 return StatusCode(StatusCodes.Status500InternalServerError, "Error al procesar la solicitud: " + ex.Message);
             }
         }
-        [HttpGet("TOP10LugarescercanosCapital")]
-        public async Task<IActionResult> ObtenerLugaresCercanos(int Id)
-        {
-            var todasLasRutas = await _rutaBAOService.EncontrarTodasLasRutasAsync(Id, Id);
 
-            var rutasCercanas = todasLasRutas.OrderBy(r => r.Item2)
-                                              .Take(10)
-                                              .Select(r => r.Item1)
-                                              .ToList();
+            [HttpGet("Top10Cercanos")]
+            public async Task<IActionResult> GetTop10CercanosALaCapital()
+            {
+                try
+                {
+                    // Obtener las rutas desde la capital a todos los departamentos
+                    var todasLasRutas = await _rutaBAOService.EncontrarTodasLasRutasAsync(Id, Id);
 
-            return Ok(rutasCercanas);
+                    // Ordenar las rutas por distancia y tomar los primeros 10
+                    var rutasCercanas = todasLasRutas.OrderBy(r => r.Item2)
+                                                      .Take(10)
+                                                      .Select(r => r.Item1)
+                                                      .ToList();
+
+                    return Ok(rutasCercanas);
+                }
+                catch (Exception ex)
+                {
+                    return StatusCode(StatusCodes.Status500InternalServerError, "Error al procesar la solicitud: " + ex.Message);
+                }
+            }
         }
-
-        [HttpGet("TOP10LugareslejanosCapital")]
-        public async Task<IActionResult> ObtenerLugaresLejanos(int Id)
-        {
-            var todasLasRutas = await _rutaBAOService.EncontrarTodasLasRutasAsync(Id, Id);
-
-            var rutasLejanas = todasLasRutas.OrderByDescending(r => r.Item2)
-                                            .Take(10)
-                                            .Select(r => r.Item1)
-                                            .ToList();
-
-            return Ok(rutasLejanas);
-        }
-
-
-
     }
-
-}
