@@ -83,7 +83,6 @@ namespace InterRedBE.Controllers.Admin
                 Nombre = departamentoDTO.Nombre,
                 Descripcion = departamentoDTO.Descripcion,
                 Imagen = departamentoDTO.Imagen,
-                Poblacion = departamentoDTO.Poblacion,
                 IdCabecera = departamentoDTO.IdCabecera
             };
 
@@ -134,7 +133,6 @@ namespace InterRedBE.Controllers.Admin
             updatedDepartamento.Nombre = departamentoDTO.Nombre;
             updatedDepartamento.Descripcion = departamentoDTO.Descripcion;
             updatedDepartamento.Imagen = departamentoDTO.Imagen;
-            updatedDepartamento.Poblacion = departamentoDTO.Poblacion;
             updatedDepartamento.IdCabecera = departamentoDTO.IdCabecera;
 
             var result = await _departamentoBAO.UpdateOne(updatedDepartamento);

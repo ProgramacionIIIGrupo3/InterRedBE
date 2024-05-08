@@ -15,9 +15,9 @@ namespace InterRedBE.DAL.Services
             _context = context;
         }
 
-        public async Task<bool> VerifyUser(string email, string password)
+        public async Task<bool> VerifyUser(string nombreUsuario, string password)
         {
-            var usuario = await _context.Usuario.FirstOrDefaultAsync(u => u.Correo == email);
+            var usuario = await _context.Usuario.FirstOrDefaultAsync(u => u.NombreUsuario == nombreUsuario);
             if (usuario == null)
             {
                 return false; // Usuario no encontrado

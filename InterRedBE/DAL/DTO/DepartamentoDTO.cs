@@ -6,7 +6,6 @@
         public string Descripcion { get; set; }
         public IFormFile ImagenFile { get; set; } // Archivo de imagen
         public string? Imagen { get; set; } // Ruta de la imagen
-        public int? Poblacion { get; set; }
         public int? IdCabecera { get; set; }
     }
 }

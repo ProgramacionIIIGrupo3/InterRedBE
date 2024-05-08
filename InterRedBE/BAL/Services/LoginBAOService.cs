@@ -12,9 +12,9 @@ namespace InterRedBE.BAL.Services
             _loginDAO = loginDAO;
         }
 
-        public async Task<bool> VerifyUser(string email, string password)
+        public async Task<bool> VerifyUser(string nombreUsuario, string password)
         {
-            return await _loginDAO.VerifyUser(email, password);
+            return await _loginDAO.VerifyUser(nombreUsuario, password);
         }
     }
 }

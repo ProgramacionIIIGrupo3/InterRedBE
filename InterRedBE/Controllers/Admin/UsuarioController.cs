@@ -44,9 +44,9 @@ namespace InterRedBE.Controllers.Admin
                 return BadRequest(ModelState);
             }
 
-            if (await _loginBAO.VerifyUser(login.Correo, login.Contrasena))
+            if (await _loginBAO.VerifyUser(login.NombreUsuario, login.Contrasena))
             {
-                var user = await _interRedContext.Usuario.FirstOrDefaultAsync(u => u.Correo == login.Correo);
+                var user = await _interRedContext.Usuario.FirstOrDefaultAsync(u => u.NombreUsuario == login.NombreUsuario);
                 var token = _jwtAAO.GenerateToken(user);
                 return Ok(new { Token = token });
             }

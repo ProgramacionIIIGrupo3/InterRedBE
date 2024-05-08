@@ -1,9 +1,10 @@
-﻿using InterRedBE.DAL.Context;
+using InterRedBE.DAL.Context;
 using InterRedBE.DAL.Dao;
 using InterRedBE.DAL.DTO;
 using InterRedBE.DAL.Models;
 using InterRedBE.UTILS;
 using InterRedBE.UTILS.Services;
+using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 
 namespace InterRedBE.DAL.Services
@@ -68,65 +69,61 @@ namespace InterRedBE.DAL.Services
         }
 
         // Método para obtener todos los departamentos 
+        // Método para obtener todos los departamentos 
         public OperationResponse<ListaEnlazadaDoble<Departamento>> GetAll()
         {
             try
             {
-                // Obtener todos los departamentos de la base de datos
-                var departamentos = _context.Departamento.ToList();
+                // Obtener todos los departamentos de la base de datos incluyendo sus municipios
+                var departamentos = _context.Departamento
+                                            .Include(d => d.Municipios)
+                                            .ToList();
 
-                // Verificar si se encontraron departamentos
                 if (departamentos.Count == 0)
                 {
-                    // Si no se encontraron, devolver un mensaje de error
                     return new OperationResponse<ListaEnlazadaDoble<Departamento>>(0, "No se encontraron los Departamentos", null);
                 }
 
-                // Crear una lista enlazada doble para almacenar los departamentos
                 var listaDepartamentos = new ListaEnlazadaDoble<Departamento>();
-
-                // Insertar cada departamento en la lista enlazada
                 foreach (var departamento in departamentos)
                 {
                     listaDepartamentos.InsertarAlFinal(departamento);
                 }
 
-                // Devolver una respuesta exitosa con la lista de departamentos encontrados
                 return new OperationResponse<ListaEnlazadaDoble<Departamento>>(1, "Departamentos Encontrados Correctamente", listaDepartamentos);
             }
             catch (Exception ex)
             {
-                // Manejar cualquier excepción que ocurra durante la obtención de los departamentos y devolver una respuesta de error
                 return new OperationResponse<ListaEnlazadaDoble<Departamento>>(0, ex.Message, null);
             }
         }
+
 
         // Método para obtener un departamento 
         public async Task<OperationResponse<Departamento>> GetOne(int id)
         {
             try
             {
-                // Buscar el departamento por su ID
-                var departamento = _context.Departamento.FirstOrDefault(ts => ts.Id == id);
+                // Buscar el departamento por su ID incluyendo sus municipios
+                var departamento = _context.Departamento
+                                           .Include(d => d.Municipios)
+                                           .FirstOrDefault(ts => ts.Id == id);
 
-                // Verificar si se encontró el departamento
                 if (departamento != null)
                 {
-                    // Si se encontró, devolver una respuesta exitosa con el departamento encontrado
                     return new OperationResponse<Departamento>(1, "Departamento Encontrado Correctamente", departamento);
                 }
                 else
                 {
-                    // Si no se encontró, devolver un mensaje de error
                     return new OperationResponse<Departamento>(0, "Departamento no encontrado", null);
                 }
             }
             catch (Exception ex)
             {
-                // Manejar cualquier excepción que ocurra durante la obtención del departamento y devolver una respuesta de error
                 return new OperationResponse<Departamento>(0, ex.Message, null);
             }
         }
+
 
         // Método para actualizar un departamento 
         public async Task<OperationResponse<Departamento>> UpdateOne(Departamento obj)
@@ -147,7 +144,6 @@ namespace InterRedBE.DAL.Services
                 departamentoExistente.Nombre = obj.Nombre;
                 departamentoExistente.Descripcion = obj.Descripcion;
                 departamentoExistente.Imagen = obj.Imagen;
-                departamentoExistente.Poblacion = obj.Poblacion;
                 departamentoExistente.IdCabecera = obj.IdCabecera;
 
                 // Actualizar el departamento en el contexto y guardar los cambios en la base de datos
