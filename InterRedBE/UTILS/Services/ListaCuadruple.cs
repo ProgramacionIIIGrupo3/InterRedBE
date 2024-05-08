@@ -1,5 +1,7 @@
-﻿using InterRedBE.UTILS.Models;
+﻿using InterRedBE.DAL.Models;
+using InterRedBE.UTILS.Models;
 using System.Collections;
+
 
 namespace InterRedBE.UTILS.Services
 {
@@ -12,6 +14,7 @@ namespace InterRedBE.UTILS.Services
             nodos = new Dictionary<int, NodoCuadruple<T>>();
         }
 
+       
         public void AgregarNodoSiNoExiste(int id, T dato)
         {
             if (!nodos.ContainsKey(id))
@@ -137,7 +140,7 @@ namespace InterRedBE.UTILS.Services
                 }
             }
         }
-
+        //BUSCARTODAS LAS RUTAS
         public ListaEnlazadaDoble<(ListaEnlazadaDoble<T>, double)> BuscarTodasLasRutas(int idInicio, int idFin, Dictionary<(int, int), double> distancias)
         {
             var todasLasRutas = new ListaEnlazadaDoble<(ListaEnlazadaDoble<T>, double)>();
@@ -150,6 +153,7 @@ namespace InterRedBE.UTILS.Services
             return todasLasRutas;
         }
 
+        //BUSCAR TODAS LAS RUTAS
         private void BuscarRutasDFS(NodoCuadruple<T> actual, int destino, ListaEnlazadaDoble<int> visitados, ListaEnlazadaDoble<int> rutaActual, double distanciaAcumulada, ListaEnlazadaDoble<(ListaEnlazadaDoble<T>, double)> todasLasRutas, Dictionary<(int, int), double> distancias)
         {
             // Verifica si el nodo actual ya fue visitado en esta ruta
@@ -199,6 +203,7 @@ namespace InterRedBE.UTILS.Services
             visitados.EliminarDatoX(actual.Id);
         }
 
+        
     }
 
 }

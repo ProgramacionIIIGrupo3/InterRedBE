@@ -5,16 +5,20 @@ using InterRedBE.DAL.Models;
 using InterRedBE.UTILS.Models;
 using InterRedBE.UTILS.Services;
 using System.Linq;
+using InterRedBE.DAL.Services;
+using InterRedBE.DAL.DTO;
 
 namespace InterRedBE.BAL.Services
 {
     public class RutaBAOService : IRutaBAO
     {
-        public readonly IRuta _rutaService;
+        private readonly IRuta _rutaService;
+        private readonly int _Id;
 
-        public RutaBAOService(IRuta ruta)
+        public RutaBAOService(IRuta rutaService)
         {
-            _rutaService = ruta;
+            _rutaService = rutaService;
+ 
         }
 
         public async Task<ListaEnlazadaDoble<(ListaEnlazadaDoble<Departamento>, double)>> EncontrarTodasLasRutasAsync(int idDepartamentoInicio, int idDepartamentoFin, int numeroDeRutas = 5)
@@ -37,5 +41,8 @@ namespace InterRedBE.BAL.Services
             }
             return resultado;
         }
+        
+
     }
+       
 }

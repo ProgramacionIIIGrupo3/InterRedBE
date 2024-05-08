@@ -5,6 +5,9 @@ using InterRedBE.BAL.Bao;
 using InterRedBE.DAL.DTO;
 using InterRedBE.UTILS.Services;
 using InterRedBE.DAL.Models;
+using InterRedBE.BAL.Services;
+using InterRedBE.DAL.Services;
+
 
 namespace InterRedBE.Controllers
 {
@@ -12,11 +15,13 @@ namespace InterRedBE.Controllers
     [ApiController]
     public class RutaController : ControllerBase
     {
-        private readonly IRutaBAO _rutaBAOService;
+       private readonly IRutaBAO _rutaBAOService;
+         private const int Id = 5;
 
         public RutaController(IRutaBAO rutaBAOService)
         {
             _rutaBAOService = rutaBAOService;
+            
         }
 
         [HttpGet("ruta/{idInicio}/{idFin}")]
@@ -57,5 +62,27 @@ namespace InterRedBE.Controllers
                 return StatusCode(StatusCodes.Status500InternalServerError, "Error al procesar la solicitud: " + ex.Message);
             }
         }
+
+            [HttpGet("Top10Cercanos")]
+            public async Task<IActionResult> GetTop10CercanosALaCapital()
+            {
+                try
+                {
+                    // Obtener las rutas desde la capital a todos los departamentos
+                    var todasLasRutas = await _rutaBAOService.EncontrarTodasLasRutasAsync(Id, Id);
+
+                    // Ordenar las rutas por distancia y tomar los primeros 10
+                    var rutasCercanas = todasLasRutas.OrderBy(r => r.Item2)
+                                                      .Take(10)
+                                                      .Select(r => r.Item1)
+                                                      .ToList();
+
+                    return Ok(rutasCercanas);
+                }
+                catch (Exception ex)
+                {
+                    return StatusCode(StatusCodes.Status500InternalServerError, "Error al procesar la solicitud: " + ex.Message);
+                }
+            }
+        }
     }
-}

@@ -16,8 +16,6 @@ namespace InterRedBE.DAL.Services
             _context = context;
         }
 
-
-
         public async Task<(ListaCuadruple<Departamento>, Dictionary<(int, int), double>)> CargarRutasAsync()
         {
             ListaCuadruple<Departamento> lista = new ListaCuadruple<Departamento>();
@@ -37,7 +35,8 @@ namespace InterRedBE.DAL.Services
 
             return (lista, distancias);
         }
-
-
+      
     }
+
 }
+

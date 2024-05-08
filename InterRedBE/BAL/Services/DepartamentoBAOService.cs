@@ -80,5 +80,6 @@ namespace InterRedBE.BAL.Services
                 return new OperationResponse<Departamento>(0, ex.Message, null);
             }
         }
+
     }
 }

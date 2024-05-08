@@ -1,4 +1,4 @@
-﻿using InterRedBE.DAL.Context;
+using InterRedBE.DAL.Context;
 using InterRedBE.DAL.Dao;
 using InterRedBE.DAL.DTO;
 using InterRedBE.DAL.Models;
@@ -9,7 +9,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace InterRedBE.DAL.Services
 {
-    
+
     public class DepartamentoService : IDepartamentoDAO
     {
         // Contexto de la base de datos
@@ -159,6 +159,8 @@ namespace InterRedBE.DAL.Services
                 return new OperationResponse<Departamento>(0, ex.Message, null);
             }
         }
+
     }
 }
+
 
