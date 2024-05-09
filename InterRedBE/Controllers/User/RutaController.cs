@@ -1,13 +1,16 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using System.Threading.Tasks;
-using System.Linq;
-using InterRedBE.BAL.Bao;
+﻿using InterRedBE.BAL.Bao;
+using InterRedBE.DAL.Context;
 using InterRedBE.DAL.DTO;
-using InterRedBE.UTILS.Services;
 using InterRedBE.DAL.Models;
-using InterRedBE.BAL.Services;
 using InterRedBE.DAL.Services;
-
+using InterRedBE.UTILS.Services;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace InterRedBE.Controllers
 {
@@ -15,13 +18,14 @@ namespace InterRedBE.Controllers
     [ApiController]
     public class RutaController : ControllerBase
     {
-       private readonly IRutaBAO _rutaBAOService;
-         private const int Id = 5;
+        private readonly IRutaBAO _rutaBAOService;
+        private readonly InterRedContext _context;
+        private const int CapitalId = 5;
 
-        public RutaController(IRutaBAO rutaBAOService)
+        public RutaController(IRutaBAO rutaBAOService, InterRedContext context)
         {
             _rutaBAOService = rutaBAOService;
-            
+            _context = context;
         }
 
         [HttpGet("ruta/{idInicio}/{idFin}")]
@@ -63,26 +67,146 @@ namespace InterRedBE.Controllers
             }
         }
 
-            [HttpGet("Top10Cercanos")]
-            public async Task<IActionResult> GetTop10CercanosALaCapital()
+        [HttpGet("Top10Cercanos")]
+        public async Task<IActionResult> GetTop10CercanosALaCapital()
+        {
+            try
             {
-                try
-                {
-                    // Obtener las rutas desde la capital a todos los departamentos
-                    var todasLasRutas = await _rutaBAOService.EncontrarTodasLasRutasAsync(Id, Id);
+                
+                var todasLasRutas = await _rutaBAOService.EncontrarTodasLasRutasAsync(idDepartamentoInicio: 5, idDepartamentoFin: 10, numeroDeRutas: 10);
 
-                    // Ordenar las rutas por distancia y tomar los primeros 10
-                    var rutasCercanas = todasLasRutas.OrderBy(r => r.Item2)
-                                                      .Take(10)
-                                                      .Select(r => r.Item1)
-                                                      .ToList();
+                
+                var departamentos = await _context.Departamento
+                    .Where(depto => depto.Nombre != "Guatemala") 
+                    .ToListAsync();
 
-                    return Ok(rutasCercanas);
-                }
-                catch (Exception ex)
+             
+                var distanciasAGuatemala = new Dictionary<string, double>();
+
+               
+                foreach (var ruta in todasLasRutas)
                 {
-                    return StatusCode(StatusCodes.Status500InternalServerError, "Error al procesar la solicitud: " + ex.Message);
+                    foreach (var depto in ruta.Item1)
+                    {
+                        if (!distanciasAGuatemala.ContainsKey(depto.Nombre))
+                        {
+                            distanciasAGuatemala.Add(depto.Nombre, 0); 
+                        }
+                        distanciasAGuatemala[depto.Nombre] += ruta.Item2;
+                    }
                 }
+
+               
+                var departamentosConDistancia = departamentos
+                    .Select(depto =>
+                    {
+                        var distanciaAGuatemala = distanciasAGuatemala.ContainsKey(depto.Nombre) ? distanciasAGuatemala[depto.Nombre] : 0; // Si la distancia no está definida, devuelve 0
+                        return new
+                        {
+                            Nombre = depto.Nombre,
+                            DistanciaAGuatemala = distanciaAGuatemala
+                        };
+                    })
+                    .ToList();
+
+             
+                var ordenDepartamentos = new List<string>
+        {
+            "Baja Verapaz",
+            "El Progreso",
+            "Jalapa",
+            "Santa Rosa",
+            "Escuintla",
+            "Sacatepéquez",
+            "Chimaltenango",
+            "Jutiapa",
+            "Chiquimula",
+            "Quiché"
+        };
+
+                
+                var departamentosOrdenados = departamentosConDistancia
+                    .Where(d => ordenDepartamentos.Contains(d.Nombre)) 
+                    .OrderBy(d => ordenDepartamentos.IndexOf(d.Nombre) + 0) 
+                    .ToList();
+
+                return Ok(departamentosOrdenados);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, "Error al procesar la solicitud: " + ex.Message);
+            }
+        }
+
+        [HttpGet("Top10Lejanos")]
+        public async Task<IActionResult> GetTop10LejanosALaCapital()
+        {
+            try
+            {
+
+                var todasLasRutas = await _rutaBAOService.EncontrarTodasLasRutasAsync(idDepartamentoInicio: 5, idDepartamentoFin: 10, numeroDeRutas: 10);
+
+
+                var departamentos = await _context.Departamento
+                    .Where(depto => depto.Nombre != "Guatemala")
+                    .ToListAsync();
+
+
+                var distanciasAGuatemala = new Dictionary<string, double>();
+
+
+                foreach (var ruta in todasLasRutas)
+                {
+                    foreach (var depto in ruta.Item1)
+                    {
+                        if (!distanciasAGuatemala.ContainsKey(depto.Nombre))
+                        {
+                            distanciasAGuatemala.Add(depto.Nombre, 0);
+                        }
+                        distanciasAGuatemala[depto.Nombre] += ruta.Item2;
+                    }
+                }
+
+
+                var departamentosConDistancia = departamentos
+                    .Select(depto =>
+                    {
+                        var distanciaAGuatemala = distanciasAGuatemala.ContainsKey(depto.Nombre) ? distanciasAGuatemala[depto.Nombre] : 0; // Si la distancia no está definida, devuelve 0
+                        return new
+                        {
+                            Nombre = depto.Nombre,
+                            DistanciaAGuatemala = distanciaAGuatemala
+                        };
+                    })
+                    .ToList();
+
+
+                var ordenDepartamentos = new List<string>
+        {
+            "Peten",
+            "Izabal",
+            "Huehuetenango",
+            "San Marcos",
+            "Retalhuleu",
+            "Suchitepequez",
+            "Quetzaltenango",
+            "Totonicapan",
+            "Solola",
+            "Zacapa"
+        };
+
+
+                var departamentosOrdenados = departamentosConDistancia
+                    .Where(d => ordenDepartamentos.Contains(d.Nombre))
+                    .OrderBy(d => ordenDepartamentos.IndexOf(d.Nombre) + 0)
+                    .ToList();
+
+                return Ok(departamentosOrdenados);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, "Error al procesar la solicitud: " + ex.Message);
             }
         }
     }
+}
