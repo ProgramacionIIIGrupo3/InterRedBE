@@ -20,12 +20,14 @@ namespace InterRedBE.Controllers
     {
         private readonly IRutaBAO _rutaBAOService;
         private readonly InterRedContext _context;
+        private readonly InterRedContext _context1;
         private const int CapitalId = 5;
 
-        public RutaController(IRutaBAO rutaBAOService, InterRedContext context)
+        public RutaController(IRutaBAO rutaBAOService, InterRedContext context, InterRedContext context1)
         {
             _rutaBAOService = rutaBAOService;
             _context = context;
+            _context1 = context1;
         }
 
         [HttpGet("ruta/{idInicio}/{idFin}")]
@@ -147,7 +149,7 @@ namespace InterRedBE.Controllers
                 var todasLasRutas = await _rutaBAOService.EncontrarTodasLasRutasAsync(idDepartamentoInicio: 5, idDepartamentoFin: 10, numeroDeRutas: 10);
 
                 // Obtener los nombres de los departamentos que no sean Guatemala
-                var departamentos = await _context.Departamento
+                var departamentos = await _context1.Departamento
                     .Where(depto => depto.Nombre != "Guatemala")
                     .ToListAsync();
 
@@ -168,7 +170,8 @@ namespace InterRedBE.Controllers
                 }
 
                 // Obtener las distancias de los departamentos a Guatemala
-                var departamentosConDistancia = await Task.WhenAll(departamentos.Select(async depto =>
+                var departamentosConDistancia = new List<DepartamentoConDistancia>();
+                foreach (var depto in departamentos)
                 {
                     var distanciaAGuatemala = distanciasAGuatemala.ContainsKey(depto.Nombre) ? distanciasAGuatemala[depto.Nombre] : 0; // Si la distancia no está definida, devuelve 0
                     if (distanciaAGuatemala == 0)
@@ -177,12 +180,12 @@ namespace InterRedBE.Controllers
                         var ruta = await _rutaBAOService.EncontrarTodasLasRutasAsync(5, depto.Id); // Suponiendo que 5 es el ID de Guatemala
                         distanciaAGuatemala = ruta.Sum(r => r.Item2); // Sumar la distancia de la ruta
                     }
-                    return new DepartamentoConDistancia // Usando la clase DepartamentoConDistancia en lugar de un tipo anónimo
+                    departamentosConDistancia.Add(new DepartamentoConDistancia
                     {
                         Nombre = depto.Nombre,
                         DistanciaAGuatemala = distanciaAGuatemala
-                    };
-                }).ToArray());
+                    });
+                }
 
                 // Ordenar los departamentos según el orden especificado
                 var ordenDepartamentos = new List<string>
@@ -216,7 +219,6 @@ namespace InterRedBE.Controllers
                 return StatusCode(StatusCodes.Status500InternalServerError, "Error al procesar la solicitud: " + ex.Message);
             }
         }
-
 
 
     }
