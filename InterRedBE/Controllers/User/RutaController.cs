@@ -143,44 +143,48 @@ namespace InterRedBE.Controllers
         {
             try
             {
-
+                // Obtener todas las rutas desde Guatemala a los departamentos
                 var todasLasRutas = await _rutaBAOService.EncontrarTodasLasRutasAsync(idDepartamentoInicio: 5, idDepartamentoFin: 10, numeroDeRutas: 10);
 
-
+                // Obtener los nombres de los departamentos que no sean Guatemala
                 var departamentos = await _context.Departamento
                     .Where(depto => depto.Nombre != "Guatemala")
                     .ToListAsync();
 
-
+                // Crear un diccionario de distancias desde Guatemala a cada departamento
                 var distanciasAGuatemala = new Dictionary<string, double>();
 
-
+                // Calcular la distancia de cada departamento a Guatemala sumando las distancias de las rutas obtenidas
                 foreach (var ruta in todasLasRutas)
                 {
                     foreach (var depto in ruta.Item1)
                     {
                         if (!distanciasAGuatemala.ContainsKey(depto.Nombre))
                         {
-                            distanciasAGuatemala.Add(depto.Nombre, 0);
+                            distanciasAGuatemala.Add(depto.Nombre, 0); // Inicializar la distancia en 0
                         }
-                        distanciasAGuatemala[depto.Nombre] += ruta.Item2;
+                        distanciasAGuatemala[depto.Nombre] += ruta.Item2; // Sumar la distancia de la ruta al departamento
                     }
                 }
 
-
-                var departamentosConDistancia = departamentos
-                    .Select(depto =>
+                // Obtener las distancias de los departamentos a Guatemala
+                var departamentosConDistancia = await Task.WhenAll(departamentos.Select(async depto =>
+                {
+                    var distanciaAGuatemala = distanciasAGuatemala.ContainsKey(depto.Nombre) ? distanciasAGuatemala[depto.Nombre] : 0; // Si la distancia no está definida, devuelve 0
+                    if (distanciaAGuatemala == 0)
                     {
-                        var distanciaAGuatemala = distanciasAGuatemala.ContainsKey(depto.Nombre) ? distanciasAGuatemala[depto.Nombre] : 0; // Si la distancia no está definida, devuelve 0
-                        return new
-                        {
-                            Nombre = depto.Nombre,
-                            DistanciaAGuatemala = distanciaAGuatemala
-                        };
-                    })
-                    .ToList();
+                        // Encontrar una ruta para los departamentos que no tienen una distancia definida
+                        var ruta = await _rutaBAOService.EncontrarTodasLasRutasAsync(5, depto.Id); // Suponiendo que 5 es el ID de Guatemala
+                        distanciaAGuatemala = ruta.Sum(r => r.Item2); // Sumar la distancia de la ruta
+                    }
+                    return new DepartamentoConDistancia // Usando la clase DepartamentoConDistancia en lugar de un tipo anónimo
+                    {
+                        Nombre = depto.Nombre,
+                        DistanciaAGuatemala = distanciaAGuatemala
+                    };
+                }).ToArray());
 
-
+                // Ordenar los departamentos según el orden especificado
                 var ordenDepartamentos = new List<string>
         {
             "Peten",
@@ -195,10 +199,14 @@ namespace InterRedBE.Controllers
             "Zacapa"
         };
 
-
-                var departamentosOrdenados = departamentosConDistancia
-                    .Where(d => ordenDepartamentos.Contains(d.Nombre))
-                    .OrderBy(d => ordenDepartamentos.IndexOf(d.Nombre) + 0)
+                // Filtrar y ordenar los departamentos según el orden especificado
+                var departamentosOrdenados = ordenDepartamentos
+                    .Select(nombre =>
+                    {
+                        var departamento = departamentosConDistancia.FirstOrDefault(d => d.Nombre == nombre);
+                        return departamento != null ? departamento : new DepartamentoConDistancia { Nombre = nombre, DistanciaAGuatemala = 0 };
+                    })
+                    .OrderBy(d => d.DistanciaAGuatemala) // Ordenar según la distancia a Guatemala de manera ascendente
                     .ToList();
 
                 return Ok(departamentosOrdenados);
@@ -208,5 +216,10 @@ namespace InterRedBE.Controllers
                 return StatusCode(StatusCodes.Status500InternalServerError, "Error al procesar la solicitud: " + ex.Message);
             }
         }
+
+
+
     }
+
 }
+
