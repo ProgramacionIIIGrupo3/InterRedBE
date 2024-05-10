@@ -1,4 +1,5 @@
-﻿using InterRedBE.UTILS.Models;
+﻿using InterRedBE.DAL.Models;
+using InterRedBE.UTILS.Models;
 using System.Collections;
 
 namespace InterRedBE.UTILS.Services
@@ -12,6 +13,10 @@ namespace InterRedBE.UTILS.Services
         {
             PrimerNodo = null;
             UltimoNodo = null;
+        }
+
+        public ListaEnlazadaDoble(List<Visita> visitas)
+        {
         }
 
         public bool ListaVacia()
