@@ -3,6 +3,6 @@
     public class VisitaDTO
     {
         public int Id { get; set; }
-        public int? IdLugarTuristico { get; set; }
+        public int? LugarTuristicoId { get; set; }
     }
 }

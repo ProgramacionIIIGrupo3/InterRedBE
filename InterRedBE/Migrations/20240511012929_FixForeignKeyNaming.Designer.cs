@@ -4,6 +4,7 @@ using InterRedBE.DAL.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace InterRedBE.Migrations
 {
     [DbContext(typeof(InterRedContext))]
-    partial class InterRedContextModelSnapshot : ModelSnapshot
+    [Migration("20240511012929_FixForeignKeyNaming")]
+    partial class FixForeignKeyNaming
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -74,6 +77,9 @@ namespace InterRedBE.Migrations
                     b.Property<string>("Nombre")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<int?>("Poblacion")
+                        .HasColumnType("int");
 
                     b.HasKey("Id");
 
@@ -220,17 +226,15 @@ namespace InterRedBE.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<int?>("LugarTuristicoId")
+                    b.Property<int?>("IdLugarTuristico")
                         .HasColumnType("int");
 
-                    b.Property<int?>("LugarTuristicoId1")
+                    b.Property<int>("LugarTuristicoId")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
 
                     b.HasIndex("LugarTuristicoId");
-
-                    b.HasIndex("LugarTuristicoId1");
 
                     b.ToTable("Visita");
                 });
@@ -315,13 +319,10 @@ namespace InterRedBE.Migrations
             modelBuilder.Entity("InterRedBE.DAL.Models.Visita", b =>
                 {
                     b.HasOne("InterRedBE.DAL.Models.LugarTuristico", "LugarTuristico")
-                        .WithMany()
-                        .HasForeignKey("LugarTuristicoId")
-                        .OnDelete(DeleteBehavior.SetNull);
-
-                    b.HasOne("InterRedBE.DAL.Models.LugarTuristico", null)
                         .WithMany("Visitas")
-                        .HasForeignKey("LugarTuristicoId1");
+                        .HasForeignKey("LugarTuristicoId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("LugarTuristico");
                 });

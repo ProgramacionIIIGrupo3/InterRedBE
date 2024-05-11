@@ -11,9 +11,9 @@ namespace InterRedBE.Controllers.User
     public class VisitaController : ControllerBase
     {
 
-        public readonly IVisitaBAO<Visita> _visitaBAO;
+        public readonly IVisitaBAO _visitaBAO;
 
-        public VisitaController(IVisitaBAO<Visita> VisitaBAO)
+        public VisitaController(IVisitaBAO VisitaBAO)
         {
             _visitaBAO = VisitaBAO;
         }
@@ -32,14 +32,14 @@ namespace InterRedBE.Controllers.User
         }
 
         [HttpPost]
-        public async Task<IActionResult> CreateOne([FromBody] CalificacionDTO VisitaDto)
+        public async Task<IActionResult> CreateOne([FromBody] VisitaDTO VisitaDto)
         {
             try
             {
                 var visita = new Visita
                 {
                     Id = VisitaDto.Id,
-                    IdLugarTuristico = VisitaDto.IdLugarTuristico,
+                    LugarTuristicoId = VisitaDto.LugarTuristicoId,
                 };
 
                 var result = await _visitaBAO.CreateOne(visita);

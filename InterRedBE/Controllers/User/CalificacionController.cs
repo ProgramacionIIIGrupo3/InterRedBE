@@ -12,9 +12,9 @@ namespace InterRedBE.Controllers.User
     public class CalificacionController : ControllerBase
     {
 
-        public readonly ICalificacionBAO<Calificacion> _calificacionBAO;
+        public readonly ICalificacionBAO _calificacionBAO;
 
-        public CalificacionController(ICalificacionBAO<Calificacion> calificacionBAO)
+        public CalificacionController(ICalificacionBAO calificacionBAO)
         {
             _calificacionBAO = calificacionBAO;
         }
@@ -39,9 +39,10 @@ namespace InterRedBE.Controllers.User
             {
                 var calificacion = new Calificacion
                 {
-                    IdLugarTuristico = calificacionDto.IdLugarTuristico,
+                    LugarTuristicoId = calificacionDto.LugarTuristicoId,
                     Puntuacion = calificacionDto.Puntuacion,
-                    Comentario = calificacionDto.Comentario
+                    Comentario = calificacionDto.Comentario,
+          
 
                 };
                 

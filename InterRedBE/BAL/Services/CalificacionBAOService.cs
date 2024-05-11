@@ -8,39 +8,21 @@ using InterRedBE.UTILS.Services;
 
 namespace InterRedBE.BAL.Services
 {
-    public class CalificacionBAOService : ICalificacionBAO<Calificacion>
+    public class CalificacionBAOService : ICalificacionBAO
     {
-        private readonly ICalificacionDAO<Calificacion> _calificacionDAO;
-        private readonly IValidator<Calificacion> _validator;
+        private readonly ICalificacionDAO _calificacionDAO;
 
-        public CalificacionBAOService(ICalificacionDAO<Calificacion> calificacionDAO, IValidator<Calificacion> validator)
+        public CalificacionBAOService(ICalificacionDAO calificacionDAO)
         {
             _calificacionDAO = calificacionDAO;
-            _validator = validator;
+            
         }
 
         public async Task<OperationResponse<Calificacion>> CreateOne(Calificacion obj)
         {
-            try
-            {
-                var validationResult = await _validator.ValidateAsync(obj);
-                if (!validationResult.IsValid)
-                {
-                    throw new ValidationException(validationResult.Errors);
-                }
-
+  
                 return await _calificacionDAO.CreateOne(obj);
-            }
-            catch (ValidationException ex)
-            {
-                return new OperationResponse<Calificacion>(0, ex.Message, null);
-            }
-            catch (Exception ex)
-            {
-                return new OperationResponse<Calificacion>(0, ex.Message, null);
-            }
-        }
-
+        }   
         public Task<OperationResponse<int>> DeleteOne(int id)
         {
             throw new NotImplementedException();
@@ -58,24 +40,8 @@ namespace InterRedBE.BAL.Services
 
         public async Task<OperationResponse<Calificacion>> UpdateOne(Calificacion obj)
         {
-            try
-            {
-                var validationResult = await _validator.ValidateAsync(obj);
-                if (!validationResult.IsValid)
-                {
-                    throw new ValidationException(validationResult.Errors);
-                }
 
                 return await _calificacionDAO.UpdateOne(obj);
-            }
-            catch (ValidationException ex)
-            {
-                return new OperationResponse<Calificacion>(0, ex.Message, null);
-            }
-            catch (Exception ex)
-            {
-                return new OperationResponse<Calificacion>(0, ex.Message, null);
-            }
         }
     }
 }

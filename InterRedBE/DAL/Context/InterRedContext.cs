@@ -60,8 +60,19 @@ namespace InterRedBE.DAL.Context
                 .HasOne(r => r.DepartamentoFin)
                 .WithMany(d => d.RutasFin)
                 .HasForeignKey(r => r.IdDepartamentoFin)
-                .OnDelete(DeleteBehavior.Restrict); 
+                .OnDelete(DeleteBehavior.Restrict);
 
+            modelBuilder.Entity<Calificacion>()
+    .HasOne(c => c.LugarTuristico)
+    .WithMany()
+    .HasForeignKey(c => c.LugarTuristicoId) // Asegúrate de que esto coincida con la columna real en la base de datos
+    .OnDelete(DeleteBehavior.SetNull);
+
+            modelBuilder.Entity<Visita>()
+                .HasOne(v => v.LugarTuristico)
+                .WithMany()
+                .HasForeignKey(v => v.LugarTuristicoId)
+                .OnDelete(DeleteBehavior.SetNull);
 
         }
 

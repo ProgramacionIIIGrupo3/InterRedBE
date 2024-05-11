@@ -24,7 +24,6 @@ namespace InterRedBE.DAL.Services
         // Método asíncrono para crear un nuevo usuario.
         public async Task<OperationResponse<Usuario>> CreateOne(Usuario obj)
         {
-    
             try
             {
                 // Si la validación es exitosa, se agrega el usuario al contexto y se guarda en la base de datos.
@@ -101,10 +100,11 @@ namespace InterRedBE.DAL.Services
         {
             try
             {
-                var usuarioExistente = _context.Usuario.FirstOrDefault(d => d.Id == obj.Id);
+                // Verificar si el usuario existe antes de intentar actualizarlo
+                var usuarioExistente = await _context.Usuario.FindAsync(obj.Id);
                 if (usuarioExistente == null)
                 {
-                    return new OperationResponse<Usuario>(0, "Usuario no encontrado.", null);
+                    return new OperationResponse<Usuario>(0, $"Usuario con ID {obj.Id} no encontrado.", null);
                 }
 
                 // Si se proporciona una nueva contraseña, hashearla antes de guardarla
@@ -129,7 +129,7 @@ namespace InterRedBE.DAL.Services
             {
                 if (!_context.Usuario.Any(e => e.Id == obj.Id))
                 {
-                    return new OperationResponse<Usuario>(0, "Usuario no encontrado.", null);
+                    return new OperationResponse<Usuario>(0, $"Usuario con ID {obj.Id} no encontrado.", null);
                 }
                 throw;
             }
@@ -138,8 +138,5 @@ namespace InterRedBE.DAL.Services
                 return new OperationResponse<Usuario>(0, ex.Message, null);
             }
         }
-
-
-  
     }
 }
