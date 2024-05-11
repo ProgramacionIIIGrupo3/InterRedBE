@@ -76,10 +76,9 @@ namespace InterRedBE.DAL.Services
             {
                 // Obtener todos los departamentos de la base de datos incluyendo sus municipios y sus datos de los lugares turisticos
                 var departamentos = _context.Departamento
-                                            .Include(d => d.LugaresTuristicos) // Incluye lugares turísticos directamente relacionados con el departamento
+
                                             .Include(d => d.Municipios)
-                                        
-                                            .Include(d => d.Cabecera)
+                                     
                                             .ToList();
 
 

@@ -235,5 +235,52 @@ namespace InterRedBE.DAL.Services
             }
         }
 
+        public async Task<OperationResponse<ListaEnlazadaDoble<LugarTuristicoDTO>>> GetByDepartamentoId(int idDepartamento)
+        {
+            try
+            {
+                // Obtener todos los lugares turísticos de la base de datos que pertenecen al departamento especificado
+                var lugaresTuristicos = await _context.LugarTuristico.Where(lt => lt.IdDepartamento == idDepartamento).ToListAsync();
+
+                // Verificar si se encontraron lugares turísticos
+                if (lugaresTuristicos.Count == 0)
+                {
+                    // Si no se encontraron, devolver un mensaje de error
+                    return new OperationResponse<ListaEnlazadaDoble<LugarTuristicoDTO>>(0, "No se encontraron los Lugares Turisticos", null);
+                }
+
+                // Mapear los lugares turísticos a DTO
+                var lugaresTuristicosDTO = lugaresTuristicos.Select(lt => new LugarTuristicoDTO
+                {
+                    Id = lt.Id,
+                    Nombre = lt.Nombre,
+                    Descripcion = lt.Descripcion,
+                    Imagen = lt.Imagen,
+                    IdMunicipio = lt.IdMunicipio,
+                    IdDepartamento = lt.IdDepartamento
+                })
+                .ToList();
+
+                // Crear una nueva instancia de ListaEnlazadaDoble<LugarTuristicoDTO>
+                var listaLugaresTuristicosDTO = new ListaEnlazadaDoble<LugarTuristicoDTO>();
+
+                // Insertar cada lugar turístico en la lista enlazada doble
+                foreach (var lugarTuristicoDTO in lugaresTuristicosDTO)
+                {
+                    listaLugaresTuristicosDTO.InsertarAlFinal(lugarTuristicoDTO);
+                }
+
+                // Devolver una respuesta exitosa con la lista de lugares turísticos encontrados
+                return new OperationResponse<ListaEnlazadaDoble<LugarTuristicoDTO>>(1, "Lugares Turisticos Encontrados Correctamente", listaLugaresTuristicosDTO);
+            }
+            catch (Exception ex)
+            {
+                // Manejar cualquier excepción que ocurra durante la obtención de los lugares turísticos y devolver una respuesta de error
+                return new OperationResponse<ListaEnlazadaDoble<LugarTuristicoDTO>>(0, ex.Message, null);
+            }
+
+
+        }
+
     }
 }
