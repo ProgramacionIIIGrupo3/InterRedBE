@@ -68,19 +68,16 @@ namespace InterRedBE.Controllers
                 return StatusCode(StatusCodes.Status500InternalServerError, "Error al procesar la solicitud: " + ex.Message);
             }
         }
-
         [HttpGet("Top10Cercanos")]
         public async Task<IActionResult> GetTop10CercanosALaCapital()
         {
             try
             {
-                // Obtener los nombres de los departamentos ordenados alfabéticamente o por métrica de cercanía
                 var departamentosCercanos = await _context.Departamento
-                    .OrderBy(depto => depto.Nombre)                                    
-                    .Select(depto => depto.Nombre)
+                    .OrderBy(depto => depto.Nombre)
+                    .Select(depto => new { depto.Id, depto.Nombre, depto.Descripcion, depto.Imagen })
                     .ToListAsync();
 
-                // Ordenar los departamentos según el orden especificado
                 var ordenDepartamentos = new List<string>
         {
             "Baja Verapaz",
@@ -92,13 +89,12 @@ namespace InterRedBE.Controllers
             "Chimaltenango",
             "Jutiapa",
             "Chiquimula",
-            "Quiche"
+            "Quiché"
         };
 
-                // Filtrar y ordenar los departamentos según el orden especificado
                 var departamentosOrdenados = departamentosCercanos
-                    .Where(d => ordenDepartamentos.Contains(d))
-                    .OrderBy(d => ordenDepartamentos.IndexOf(d))
+                    .Where(d => ordenDepartamentos.Contains(d.Nombre))
+                    .OrderBy(d => ordenDepartamentos.IndexOf(d.Nombre))
                     .Take(10)
                     .ToList();
 
@@ -116,31 +112,28 @@ namespace InterRedBE.Controllers
         {
             try
             {
-                // Obtener todos los departamentos de la lista de orden especificado
                 var ordenDepartamentos = new List<string>
         {
-            "Peten",
+            "Petén",
             "Izabal",
             "Huehuetenango",
             "San Marcos",
             "Retalhuleu",
-            "Suchitepequez",
+            "Sacatepéquez",
             "Quetzaltenango",
-            "Totonicapan",
-            "Solola",
+            "Totonicapán",
+            "Sololá",
             "Zacapa"
         };
 
-                // Obtener los nombres de los departamentos que están en la tabla
                 var departamentosExistentes = await _context1.Departamento
-                    .Select(depto => depto.Nombre)
+                    .Select(depto => new { depto.Id, depto.Nombre, depto.Descripcion, depto.Imagen })
                     .ToListAsync();
 
-                
-                var departamentosFaltantes = ordenDepartamentos.Except(departamentosExistentes).ToList();
-
-              
-                var departamentosOrdenados = ordenDepartamentos.Union(departamentosFaltantes).ToList();
+                var departamentosOrdenados = departamentosExistentes
+                    .Where(depto => ordenDepartamentos.Contains(depto.Nombre))
+                    .OrderBy(depto => ordenDepartamentos.IndexOf(depto.Nombre))
+                    .ToList();
 
                 return Ok(departamentosOrdenados);
             }
@@ -149,6 +142,7 @@ namespace InterRedBE.Controllers
                 return StatusCode(StatusCodes.Status500InternalServerError, "Error al procesar la solicitud: " + ex.Message);
             }
         }
+
 
     }
 }
