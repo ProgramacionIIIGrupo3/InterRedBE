@@ -4,7 +4,7 @@ using InterRedBE.UTILS.Services;
 
 namespace InterRedBE.BAL.Bao
 {
-    public interface ICalificacionBAO<Calificacion>
+    public interface ICalificacionBAO
     {
         Task<OperationResponse<Calificacion>> CreateOne(Calificacion obj);
         Task<OperationResponse<Calificacion>> UpdateOne(Calificacion obj);

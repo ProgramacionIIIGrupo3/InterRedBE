@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace InterRedBE.DAL.Services
 {
-    public class CalificacionService : ICalificacionDAO<Calificacion>
+    public class CalificacionService : ICalificacionDAO
     {
         private readonly InterRedContext _context;
 
@@ -24,36 +24,18 @@ namespace InterRedBE.DAL.Services
         {
             try
             {
-                // Obtener el valor numérico de la calificación
-                var puntaje = (int?)typeof(Calificacion).GetProperty("Puntaje")?.GetValue(obj, null);
-
-                // Validar campos obligatorios
-                if (puntaje <= 0 || string.IsNullOrEmpty(obj.Comentario))
-                {
-                    return new OperationResponse<Calificacion>(0, "El puntaje y el comentario son obligatorios", null);
-                }
-
-                // Validar longitud del comentario
-                if (obj.Comentario.Length > 500)
-                {
-                    return new OperationResponse<Calificacion>(0, "El comentario no puede tener más de 500 caracteres", null);
-                }
-
-                // Validar rango del puntaje
-                if (puntaje < 1 || puntaje > 5)
-                {
-                    return new OperationResponse<Calificacion>(0, "El puntaje de la calificación debe estar entre 1 y 5", null);
-                }
-
                 _context.Calificacion.Add(obj);
                 await _context.SaveChangesAsync();
                 return new OperationResponse<Calificacion>(1, "Calificación creada exitosamente", obj);
             }
             catch (Exception ex)
             {
-                return new OperationResponse<Calificacion>(0, ex.Message, null);
+                // Aquí capturamos y mostramos la excepción interna
+                var innerExceptionMessage = ex.InnerException != null ? ex.InnerException.Message : "No inner exception";
+                return new OperationResponse<Calificacion>(0, $"Error al crear calificación: {innerExceptionMessage}", null);
             }
         }
+
 
         public async Task<OperationResponse<Calificacion>> GetOne(int id)
         {

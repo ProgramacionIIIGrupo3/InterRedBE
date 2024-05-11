@@ -28,6 +28,8 @@ builder.Services.AddScoped<IMunicipioDAO, MunicipioService>();
 builder.Services.AddScoped<IUsuarioDAO, UsuarioService>();
 builder.Services.AddScoped<ILoginDAO, LoginService>();
 builder.Services.AddScoped<IRuta, RutaService>();
+builder.Services.AddScoped<IVisistaDAO, VisitaService>();
+builder.Services.AddScoped<ICalificacionDAO, CalificacionService>();
 
 // BAO DI
 builder.Services.AddScoped<IDepartamentoBAO, DepartamentoBAOService>();
@@ -36,6 +38,9 @@ builder.Services.AddScoped<IUsuarioBAO, UsuarioBAOService>();
 builder.Services.AddScoped<IMunicipioBAO, MunicipioBAOService>();
 builder.Services.AddScoped<ILoginBAO, LoginBAOService>();
 builder.Services.AddScoped<IRutaBAO, RutaBAOService>();
+builder.Services.AddScoped<IVisitaBAO, VisitaBAOService>();
+builder.Services.AddScoped<ICalificacionBAO, CalificacionBAOService>();
+
 
 // AAO DI
 builder.Services.AddScoped<IJwtAAO, JwtService>();

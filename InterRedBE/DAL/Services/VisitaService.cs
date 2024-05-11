@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace InterRedBE.DAL.Services
 {
-    public class VisitaService : IVisistaDAO<Visita>
+    public class VisitaService : IVisistaDAO
     {
         private readonly InterRedContext _context;
 

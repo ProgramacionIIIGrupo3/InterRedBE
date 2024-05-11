@@ -7,11 +7,11 @@ using System.Threading.Tasks;
 
 namespace InterRedBE.BAL.Services
 {
-    public class VisitaBAOService : IVisitaBAO<Visita>
+    public class VisitaBAOService : IVisitaBAO
     {
-        private readonly IVisistaDAO<Visita> _visitaDAO;
+        private readonly IVisistaDAO _visitaDAO;
 
-        public VisitaBAOService(IVisistaDAO<Visita> visitaDAO)
+        public VisitaBAOService(IVisistaDAO visitaDAO)
         {
             _visitaDAO = visitaDAO;
         }
