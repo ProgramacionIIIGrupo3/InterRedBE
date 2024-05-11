@@ -9,6 +9,17 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="wwwroot\images\DALL·E 2024-01-25 10.08.42 - A minimalist 404 error page design, prominently displaying the number %27404%27 in a bold, clear font at the center. Around the %27404%27, include a variety o.png\**" />
+    <Content Remove="wwwroot\images\DALL·E 2024-01-25 10.08.42 - A minimalist 404 error page design, prominently displaying the number %27404%27 in a bold, clear font at the center. Around the %27404%27, include a variety o.png\**" />
+    <EmbeddedResource Remove="wwwroot\images\DALL·E 2024-01-25 10.08.42 - A minimalist 404 error page design, prominently displaying the number %27404%27 in a bold, clear font at the center. Around the %27404%27, include a variety o.png\**" />
+    <None Remove="wwwroot\images\DALL·E 2024-01-25 10.08.42 - A minimalist 404 error page design, prominently displaying the number %27404%27 in a bold, clear font at the center. Around the %27404%27, include a variety o.png\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="FluentValidation" Version="11.9.0" />
+    <PackageReference Include="FluentValidation.AspNetCore" Version="11.3.0" />
+    <PackageReference Include="IdentityModel" Version="7.0.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="8.0.4" />
     <PackageReference Include="Microsoft.AspNetCore.Components.QuickGrid.EntityFrameworkAdapter" Version="8.0.4" />
     <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="8.0.4" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="8.0.4" />
@@ -19,14 +30,13 @@
     </PackageReference>
     <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.19.6" />
     <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="8.0.2" />
+    <PackageReference Include="Serilog" Version="3.1.1" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.5.0" />
+    <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="7.5.1" />
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="BAL\Services\" />
-    <Folder Include="Controllers\Admin\" />
-    <Folder Include="Controllers\User\" />
-    <Folder Include="DAL\Services\" />
+    <Folder Include="wwwroot\images\" />
   </ItemGroup>
 
 </Project>
