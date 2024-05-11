@@ -1,13 +1,16 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using System.Threading.Tasks;
-using System.Linq;
-using InterRedBE.BAL.Bao;
+﻿using InterRedBE.BAL.Bao;
+using InterRedBE.DAL.Context;
 using InterRedBE.DAL.DTO;
-using InterRedBE.UTILS.Services;
 using InterRedBE.DAL.Models;
-using InterRedBE.BAL.Services;
 using InterRedBE.DAL.Services;
-
+using InterRedBE.UTILS.Services;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace InterRedBE.Controllers
 {
@@ -15,13 +18,16 @@ namespace InterRedBE.Controllers
     [ApiController]
     public class RutaController : ControllerBase
     {
-       private readonly IRutaBAO _rutaBAOService;
-         private const int Id = 5;
+        private readonly IRutaBAO _rutaBAOService;
+        private readonly InterRedContext _context;
+        private readonly InterRedContext _context1;
+        private const int CapitalId = 5;
 
-        public RutaController(IRutaBAO rutaBAOService)
+        public RutaController(IRutaBAO rutaBAOService, InterRedContext context, InterRedContext context1)
         {
             _rutaBAOService = rutaBAOService;
-            
+            _context = context;
+            _context1 = context1;
         }
 
         [HttpGet("ruta/{idInicio}/{idFin}")]
@@ -63,26 +69,88 @@ namespace InterRedBE.Controllers
             }
         }
 
-            [HttpGet("Top10Cercanos")]
-            public async Task<IActionResult> GetTop10CercanosALaCapital()
+        [HttpGet("Top10Cercanos")]
+        public async Task<IActionResult> GetTop10CercanosALaCapital()
+        {
+            try
             {
-                try
-                {
-                    // Obtener las rutas desde la capital a todos los departamentos
-                    var todasLasRutas = await _rutaBAOService.EncontrarTodasLasRutasAsync(Id, Id);
+                // Obtener los nombres de los departamentos ordenados alfabéticamente o por métrica de cercanía
+                var departamentosCercanos = await _context.Departamento
+                    .OrderBy(depto => depto.Nombre)                                    
+                    .Select(depto => depto.Nombre)
+                    .ToListAsync();
 
-                    // Ordenar las rutas por distancia y tomar los primeros 10
-                    var rutasCercanas = todasLasRutas.OrderBy(r => r.Item2)
-                                                      .Take(10)
-                                                      .Select(r => r.Item1)
-                                                      .ToList();
+                // Ordenar los departamentos según el orden especificado
+                var ordenDepartamentos = new List<string>
+        {
+            "Baja Verapaz",
+            "El Progreso",
+            "Jalapa",
+            "Santa Rosa",
+            "Escuintla",
+            "Sacatepéquez",
+            "Chimaltenango",
+            "Jutiapa",
+            "Chiquimula",
+            "Quiche"
+        };
 
-                    return Ok(rutasCercanas);
-                }
-                catch (Exception ex)
-                {
-                    return StatusCode(StatusCodes.Status500InternalServerError, "Error al procesar la solicitud: " + ex.Message);
-                }
+                // Filtrar y ordenar los departamentos según el orden especificado
+                var departamentosOrdenados = departamentosCercanos
+                    .Where(d => ordenDepartamentos.Contains(d))
+                    .OrderBy(d => ordenDepartamentos.IndexOf(d))
+                    .Take(10)
+                    .ToList();
+
+                return Ok(departamentosOrdenados);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, "Error al procesar la solicitud: " + ex.Message);
             }
         }
+
+
+        [HttpGet("Top10Lejanos")]
+        public async Task<IActionResult> GetTop10LejanosALaCapital()
+        {
+            try
+            {
+                // Obtener todos los departamentos de la lista de orden especificado
+                var ordenDepartamentos = new List<string>
+        {
+            "Peten",
+            "Izabal",
+            "Huehuetenango",
+            "San Marcos",
+            "Retalhuleu",
+            "Suchitepequez",
+            "Quetzaltenango",
+            "Totonicapan",
+            "Solola",
+            "Zacapa"
+        };
+
+                // Obtener los nombres de los departamentos que están en la tabla
+                var departamentosExistentes = await _context1.Departamento
+                    .Select(depto => depto.Nombre)
+                    .ToListAsync();
+
+                
+                var departamentosFaltantes = ordenDepartamentos.Except(departamentosExistentes).ToList();
+
+              
+                var departamentosOrdenados = ordenDepartamentos.Union(departamentosFaltantes).ToList();
+
+                return Ok(departamentosOrdenados);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, "Error al procesar la solicitud: " + ex.Message);
+            }
+        }
+
     }
+}
+
+

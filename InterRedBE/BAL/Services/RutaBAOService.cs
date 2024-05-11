@@ -29,6 +29,15 @@ namespace InterRedBE.BAL.Services
             // Ordenar las rutas por distancia y tomar las primeras rutas
             var rutasOrdenadas = todasLasRutas.OrderBy(r => r.Item2);
             var resultado = new ListaEnlazadaDoble<(ListaEnlazadaDoble<Departamento>, double)>();
+
+            // Verificar si el número de rutas disponibles es menor que el número solicitado
+            int numeroDeRutasDisponibles = todasLasRutas.Count();
+            if (numeroDeRutasDisponibles < numeroDeRutas)
+            {
+                // Si hay menos rutas disponibles que las solicitadas, ajustar el número de rutas a devolver
+                numeroDeRutas = numeroDeRutasDisponibles;
+            }
+
             var contador = 0;
             foreach (var ruta in rutasOrdenadas)
             {
@@ -41,8 +50,8 @@ namespace InterRedBE.BAL.Services
             }
             return resultado;
         }
-        
+
 
     }
-       
+
 }
