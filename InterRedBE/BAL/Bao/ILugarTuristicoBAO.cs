@@ -9,5 +9,6 @@ namespace InterRedBE.BAL.Bao
     {
         public OperationResponse<ListaEnlazadaDoble<LugarTuristicoConVisitasDTO>> GetTop10Visitas();
         public OperationResponse<ListaEnlazadaDoble<LugarTuristicoConPromedioDTO>> GetTop10ByRating();
+        Task<OperationResponse<ListaEnlazadaDoble<LugarTuristicoDTO>>> GetByDepartamentoId(int idDepartamento);
     }
 }

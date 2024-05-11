@@ -173,6 +173,27 @@ namespace InterRedBE.Controllers.Admin
                 return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
             }
         }
+
+        [HttpGet("departamento/{idDepartamento}")]
+        public async Task<IActionResult> GetByDepartamentoId(int idDepartamento)
+        {
+            try
+            {
+                var result = await _lugarTuristicoBAO.GetByDepartamentoId(idDepartamento);
+                if (result.Data != null)
+                {
+                    return Ok(result.Data);
+                }
+                else
+                {
+                    return NotFound(result.Message);
+                }
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+            }
+        }
     }
 }
 

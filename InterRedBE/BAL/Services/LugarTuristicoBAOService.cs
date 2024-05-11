@@ -104,5 +104,17 @@ namespace InterRedBE.BAL.Services
                 return new OperationResponse<ListaEnlazadaDoble<LugarTuristicoConPromedioDTO>>(0, ex.Message, null);
             }
         }
+
+        public async Task<OperationResponse<ListaEnlazadaDoble<LugarTuristicoDTO>>> GetByDepartamentoId(int idDepartamento)
+        {
+            try
+            {
+                return await _lugarTuristicoDAO.GetByDepartamentoId(idDepartamento);
+            }
+            catch (Exception ex)
+            {
+                return new OperationResponse<ListaEnlazadaDoble<LugarTuristicoDTO>>(0, ex.Message, null);
+            }
+        }
     }
 }
