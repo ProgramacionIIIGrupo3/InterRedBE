@@ -603,7 +603,7 @@ namespace InterRedBE.UTILS.Services
         }
 
         IEnumerator IEnumerable.GetEnumerator()
-        {
+            {
             return GetEnumerator();
         }
     }
