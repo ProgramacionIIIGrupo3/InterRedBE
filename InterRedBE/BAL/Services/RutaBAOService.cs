@@ -22,28 +22,28 @@ namespace InterRedBE.BAL.Services
             var (grafoDepartamentos, distancias) = await _rutaService.CargarRutasAsync();
             var todasLasRutas = grafoDepartamentos.BuscarTodasLasRutas(idDepartamentoInicio, idDepartamentoFin, distancias);
 
-            // Ordenar las rutas por distancia y tomar las primeras rutas
-            var rutasOrdenadas = todasLasRutas.OrderBy(r => r.Item2);
-            var resultado = new ListaEnlazadaDoble<(ListaEnlazadaDoble<Departamento>, double)>();
+            // Crear un diccionario para almacenar las rutas únicas
+            var rutasUnicas = new Dictionary<string, (ListaEnlazadaDoble<Departamento>, double)>();
 
-            // Verificar si el número de rutas disponibles es menor que el número solicitado
-            int numeroDeRutasDisponibles = todasLasRutas.Count();
-            if (numeroDeRutasDisponibles < numeroDeRutas)
+            foreach (var ruta in todasLasRutas)
             {
-                // Si hay menos rutas disponibles que las solicitadas, ajustar el número de rutas a devolver
-                numeroDeRutas = numeroDeRutasDisponibles;
-            }
-
-            var contador = 0;
-            foreach (var ruta in rutasOrdenadas)
-            {
-                resultado.InsertarAlFinal(ruta);
-                contador++;
-                if (contador == numeroDeRutas)
+                var rutaStr = string.Join(",", ruta.Item1.Select(d => d.Id));
+                if (!rutasUnicas.ContainsKey(rutaStr))
                 {
-                    break;
+                    rutasUnicas[rutaStr] = ruta;
                 }
             }
+
+            // Ordenar las rutas únicas por distancia
+            var rutasOrdenadasUnicas = rutasUnicas.Values.OrderBy(r => r.Item2);
+
+            // Tomar las primeras numeroDeRutas rutas únicas
+            var resultado = new ListaEnlazadaDoble<(ListaEnlazadaDoble<Departamento>, double)>();
+            foreach (var ruta in rutasOrdenadasUnicas.Take(numeroDeRutas))
+            {
+                resultado.InsertarAlFinal(ruta);
+            }
+
             return resultado;
         }
     }
