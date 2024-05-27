@@ -12,3 +12,4 @@
         public virtual ICollection<LugarTuristico> LugaresTuristicos { get; set; }
     }
 }
+//
