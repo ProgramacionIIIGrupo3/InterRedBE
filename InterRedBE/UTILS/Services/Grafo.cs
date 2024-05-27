@@ -1,9 +1,10 @@
-﻿using InterRedBE.UTILS.Models;
+﻿using InterRedBE.UTILS.Interfaces;
+using InterRedBE.UTILS.Models;
 using System.Collections.Generic;
 
 namespace InterRedBE.UTILS.Services
 {
-    public class Grafo<T>
+    public class Grafo<T> where T : IIdentificable
     {
         private Dictionary<int, NodoGrafo<T>> nodos;
 
@@ -121,48 +122,119 @@ namespace InterRedBE.UTILS.Services
 
         public ListaEnlazadaDoble<(ListaEnlazadaDoble<T>, double)> EncontrarKRutasMasCortas(int idInicio, int idFin, int k, Dictionary<(int, int), double> distancias)
         {
-            var todasLasRutas = BuscarTodasLasRutas(idInicio, idFin, distancias);
             var rutasMasCortas = new ListaEnlazadaDoble<(ListaEnlazadaDoble<T>, double)>();
+            var nodosExcluidos = new HashSet<int>();
 
-            foreach (var ruta in todasLasRutas)
+            for (int i = 0; i < k; i++)
             {
-                // Insertar en la lista de rutas más cortas de forma ordenada por distancia
-                var iterador = rutasMasCortas.PrimerNodo;
-                while (iterador != null && iterador.Dato.Item2 < ruta.Item2)
+                var distanciasDesdeInicio = new Dictionary<int, double>();
+                var nodoPrevio = new Dictionary<int, int?>();
+                var visitados = new HashSet<int>();
+
+                // Inicializar distancias y nodos previos
+                foreach (var nodo in nodos.Values)
                 {
-                    iterador = (NodoDobleLiga<(ListaEnlazadaDoble<T>, double)>)iterador.LigaSiguiente;
+                    distanciasDesdeInicio[nodo.Id] = double.PositiveInfinity;
+                    nodoPrevio[nodo.Id] = null;
                 }
 
-                if (iterador == null)
+                distanciasDesdeInicio[idInicio] = 0;
+
+                // Cola de prioridad usando ListaEnlazadaDoble
+                var cola = new ListaEnlazadaDoble<(int, double)>();
+                cola.InsertarAlFinal((idInicio, 0));
+
+                bool rutaEncontrada = false;
+
+                while (!cola.ListaVacia())
                 {
-                    rutasMasCortas.InsertarAlFinal(ruta);
-                }
-                else
-                {
-                    var nuevoNodo = new NodoDobleLiga<(ListaEnlazadaDoble<T>, double)>(ruta);
-                    nuevoNodo.LigaSiguiente = iterador;
-                    nuevoNodo.LigaAnterior = iterador.LigaAnterior;
-                    if (iterador.LigaAnterior != null)
+                    // Extraer el nodo con la menor distancia
+                    var nodoActual = cola.PrimerNodo.Dato;
+                    cola.EliminarAlInicio();
+
+                    if (visitados.Contains(nodoActual.Item1) || nodosExcluidos.Contains(nodoActual.Item1)) continue;
+                    visitados.Add(nodoActual.Item1);
+
+                    var nodoId = nodoActual.Item1;
+                    var distanciaActual = nodoActual.Item2;
+
+                    if (nodoId == idFin)
                     {
-                        iterador.LigaAnterior.LigaSiguiente = nuevoNodo;
-                    }
-                    iterador.LigaAnterior = nuevoNodo;
+                        var ruta = new ListaEnlazadaDoble<T>();
+                        double distanciaTotal = distanciaActual;
 
-                    if (iterador == rutasMasCortas.PrimerNodo)
+                        // Construir la ruta desde el destino al inicio
+                        int? actual = nodoId;
+                        while (actual != null)
+                        {
+                            ruta.InsertarAlInicio(nodos[(int)actual].Dato);
+                            actual = nodoPrevio[(int)actual];
+                        }
+
+                        rutasMasCortas.InsertarAlFinal((ruta, distanciaTotal));
+                        rutaEncontrada = true;
+                        break;
+                    }
+
+                    foreach (var arista in nodos[nodoId].Adyacentes)
                     {
-                        rutasMasCortas.PrimerNodo = nuevoNodo;
+                        var vecino = arista.Nodo.Id;
+                        var distancia = arista.Distancia;
+                        var distanciaTentativa = distanciaActual + distancia;
+
+                        if (distanciaTentativa < distanciasDesdeInicio[vecino] && !nodosExcluidos.Contains(vecino))
+                        {
+                            distanciasDesdeInicio[vecino] = distanciaTentativa;
+                            nodoPrevio[vecino] = nodoId;
+
+                            // Inserción ordenada en la cola
+                            var iterador = cola.PrimerNodo;
+                            while (iterador != null && iterador.Dato.Item2 < distanciaTentativa)
+                            {
+                                iterador = (NodoDobleLiga<(int, double)>)iterador.LigaSiguiente;
+                            }
+
+                            if (iterador == null)
+                            {
+                                cola.InsertarAlFinal((vecino, distanciaTentativa));
+                            }
+                            else
+                            {
+                                var nuevoNodo = new NodoDobleLiga<(int, double)>((vecino, distanciaTentativa));
+                                nuevoNodo.LigaSiguiente = iterador;
+                                nuevoNodo.LigaAnterior = iterador.LigaAnterior;
+                                if (iterador.LigaAnterior != null)
+                                {
+                                    iterador.LigaAnterior.LigaSiguiente = nuevoNodo;
+                                }
+                                iterador.LigaAnterior = nuevoNodo;
+
+                                if (iterador == cola.PrimerNodo)
+                                {
+                                    cola.PrimerNodo = nuevoNodo;
+                                }
+                            }
+                        }
                     }
                 }
 
-                // Mantener solo las K rutas más cortas
-                if (rutasMasCortas.Count() > k)
+                if (!rutaEncontrada)
                 {
-                    rutasMasCortas.EliminarAlFinal();
+                    break;
+                }
+
+                // Excluir los nodos de la última ruta encontrada
+                var ultimaRuta = rutasMasCortas.UltimoNodo.Dato.Item1;
+                foreach (var nodo in ultimaRuta)
+                {
+                    nodosExcluidos.Add(nodo.Id);
                 }
             }
 
             return rutasMasCortas;
         }
+
+
 
     }
 }

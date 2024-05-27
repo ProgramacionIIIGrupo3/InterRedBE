@@ -1,6 +1,8 @@
-﻿namespace InterRedBE.DAL.Models
+﻿using InterRedBE.UTILS.Interfaces;
+
+namespace InterRedBE.DAL.Models
 {
-    public class Departamento
+    public class Departamento : IIdentificable
     {
         public int Id { get; set; }
         public string Nombre { get; set; }
