@@ -6,7 +6,7 @@ namespace InterRedBE.DAL.Dao
 {
     public interface IRuta
     {
-        Task<(ListaCuadruple<Departamento>, Dictionary<(int, int), double>)> CargarRutasAsync();
+        Task<(Grafo<Departamento>, Dictionary<(int, int), double>)> CargarRutasAsync();
       
     }
 }

@@ -1,4 +1,5 @@
-﻿using InterRedBE.BAL.Bao;
+﻿using System.Threading.Tasks;
+using InterRedBE.BAL.Bao;
 using InterRedBE.DAL.Context;
 using InterRedBE.DAL.DTO;
 using InterRedBE.DAL.Models;
@@ -10,7 +11,6 @@ using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 
 namespace InterRedBE.Controllers
 {
@@ -39,6 +39,8 @@ namespace InterRedBE.Controllers
                 if (!todasLasRutas.ListaVacia())
                 {
                     var rutas = new ListaEnlazadaDoble<object>();
+                    var rutasUnicas = new HashSet<string>(); // Para asegurar rutas únicas
+
                     foreach (var ruta in todasLasRutas)
                     {
                         var caminoDTO = new ListaEnlazadaDoble<DepartamentoRutaDTO>();
@@ -50,11 +52,16 @@ namespace InterRedBE.Controllers
                                 Nombre = departamento.Nombre
                             });
                         }
-                        rutas.InsertarAlFinal(new
+                        var rutaStr = string.Join("->", ruta.Item1.Select(d => d.Id)); // Ruta como string única
+                        if (!rutasUnicas.Contains(rutaStr))
                         {
-                            Ruta = caminoDTO,
-                            DistanciaTotal = ruta.Item2
-                        });
+                            rutas.InsertarAlFinal(new
+                            {
+                                Ruta = caminoDTO,
+                                DistanciaTotal = ruta.Item2
+                            });
+                            rutasUnicas.Add(rutaStr);
+                        }
                     }
                     return Ok(new { Rutas = rutas });
                 }
@@ -68,6 +75,7 @@ namespace InterRedBE.Controllers
                 return StatusCode(StatusCodes.Status500InternalServerError, "Error al procesar la solicitud: " + ex.Message);
             }
         }
+
         [HttpGet("Top10Cercanos")]
         public async Task<IActionResult> GetTop10CercanosALaCapital()
         {
@@ -79,18 +87,18 @@ namespace InterRedBE.Controllers
                     .ToListAsync();
 
                 var ordenDepartamentos = new List<string>
-        {
-            "Baja Verapaz",
-            "El Progreso",
-            "Jalapa",
-            "Santa Rosa",
-            "Escuintla",
-            "Sacatepéquez",
-            "Chimaltenango",
-            "Jutiapa",
-            "Chiquimula",
-            "Quiché"
-        };
+                {
+                    "Baja Verapaz",
+                    "El Progreso",
+                    "Jalapa",
+                    "Santa Rosa",
+                    "Escuintla",
+                    "Sacatepéquez",
+                    "Chimaltenango",
+                    "Jutiapa",
+                    "Chiquimula",
+                    "Quiché"
+                };
 
                 var departamentosOrdenados = departamentosCercanos
                     .Where(d => ordenDepartamentos.Contains(d.Nombre))
@@ -106,25 +114,24 @@ namespace InterRedBE.Controllers
             }
         }
 
-
         [HttpGet("Top10Lejanos")]
         public async Task<IActionResult> GetTop10LejanosALaCapital()
         {
             try
             {
                 var ordenDepartamentos = new List<string>
-        {
-            "Petén",
-            "Izabal",
-            "Huehuetenango",
-            "San Marcos",
-            "Retalhuleu",
-            "Sacatepéquez",
-            "Quetzaltenango",
-            "Totonicapán",
-            "Sololá",
-            "Zacapa"
-        };
+                {
+                    "Petén",
+                    "Izabal",
+                    "Huehuetenango",
+                    "San Marcos",
+                    "Retalhuleu",
+                    "Sacatepéquez",
+                    "Quetzaltenango",
+                    "Totonicapán",
+                    "Sololá",
+                    "Zacapa"
+                };
 
                 var departamentosExistentes = await _context1.Departamento
                     .Select(depto => new { depto.Id, depto.Nombre, depto.Descripcion, depto.Imagen })
@@ -142,9 +149,5 @@ namespace InterRedBE.Controllers
                 return StatusCode(StatusCodes.Status500InternalServerError, "Error al procesar la solicitud: " + ex.Message);
             }
         }
-
-
     }
 }
-
-

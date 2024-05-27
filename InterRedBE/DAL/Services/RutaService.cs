@@ -1,42 +1,52 @@
 ﻿using InterRedBE.DAL.Context;
 using InterRedBE.DAL.Dao;
 using InterRedBE.DAL.Models;
+using InterRedBE.UTILS.Models;
 using InterRedBE.UTILS.Services;
 using Microsoft.EntityFrameworkCore;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace InterRedBE.DAL.Services
 {
     public class RutaService : IRuta
     {
-
-        public readonly InterRedContext _context;
+        private readonly InterRedContext _context;
 
         public RutaService(InterRedContext context)
         {
             _context = context;
         }
 
-        public async Task<(ListaCuadruple<Departamento>, Dictionary<(int, int), double>)> CargarRutasAsync()
+        public async Task<(Grafo<Departamento>, Dictionary<(int, int), double>)> CargarRutasAsync()
         {
-            ListaCuadruple<Departamento> lista = new ListaCuadruple<Departamento>();
+            Grafo<Departamento> grafo = new Grafo<Departamento>();
             Dictionary<(int, int), double> distancias = new Dictionary<(int, int), double>();
 
             var rutas = await _context.Ruta.Include(r => r.DepartamentoInicio).Include(r => r.DepartamentoFin).ToListAsync();
 
             foreach (var ruta in rutas)
             {
-                lista.AgregarNodoSiNoExiste(ruta.IdDepartamentoInicio, ruta.DepartamentoInicio);
-                lista.AgregarNodoSiNoExiste(ruta.IdDepartamentoFin, ruta.DepartamentoFin);
-                lista.Conectar(ruta.IdDepartamentoInicio, ruta.IdDepartamentoFin, ruta.Direccion);
+                // Agregar nodos al grafo si no existen
+                if (!grafo.ObtenerNodos().ContainsKey(ruta.IdDepartamentoInicio))
+                {
+                    grafo.AgregarNodo(ruta.IdDepartamentoInicio, ruta.DepartamentoInicio);
+                }
+
+                if (!grafo.ObtenerNodos().ContainsKey(ruta.IdDepartamentoFin))
+                {
+                    grafo.AgregarNodo(ruta.IdDepartamentoFin, ruta.DepartamentoFin);
+                }
+
+                // Conectar los nodos en el grafo
+                grafo.Conectar(ruta.IdDepartamentoInicio, ruta.IdDepartamentoFin, ruta.Distancia);
 
                 // Guardar la distancia en el diccionario para uso posterior en BAO
                 distancias[(ruta.IdDepartamentoInicio, ruta.IdDepartamentoFin)] = ruta.Distancia;
+                distancias[(ruta.IdDepartamentoFin, ruta.IdDepartamentoInicio)] = ruta.Distancia; // Asegurarse de incluir ambas direcciones
             }
 
-            return (lista, distancias);
+            return (grafo, distancias);
         }
-      
     }
-
 }
-
