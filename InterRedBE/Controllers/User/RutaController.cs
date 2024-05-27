@@ -149,5 +149,41 @@ namespace InterRedBE.Controllers
                 return StatusCode(StatusCodes.Status500InternalServerError, "Error al procesar la solicitud: " + ex.Message);
             }
         }
+
+        [HttpGet("ruta/dijkstra/{idInicio}/{idFin}/{k}")]
+        public async Task<IActionResult> GetKRutasMasCortas(int idInicio, int idFin, int k)
+        {
+            try
+            {
+                var rutasMasCortas = await _rutaBAOService.EncontrarKRutasMasCortasAsync(idInicio, idFin, k);
+                if (!rutasMasCortas.ListaVacia())
+                {
+                    var rutasDTO = new ListaEnlazadaDoble<object>();
+                    foreach (var (ruta, distanciaTotal) in rutasMasCortas)
+                    {
+                        var rutaDTO = new ListaEnlazadaDoble<DepartamentoRutaDTO>();
+                        foreach (var departamento in ruta)
+                        {
+                            rutaDTO.InsertarAlFinal(new DepartamentoRutaDTO
+                            {
+                                Id = departamento.Id,
+                                Nombre = departamento.Nombre
+                            });
+                        }
+                        rutasDTO.InsertarAlFinal(new { Ruta = rutaDTO, DistanciaTotal = distanciaTotal });
+                    }
+                    return Ok(new { Rutas = rutasDTO });
+                }
+                else
+                {
+                    return NotFound("No se encontraron rutas entre los departamentos especificados.");
+                }
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, "Error al procesar la solicitud: " + ex.Message);
+            }
+        }
+
     }
 }

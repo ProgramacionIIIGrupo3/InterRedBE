@@ -118,5 +118,51 @@ namespace InterRedBE.UTILS.Services
             rutaActual.EliminarDatoX(actual.Id);
             visitados.EliminarDatoX(actual.Id);
         }
+
+        public ListaEnlazadaDoble<(ListaEnlazadaDoble<T>, double)> EncontrarKRutasMasCortas(int idInicio, int idFin, int k, Dictionary<(int, int), double> distancias)
+        {
+            var todasLasRutas = BuscarTodasLasRutas(idInicio, idFin, distancias);
+            var rutasMasCortas = new ListaEnlazadaDoble<(ListaEnlazadaDoble<T>, double)>();
+
+            foreach (var ruta in todasLasRutas)
+            {
+                // Insertar en la lista de rutas más cortas de forma ordenada por distancia
+                var iterador = rutasMasCortas.PrimerNodo;
+                while (iterador != null && iterador.Dato.Item2 < ruta.Item2)
+                {
+                    iterador = (NodoDobleLiga<(ListaEnlazadaDoble<T>, double)>)iterador.LigaSiguiente;
+                }
+
+                if (iterador == null)
+                {
+                    rutasMasCortas.InsertarAlFinal(ruta);
+                }
+                else
+                {
+                    var nuevoNodo = new NodoDobleLiga<(ListaEnlazadaDoble<T>, double)>(ruta);
+                    nuevoNodo.LigaSiguiente = iterador;
+                    nuevoNodo.LigaAnterior = iterador.LigaAnterior;
+                    if (iterador.LigaAnterior != null)
+                    {
+                        iterador.LigaAnterior.LigaSiguiente = nuevoNodo;
+                    }
+                    iterador.LigaAnterior = nuevoNodo;
+
+                    if (iterador == rutasMasCortas.PrimerNodo)
+                    {
+                        rutasMasCortas.PrimerNodo = nuevoNodo;
+                    }
+                }
+
+                // Mantener solo las K rutas más cortas
+                if (rutasMasCortas.Count() > k)
+                {
+                    rutasMasCortas.EliminarAlFinal();
+                }
+            }
+
+            return rutasMasCortas;
+        }
+
     }
 }

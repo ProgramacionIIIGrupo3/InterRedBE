@@ -46,5 +46,12 @@ namespace InterRedBE.BAL.Services
 
             return resultado;
         }
+
+        public async Task<ListaEnlazadaDoble<(ListaEnlazadaDoble<Departamento>, double)>> EncontrarKRutasMasCortasAsync(int idDepartamentoInicio, int idDepartamentoFin, int k)
+        {
+            var (grafoDepartamentos, distancias) = await _rutaService.CargarRutasAsync();
+            var rutasMasCortas = grafoDepartamentos.EncontrarKRutasMasCortas(idDepartamentoInicio, idDepartamentoFin, k, distancias);
+            return rutasMasCortas;
+        }
     }
 }
