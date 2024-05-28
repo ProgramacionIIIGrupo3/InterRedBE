@@ -6,18 +6,17 @@ namespace InterRedBE.DAL.Context
 {
     public class InterRedContext : DbContext
     {
-
         public InterRedContext(DbContextOptions<InterRedContext> options) : base(options)
         {
         }
 
-        public DbSet<Models.LugarTuristico> LugarTuristico { get; set; }
-        public DbSet<Models.Visita> Visita { get; set; }
-        public DbSet<Models.Calificacion> Calificacion { get; set; }
-        public DbSet<Models.Usuario> Usuario { get; set; }
-        public DbSet<Models.Departamento> Departamento { get; set; }
-        public DbSet<Models.Municipio> Municipio { get; set; }
-        public DbSet<Models.Ruta> Ruta { get; set; }
+        public DbSet<LugarTuristico> LugarTuristico { get; set; }
+        public DbSet<Visita> Visita { get; set; }
+        public DbSet<Calificacion> Calificacion { get; set; }
+        public DbSet<Usuario> Usuario { get; set; }
+        public DbSet<Departamento> Departamento { get; set; }
+        public DbSet<Municipio> Municipio { get; set; }
+        public DbSet<Ruta> Ruta { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -38,44 +37,60 @@ namespace InterRedBE.DAL.Context
             // Agregar configuración para LugarTuristico
             modelBuilder.Entity<LugarTuristico>()
                 .HasOne(l => l.Municipio)
-                .WithMany() 
+                .WithMany()
                 .HasForeignKey(l => l.IdMunicipio)
-                .OnDelete(DeleteBehavior.SetNull); 
+                .OnDelete(DeleteBehavior.SetNull);
 
             modelBuilder.Entity<LugarTuristico>()
                 .HasOne(l => l.Departamento)
-                .WithMany() 
+                .WithMany()
                 .HasForeignKey(l => l.IdDepartamento)
                 .OnDelete(DeleteBehavior.SetNull);
 
-            // Configuración para la relación de Ruta con DepartamentoInicio
+            // Configuración para Ruta
+            modelBuilder.Entity<Ruta>()
+                .Property(r => r.TipoInicio)
+                .HasConversion<string>();
+
+            modelBuilder.Entity<Ruta>()
+                .Property(r => r.TipoFin)
+                .HasConversion<string>();
+
             modelBuilder.Entity<Ruta>()
                 .HasOne(r => r.DepartamentoInicio)
                 .WithMany(d => d.RutasInicio)
-                .HasForeignKey(r => r.IdDepartamentoInicio)
-                .OnDelete(DeleteBehavior.Restrict); 
+                .HasForeignKey(r => r.IdEntidadInicio)
+                .OnDelete(DeleteBehavior.Restrict);
 
-            // Configuración para la relación de Ruta con DepartamentoFin
             modelBuilder.Entity<Ruta>()
                 .HasOne(r => r.DepartamentoFin)
                 .WithMany(d => d.RutasFin)
-                .HasForeignKey(r => r.IdDepartamentoFin)
+                .HasForeignKey(r => r.IdEntidadFin)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<Ruta>()
+                .HasOne(r => r.MunicipioInicio)
+                .WithMany(m => m.RutasInicio)
+                .HasForeignKey(r => r.IdEntidadInicio)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<Ruta>()
+                .HasOne(r => r.MunicipioFin)
+                .WithMany(m => m.RutasFin)
+                .HasForeignKey(r => r.IdEntidadFin)
                 .OnDelete(DeleteBehavior.Restrict);
 
             modelBuilder.Entity<Calificacion>()
-    .HasOne(c => c.LugarTuristico)
-    .WithMany()
-    .HasForeignKey(c => c.LugarTuristicoId) // Asegúrate de que esto coincida con la columna real en la base de datos
-    .OnDelete(DeleteBehavior.SetNull);
+                .HasOne(c => c.LugarTuristico)
+                .WithMany()
+                .HasForeignKey(c => c.LugarTuristicoId)
+                .OnDelete(DeleteBehavior.SetNull);
 
             modelBuilder.Entity<Visita>()
                 .HasOne(v => v.LugarTuristico)
                 .WithMany()
                 .HasForeignKey(v => v.LugarTuristicoId)
                 .OnDelete(DeleteBehavior.SetNull);
-
         }
-
-
     }
 }

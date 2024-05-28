@@ -1,7 +1,7 @@
 ﻿using InterRedBE.DAL.Context;
 using InterRedBE.DAL.Dao;
 using InterRedBE.DAL.Models;
-using InterRedBE.UTILS.Models;
+using InterRedBE.UTILS.Interfaces;
 using InterRedBE.UTILS.Services;
 using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
@@ -18,32 +18,61 @@ namespace InterRedBE.DAL.Services
             _context = context;
         }
 
-        public async Task<(Grafo<Departamento>, Dictionary<(int, int), double>)> CargarRutasAsync()
+        public async Task<(Grafo<IIdentificable>, Dictionary<(int, int), double>)> CargarRutasAsync()
         {
-            Grafo<Departamento> grafo = new Grafo<Departamento>();
+            Grafo<IIdentificable> grafo = new Grafo<IIdentificable>();
             Dictionary<(int, int), double> distancias = new Dictionary<(int, int), double>();
 
-            var rutas = await _context.Ruta.Include(r => r.DepartamentoInicio).Include(r => r.DepartamentoFin).ToListAsync();
+            var rutas = await _context.Ruta
+                                      .Include(r => r.DepartamentoInicio)
+                                      .Include(r => r.DepartamentoFin)
+                                      .Include(r => r.MunicipioInicio)
+                                      .Include(r => r.MunicipioFin)
+                                      .ToListAsync();
 
             foreach (var ruta in rutas)
             {
-                // Agregar nodos al grafo si no existen
-                if (!grafo.ObtenerNodos().ContainsKey(ruta.IdDepartamentoInicio))
+                IIdentificable entidadInicio = null;
+                IIdentificable entidadFin = null;
+
+                if (ruta.TipoInicio == TipoEntidad.Departamento)
                 {
-                    grafo.AgregarNodo(ruta.IdDepartamentoInicio, ruta.DepartamentoInicio);
+                    entidadInicio = ruta.DepartamentoInicio;
+                }
+                else if (ruta.TipoInicio == TipoEntidad.Municipio)
+                {
+                    entidadInicio = ruta.MunicipioInicio;
                 }
 
-                if (!grafo.ObtenerNodos().ContainsKey(ruta.IdDepartamentoFin))
+                if (ruta.TipoFin == TipoEntidad.Departamento)
                 {
-                    grafo.AgregarNodo(ruta.IdDepartamentoFin, ruta.DepartamentoFin);
+                    entidadFin = ruta.DepartamentoFin;
+                }
+                else if (ruta.TipoFin == TipoEntidad.Municipio)
+                {
+                    entidadFin = ruta.MunicipioFin;
                 }
 
-                // Conectar los nodos en el grafo
-                grafo.Conectar(ruta.IdDepartamentoInicio, ruta.IdDepartamentoFin, ruta.Distancia);
+                if (entidadInicio != null && entidadFin != null)
+                {
+                    // Agregar nodos al grafo si no existen
+                    if (!grafo.ObtenerNodos().ContainsKey(ruta.IdEntidadInicio))
+                    {
+                        grafo.AgregarNodo(ruta.IdEntidadInicio, entidadInicio);
+                    }
 
-                // Guardar la distancia en el diccionario para uso posterior en BAO
-                distancias[(ruta.IdDepartamentoInicio, ruta.IdDepartamentoFin)] = ruta.Distancia;
-                distancias[(ruta.IdDepartamentoFin, ruta.IdDepartamentoInicio)] = ruta.Distancia; // Asegurarse de incluir ambas direcciones
+                    if (!grafo.ObtenerNodos().ContainsKey(ruta.IdEntidadFin))
+                    {
+                        grafo.AgregarNodo(ruta.IdEntidadFin, entidadFin);
+                    }
+
+                    // Conectar los nodos en el grafo
+                    grafo.Conectar(ruta.IdEntidadInicio, ruta.IdEntidadFin, ruta.Distancia);
+
+                    // Guardar la distancia en el diccionario para uso posterior
+                    distancias[(ruta.IdEntidadInicio, ruta.IdEntidadFin)] = ruta.Distancia;
+                    distancias[(ruta.IdEntidadFin, ruta.IdEntidadInicio)] = ruta.Distancia; // Asegurarse de incluir ambas direcciones
+                }
             }
 
             return (grafo, distancias);

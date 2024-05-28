@@ -30,12 +30,12 @@ namespace InterRedBE.Controllers
             _context1 = context1;
         }
 
-        [HttpGet("ruta/{idInicio}/{idFin}")]
-        public async Task<IActionResult> GetRuta(int idInicio, int idFin, [FromQuery] int numeroDeRutas = 5)
+        [HttpGet("ruta/{idInicio}/{tipoInicio}/{idFin}/{tipoFin}")]
+        public async Task<IActionResult> GetRuta(int idInicio, TipoEntidad tipoInicio, int idFin, TipoEntidad tipoFin, [FromQuery] int numeroDeRutas = 5)
         {
             try
             {
-                var todasLasRutas = await _rutaBAOService.EncontrarTodasLasRutasAsync(idInicio, idFin, numeroDeRutas);
+                var todasLasRutas = await _rutaBAOService.EncontrarTodasLasRutasAsync(idInicio, tipoInicio, idFin, tipoFin, numeroDeRutas);
                 if (!todasLasRutas.ListaVacia())
                 {
                     var rutas = new ListaEnlazadaDoble<object>();
@@ -43,16 +43,16 @@ namespace InterRedBE.Controllers
 
                     foreach (var ruta in todasLasRutas)
                     {
-                        var caminoDTO = new ListaEnlazadaDoble<DepartamentoRutaDTO>();
-                        foreach (var departamento in ruta.Item1)
+                        var caminoDTO = new ListaEnlazadaDoble<EntidadRutaDTO>();
+                        foreach (var entidad in ruta.Item1)
                         {
-                            caminoDTO.InsertarAlFinal(new DepartamentoRutaDTO
+                            caminoDTO.InsertarAlFinal(new EntidadRutaDTO
                             {
-                                Id = departamento.Id,
-                                Nombre = departamento.Nombre
+                                Id = entidad.Id,
+                                Nombre = entidad.Nombre
                             });
                         }
-                        var rutaStr = string.Join("->", ruta.Item1.Select(d => d.Id)); // Ruta como string única
+                        var rutaStr = string.Join("->", ruta.Item1.Select(e => e.Id)); // Ruta como string única
                         if (!rutasUnicas.Contains(rutaStr))
                         {
                             rutas.InsertarAlFinal(new
@@ -67,7 +67,7 @@ namespace InterRedBE.Controllers
                 }
                 else
                 {
-                    return NotFound("No se encontraron rutas entre los departamentos especificados.");
+                    return NotFound("No se encontraron rutas entre las entidades especificadas.");
                 }
             }
             catch (Exception ex)
@@ -75,6 +75,9 @@ namespace InterRedBE.Controllers
                 return StatusCode(StatusCodes.Status500InternalServerError, "Error al procesar la solicitud: " + ex.Message);
             }
         }
+
+
+
 
         [HttpGet("Top10Cercanos")]
         public async Task<IActionResult> GetTop10CercanosALaCapital()

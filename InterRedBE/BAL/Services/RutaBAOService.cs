@@ -5,6 +5,7 @@ using InterRedBE.DAL.Models;
 using InterRedBE.UTILS.Models;
 using InterRedBE.UTILS.Services;
 using System.Linq;
+using InterRedBE.UTILS.Interfaces;
 
 namespace InterRedBE.BAL.Services
 {
@@ -17,13 +18,13 @@ namespace InterRedBE.BAL.Services
             _rutaService = rutaService;
         }
 
-        public async Task<ListaEnlazadaDoble<(ListaEnlazadaDoble<Departamento>, double)>> EncontrarTodasLasRutasAsync(int idDepartamentoInicio, int idDepartamentoFin, int numeroDeRutas = 5)
+        public async Task<ListaEnlazadaDoble<(ListaEnlazadaDoble<IIdentificable>, double)>> EncontrarTodasLasRutasAsync(int idInicio, TipoEntidad tipoInicio, int idFin, TipoEntidad tipoFin, int numeroDeRutas = 5)
         {
-            var (grafoDepartamentos, distancias) = await _rutaService.CargarRutasAsync();
-            var todasLasRutas = grafoDepartamentos.BuscarTodasLasRutas(idDepartamentoInicio, idDepartamentoFin, distancias);
+            var (grafoEntidades, distancias) = await _rutaService.CargarRutasAsync();
+            var todasLasRutas = grafoEntidades.BuscarTodasLasRutas(idInicio, idFin, distancias);
 
             // Crear un diccionario para almacenar las rutas únicas
-            var rutasUnicas = new Dictionary<string, (ListaEnlazadaDoble<Departamento>, double)>();
+            var rutasUnicas = new Dictionary<string, (ListaEnlazadaDoble<IIdentificable>, double)>();
 
             foreach (var ruta in todasLasRutas)
             {
@@ -38,7 +39,7 @@ namespace InterRedBE.BAL.Services
             var rutasOrdenadasUnicas = rutasUnicas.Values.OrderBy(r => r.Item2);
 
             // Tomar las primeras numeroDeRutas rutas únicas
-            var resultado = new ListaEnlazadaDoble<(ListaEnlazadaDoble<Departamento>, double)>();
+            var resultado = new ListaEnlazadaDoble<(ListaEnlazadaDoble<IIdentificable>, double)>();
             foreach (var ruta in rutasOrdenadasUnicas.Take(numeroDeRutas))
             {
                 resultado.InsertarAlFinal(ruta);
@@ -47,11 +48,13 @@ namespace InterRedBE.BAL.Services
             return resultado;
         }
 
+
         public async Task<ListaEnlazadaDoble<(ListaEnlazadaDoble<Departamento>, double)>> EncontrarKRutasMasCortasAsync(int idDepartamentoInicio, int idDepartamentoFin, int k)
         {
-            var (grafoDepartamentos, distancias) = await _rutaService.CargarRutasAsync();
-            var rutasMasCortas = grafoDepartamentos.EncontrarKRutasMasCortas(idDepartamentoInicio, idDepartamentoFin, k, distancias);
-            return rutasMasCortas;
+            throw new System.NotImplementedException();
+            //var (grafoDepartamentos, distancias) = await _rutaService.CargarRutasAsync();
+            //var rutasMasCortas = grafoDepartamentos.EncontrarKRutasMasCortas(idDepartamentoInicio, idDepartamentoFin, k, distancias);
+            //return rutasMasCortas;
         }
     }
 }

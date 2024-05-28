@@ -15,7 +15,7 @@ namespace InterRedBE.DAL.Models
         public virtual ICollection<Ruta> RutasInicio { get; set; }
         public virtual ICollection<Ruta> RutasFin { get; set; }
 
-        // Calcular poblacion total del departamento
+        // Calcular población total del departamento
         public int PoblacionTotal => Municipios?.Sum(m => m.Poblacion) ?? 0;
     }
 }
