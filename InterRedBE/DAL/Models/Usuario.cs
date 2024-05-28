@@ -1,4 +1,6 @@
-﻿namespace InterRedBE.DAL.Models
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace InterRedBE.DAL.Models
 {
     public class Usuario
     {
@@ -7,5 +9,10 @@
         public string Correo { get; set; }
         public string Contrasena { get; set; }
 
+        [Required]
+        [RegularExpression("^(Invitado|Administrador)$", ErrorMessage = "El rol debe ser 'Invitado' o 'Administrador'.")]
+        public string Rol { get; set; }
+
     }
 }
+

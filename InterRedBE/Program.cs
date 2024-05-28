@@ -9,16 +9,15 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
-using System.Text.Json.Serialization; 
+using System.Text.Json.Serialization;
 using Microsoft.OpenApi.Models;
-using Serilog;
-using Serilog.Events;
 using InterRedBE.AUTH.Aao;
 using InterRedBE.AUTH.Service;
 
-
-
 var builder = WebApplication.CreateBuilder(args);
+
+// Configuración de servicios
+var configuration = builder.Configuration;
 
 // DAO DI
 builder.Services.AddHttpContextAccessor();
@@ -41,7 +40,6 @@ builder.Services.AddScoped<IRutaBAO, RutaBAOService>();
 builder.Services.AddScoped<IVisitaBAO, VisitaBAOService>();
 builder.Services.AddScoped<ICalificacionBAO, CalificacionBAOService>();
 
-
 // AAO DI
 builder.Services.AddScoped<IJwtAAO, JwtService>();
 
@@ -54,7 +52,6 @@ builder.Services.AddControllers()
         options.JsonSerializerOptions.WriteIndented = true; // Hacer la salida del JSON más legible
     });
 
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
@@ -63,31 +60,53 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
         options.RequireHttpsMetadata = false;
         options.SaveToken = true;
         options.TokenValidationParameters = new TokenValidationParameters
-        ()
         {
             ValidateIssuer = true,
             ValidateAudience = true,
             ValidateLifetime = true,
             ValidateIssuerSigningKey = true,
-
-            ValidIssuer = builder.Configuration[key: "Jwt:Issuer"],
-            ValidAudience = builder.Configuration[key: "Jwt:Issuer"],
-            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration[key: "Jwt:Key"]))
+            ValidIssuer = configuration["Jwt:Issuer"],
+            ValidAudience = configuration["Jwt:Audience"],
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration["Jwt:Key"]))
         };
     });
 
+builder.Services.AddAuthorization(options =>
+{
+    options.AddPolicy("RequireAdministratorRole", policy => policy.RequireRole("Administrador"));
+});
 
-builder.Services.AddSwaggerGen();
-
-
-
+builder.Services.AddSwaggerGen(c =>
+{
+    c.SwaggerDoc("v1", new OpenApiInfo { Title = "InterRed API", Version = "v1" });
+    c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+    {
+        Description = "JWT Authorization header using the Bearer scheme. Example: \"Authorization: Bearer {token}\"",
+        Name = "Authorization",
+        In = ParameterLocation.Header,
+        Type = SecuritySchemeType.ApiKey,
+        Scheme = "Bearer"
+    });
+    c.AddSecurityRequirement(new OpenApiSecurityRequirement{
+    {
+        new OpenApiSecurityScheme
+        {
+            Reference = new OpenApiReference
+            {
+                Type = ReferenceType.SecurityScheme,
+                Id = "Bearer"
+            }
+        },
+        new string[] {}
+    }});
+});
 
 // Register DbContext with SQL Server
 builder.Services.AddDbContext<InterRedContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+    options.UseSqlServer(configuration.GetConnectionString("DefaultConnection")));
 
 var corsPolicyName = "DefaultCorsPolicy";
-var allowedOrigins = builder.Configuration.GetSection("Cors:AllowedOrigins").Get<string[]>();
+var allowedOrigins = configuration.GetSection("Cors:AllowedOrigins").Get<string[]>();
 builder.Services.AddCors(options =>
 {
     options.AddPolicy(corsPolicyName, policyBuilder =>
@@ -99,15 +118,14 @@ builder.Services.AddCors(options =>
     });
 });
 
-
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
     app.UseDeveloperExceptionPage();
-
 }
+
 app.UseSwagger();
 app.UseSwaggerUI();
 
