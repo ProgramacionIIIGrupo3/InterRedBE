@@ -29,7 +29,6 @@ namespace InterRedBE.Controllers
             _context = context;
             _context1 = context1;
         }
-
         [HttpGet("ruta/{idInicio}/{tipoInicio}/{idFin}/{tipoFin}")]
         public async Task<IActionResult> GetRuta(int idInicio, TipoEntidad tipoInicio, int idFin, TipoEntidad tipoFin, [FromQuery] int numeroDeRutas = 5)
         {
@@ -75,7 +74,6 @@ namespace InterRedBE.Controllers
                 return StatusCode(StatusCodes.Status500InternalServerError, "Error al procesar la solicitud: " + ex.Message);
             }
         }
-
 
 
 

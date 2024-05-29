@@ -21,6 +21,12 @@ namespace InterRedBE.BAL.Services
         public async Task<ListaEnlazadaDoble<(ListaEnlazadaDoble<IIdentificable>, double)>> EncontrarTodasLasRutasAsync(int idInicio, TipoEntidad tipoInicio, int idFin, TipoEntidad tipoFin, int numeroDeRutas = 5)
         {
             var (grafoEntidades, distancias) = await _rutaService.CargarRutasAsync();
+
+            if (!grafoEntidades.ObtenerNodos().ContainsKey(idInicio) || !grafoEntidades.ObtenerNodos().ContainsKey(idFin))
+            {
+                return new ListaEnlazadaDoble<(ListaEnlazadaDoble<IIdentificable>, double)>(); // Retorna vacío si no se encuentran los nodos
+            }
+
             var todasLasRutas = grafoEntidades.BuscarTodasLasRutas(idInicio, idFin, distancias);
 
             // Crear un diccionario para almacenar las rutas únicas
