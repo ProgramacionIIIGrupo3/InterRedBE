@@ -10,8 +10,10 @@ namespace InterRedBE.DAL.Models
         public int Poblacion { get; set; }
         public int? IdDepartamento { get; set; }
         public string? Imagen { get; set; }
+        public string IdX { get; set; } // Nuevo Columna
         public virtual Departamento Departamento { get; set; }
         public virtual ICollection<LugarTuristico> LugaresTuristicos { get; set; }
+
 
         // Nuevas relaciones con Ruta
         public virtual ICollection<Ruta> RutasInicio { get; set; }

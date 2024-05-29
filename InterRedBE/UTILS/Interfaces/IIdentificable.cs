@@ -2,7 +2,8 @@
 {
     public interface IIdentificable
     {
-        int Id { get; }
-        string Nombre { get; }
+        int Id { get; set; }
+        string IdX { get; set; } // Añadir esta propiedad
+        string Nombre { get; set; }
     }
 }

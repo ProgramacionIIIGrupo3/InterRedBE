@@ -8,6 +8,7 @@ namespace InterRedBE.DAL.Dao
     public interface IRuta
     {
         Task<(Grafo<IIdentificable>, Dictionary<(int, int), double>)> CargarRutasAsync();
+        Task<(Grafo<IIdentificable>, Dictionary<(string, string), double>)> CargarRutasNuevoAsync();
 
     }
 }

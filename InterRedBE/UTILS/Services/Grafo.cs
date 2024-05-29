@@ -58,36 +58,37 @@ namespace InterRedBE.UTILS.Services
             return nodos;
         }
 
-        public ListaEnlazadaDoble<(ListaEnlazadaDoble<T>, double)> BuscarTodasLasRutas(int idInicio, int idFin, Dictionary<(int, int), double> distancias)
+        public ListaEnlazadaDoble<(ListaEnlazadaDoble<T>, double)> BuscarTodasLasRutas(string idInicio, string idFin, Dictionary<(string, string), double> distancias)
         {
             var todasLasRutas = new ListaEnlazadaDoble<(ListaEnlazadaDoble<T>, double)>();
-            var rutaActual = new ListaEnlazadaDoble<int>();
+            var rutaActual = new ListaEnlazadaDoble<string>();
             var distanciaAcumulada = 0.0;
-            var visitados = new ListaEnlazadaDoble<int>();
+            var visitados = new ListaEnlazadaDoble<string>();
 
-            BuscarRutasDFS(ObtenerNodo(idInicio), idFin, visitados, rutaActual, distanciaAcumulada, todasLasRutas, distancias);
+            var nodoInicio = ObtenerNodoPorIdX(idInicio);
+            BuscarRutasDFS(nodoInicio, idFin, visitados, rutaActual, distanciaAcumulada, todasLasRutas, distancias);
 
             return todasLasRutas;
         }
 
-        private void BuscarRutasDFS(NodoGrafo<T> actual, int destino, ListaEnlazadaDoble<int> visitados, ListaEnlazadaDoble<int> rutaActual, double distanciaAcumulada, ListaEnlazadaDoble<(ListaEnlazadaDoble<T>, double)> todasLasRutas, Dictionary<(int, int), double> distancias)
+        private void BuscarRutasDFS(NodoGrafo<T> actual, string destino, ListaEnlazadaDoble<string> visitados, ListaEnlazadaDoble<string> rutaActual, double distanciaAcumulada, ListaEnlazadaDoble<(ListaEnlazadaDoble<T>, double)> todasLasRutas, Dictionary<(string, string), double> distancias)
         {
             // Verifica si el nodo actual ya fue visitado en esta ruta
-            if (visitados.Contains(actual.Id))
+            if (visitados.Contains(actual.Dato.IdX))
             {
                 return; // Evita ciclos dentro de la misma ruta de exploración
             }
 
             // Agrega el nodo actual a la ruta y marca como visitado
-            rutaActual.InsertarAlFinal(actual.Id);
-            visitados.InsertarAlFinal(actual.Id);
+            rutaActual.InsertarAlFinal(actual.Dato.IdX);
+            visitados.InsertarAlFinal(actual.Dato.IdX);
 
-            if (actual.Id == destino)
+            if (actual.Dato.IdX == destino)
             {
                 var ruta = new ListaEnlazadaDoble<T>();
                 foreach (var id in rutaActual)
                 {
-                    ruta.InsertarAlFinal(ObtenerNodo(id).Dato);
+                    ruta.InsertarAlFinal(ObtenerNodoPorIdX(id).Dato);
                 }
                 todasLasRutas.InsertarAlFinal((ruta, distanciaAcumulada));
             }
@@ -97,15 +98,15 @@ namespace InterRedBE.UTILS.Services
                 foreach (var arista in actual.Adyacentes)
                 {
                     var vecino = arista.Nodo;
-                    if (!visitados.Contains(vecino.Id))
+                    if (!visitados.Contains(vecino.Dato.IdX))
                     {
-                        var edgeKey = (actual.Id, vecino.Id);
-                        var nuevosVisitados = new ListaEnlazadaDoble<int>();
+                        var edgeKey = (actual.Dato.IdX, vecino.Dato.IdX);
+                        var nuevosVisitados = new ListaEnlazadaDoble<string>();
                         foreach (var visitado in visitados)
                         {
                             nuevosVisitados.InsertarAlFinal(visitado);
                         }
-                        var nuevaRutaActual = new ListaEnlazadaDoble<int>();
+                        var nuevaRutaActual = new ListaEnlazadaDoble<string>();
                         foreach (var nodo in rutaActual)
                         {
                             nuevaRutaActual.InsertarAlFinal(nodo);
@@ -116,9 +117,10 @@ namespace InterRedBE.UTILS.Services
             }
 
             // Elimina el nodo actual de rutaActual y desmarca como visitado
-            rutaActual.EliminarDatoX(actual.Id);
-            visitados.EliminarDatoX(actual.Id);
+            rutaActual.EliminarDatoX(actual.Dato.IdX);
+            visitados.EliminarDatoX(actual.Dato.IdX);
         }
+
 
         public ListaEnlazadaDoble<(ListaEnlazadaDoble<T>, double)> EncontrarKRutasMasCortas(int idInicio, int idFin, int k, Dictionary<(int, int), double> distancias)
         {
@@ -232,6 +234,27 @@ namespace InterRedBE.UTILS.Services
             }
 
             return rutasMasCortas;
+        }
+
+        public void ConectarPorIdX(string idInicio, string idFin, double distancia)
+        {
+            var nodoInicio = ObtenerNodoPorIdX(idInicio);
+            var nodoFin = ObtenerNodoPorIdX(idFin);
+
+            nodoInicio.Adyacentes.InsertarAlFinal(new Arista<T>(nodoFin, distancia));
+            nodoFin.Adyacentes.InsertarAlFinal(new Arista<T>(nodoInicio, distancia)); // Si el grafo es no dirigido.
+        }
+
+        private NodoGrafo<T> ObtenerNodoPorIdX(string idX)
+        {
+            foreach (var nodo in nodos.Values)
+            {
+                if (nodo.Dato.IdX == idX)
+                {
+                    return nodo;
+                }
+            }
+            throw new KeyNotFoundException("El nodo con el IdX proporcionado no existe.");
         }
 
 

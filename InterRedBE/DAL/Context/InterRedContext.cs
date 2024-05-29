@@ -1,4 +1,5 @@
 ﻿using InterRedBE.DAL.Models;
+using InterRedBE.UTILS.Services;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
@@ -17,6 +18,7 @@ namespace InterRedBE.DAL.Context
         public DbSet<Departamento> Departamento { get; set; }
         public DbSet<Municipio> Municipio { get; set; }
         public DbSet<Ruta> Ruta { get; set; }
+        public DbSet<Rutaa> Rutaa { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -91,6 +93,16 @@ namespace InterRedBE.DAL.Context
                 .WithMany()
                 .HasForeignKey(v => v.LugarTuristicoId)
                 .OnDelete(DeleteBehavior.SetNull);
+
+            // Configuración para Departamento y Municipio
+            modelBuilder.Entity<Departamento>()
+                .Property(d => d.IdX)
+                .HasValueGenerator<DepartamentoIdXGenerator>();
+
+            modelBuilder.Entity<Municipio>()
+                .Property(m => m.IdX)
+                .HasValueGenerator<MunicipioIdXGenerator>();
+
         }
     }
 }
