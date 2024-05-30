@@ -59,7 +59,7 @@ namespace InterRedBE.Controllers.Admin
         }
 
         [HttpGet]
-        [Authorize]
+        [Authorize(Roles = "Administrador")]
         public IActionResult GetAll()
         {
             try
