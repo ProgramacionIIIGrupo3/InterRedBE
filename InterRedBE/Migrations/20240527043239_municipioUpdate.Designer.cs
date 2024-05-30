@@ -4,6 +4,7 @@ using InterRedBE.DAL.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace InterRedBE.Migrations
 {
     [DbContext(typeof(InterRedContext))]
-    partial class InterRedContextModelSnapshot : ModelSnapshot
+    [Migration("20240527043239_municipioUpdate")]
+    partial class municipioUpdate
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -175,25 +178,17 @@ namespace InterRedBE.Migrations
                     b.Property<double>("Distancia")
                         .HasColumnType("float");
 
-                    b.Property<int>("IdEntidadFin")
+                    b.Property<int>("IdDepartamentoFin")
                         .HasColumnType("int");
 
-                    b.Property<int>("IdEntidadInicio")
+                    b.Property<int>("IdDepartamentoInicio")
                         .HasColumnType("int");
-
-                    b.Property<string>("TipoFin")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("TipoInicio")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("IdEntidadFin");
+                    b.HasIndex("IdDepartamentoFin");
 
-                    b.HasIndex("IdEntidadInicio");
+                    b.HasIndex("IdDepartamentoInicio");
 
                     b.ToTable("Ruta");
                 });
@@ -308,35 +303,19 @@ namespace InterRedBE.Migrations
                 {
                     b.HasOne("InterRedBE.DAL.Models.Departamento", "DepartamentoFin")
                         .WithMany("RutasFin")
-                        .HasForeignKey("IdEntidadFin")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("InterRedBE.DAL.Models.Municipio", "MunicipioFin")
-                        .WithMany("RutasFin")
-                        .HasForeignKey("IdEntidadFin")
+                        .HasForeignKey("IdDepartamentoFin")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("InterRedBE.DAL.Models.Departamento", "DepartamentoInicio")
                         .WithMany("RutasInicio")
-                        .HasForeignKey("IdEntidadInicio")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("InterRedBE.DAL.Models.Municipio", "MunicipioInicio")
-                        .WithMany("RutasInicio")
-                        .HasForeignKey("IdEntidadInicio")
+                        .HasForeignKey("IdDepartamentoInicio")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("DepartamentoFin");
 
                     b.Navigation("DepartamentoInicio");
-
-                    b.Navigation("MunicipioFin");
-
-                    b.Navigation("MunicipioInicio");
                 });
 
             modelBuilder.Entity("InterRedBE.DAL.Models.Visita", b =>
@@ -374,10 +353,6 @@ namespace InterRedBE.Migrations
             modelBuilder.Entity("InterRedBE.DAL.Models.Municipio", b =>
                 {
                     b.Navigation("LugaresTuristicos");
-
-                    b.Navigation("RutasFin");
-
-                    b.Navigation("RutasInicio");
                 });
 #pragma warning restore 612, 618
         }
