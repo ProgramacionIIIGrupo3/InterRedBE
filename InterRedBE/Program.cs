@@ -19,6 +19,9 @@ var builder = WebApplication.CreateBuilder(args);
 // Configuración de servicios
 var configuration = builder.Configuration;
 
+// Add MemoryCache service
+builder.Services.AddMemoryCache();
+
 // DAO DI
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddScoped<IDepartamentoDAO, DepartamentoService>();
@@ -102,8 +105,9 @@ builder.Services.AddSwaggerGen(c =>
 });
 
 // Register DbContext with SQL Server
-builder.Services.AddDbContext<InterRedContext>(options =>
+builder.Services.AddDbContextFactory<InterRedContext>(options =>
     options.UseSqlServer(configuration.GetConnectionString("DefaultConnection")));
+
 
 var corsPolicyName = "DefaultCorsPolicy";
 var allowedOrigins = configuration.GetSection("Cors:AllowedOrigins").Get<string[]>();
