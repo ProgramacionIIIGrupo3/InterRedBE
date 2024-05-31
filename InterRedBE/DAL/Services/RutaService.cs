@@ -79,42 +79,43 @@ namespace InterRedBE.DAL.Services
         // Método para cargar la nueva estructura de rutas
         public async Task<(Grafo<IIdentificable>, Dictionary<(string, string), double>)> CargarRutasNuevoAsync()
         {
-            Grafo<IIdentificable> grafo = new Grafo<IIdentificable>();
-            Dictionary<(string, string), double> distancias = new Dictionary<(string, string), double>();
+            
+                Grafo<IIdentificable> grafo = new Grafo<IIdentificable>();
+                Dictionary<(string, string), double> distancias = new Dictionary<(string, string), double>();
 
-            var rutas = await _context.Rutaa.ToListAsync();
+                var rutas = await _context.Rutaa.ToListAsync();
 
-            foreach (var ruta in rutas)
-            {
-                var entidadInicio = _context.Departamento.FirstOrDefault(d => d.IdX == ruta.EntidadInicio) as IIdentificable
-                                    ?? _context.Municipio.FirstOrDefault(m => m.IdX == ruta.EntidadInicio) as IIdentificable;
-
-                var entidadFin = _context.Departamento.FirstOrDefault(d => d.IdX == ruta.EntidadFinal) as IIdentificable
-                                 ?? _context.Municipio.FirstOrDefault(m => m.IdX == ruta.EntidadFinal) as IIdentificable;
-
-                if (entidadInicio != null && entidadFin != null)
+                foreach (var ruta in rutas)
                 {
-                    // Agregar nodos al grafo si no existen
-                    if (!grafo.ObtenerNodos().Values.Any(n => n.Dato.IdX == ruta.EntidadInicio))
+                    var entidadInicio = _context.Departamento.FirstOrDefault(d => d.IdX == ruta.EntidadInicio) as IIdentificable
+                                        ?? _context.Municipio.FirstOrDefault(m => m.IdX == ruta.EntidadInicio) as IIdentificable;
+
+                    var entidadFin = _context.Departamento.FirstOrDefault(d => d.IdX == ruta.EntidadFinal) as IIdentificable
+                                     ?? _context.Municipio.FirstOrDefault(m => m.IdX == ruta.EntidadFinal) as IIdentificable;
+
+                    if (entidadInicio != null && entidadFin != null)
                     {
-                        grafo.AgregarNodo(entidadInicio.Id, entidadInicio);
+                        // Agregar nodos al grafo si no existen
+                        if (!grafo.ObtenerNodos().Values.Any(n => n.Dato.IdX == ruta.EntidadInicio))
+                        {
+                            grafo.AgregarNodo(entidadInicio.Id, entidadInicio);
+                        }
+
+                        if (!grafo.ObtenerNodos().Values.Any(n => n.Dato.IdX == ruta.EntidadFinal))
+                        {
+                            grafo.AgregarNodo(entidadFin.Id, entidadFin);
+                        }
+
+                        // Conectar los nodos en el grafo
+                        grafo.ConectarPorIdX(ruta.EntidadInicio, ruta.EntidadFinal, ruta.Distancia);
+
+                        // Guardar la distancia en el diccionario para uso posterior
+                        distancias[(ruta.EntidadInicio, ruta.EntidadFinal)] = ruta.Distancia;
+                        distancias[(ruta.EntidadFinal, ruta.EntidadInicio)] = ruta.Distancia; // Asegurarse de incluir ambas direcciones
                     }
-
-                    if (!grafo.ObtenerNodos().Values.Any(n => n.Dato.IdX == ruta.EntidadFinal))
-                    {
-                        grafo.AgregarNodo(entidadFin.Id, entidadFin);
-                    }
-
-                    // Conectar los nodos en el grafo
-                    grafo.ConectarPorIdX(ruta.EntidadInicio, ruta.EntidadFinal, ruta.Distancia);
-
-                    // Guardar la distancia en el diccionario para uso posterior
-                    distancias[(ruta.EntidadInicio, ruta.EntidadFinal)] = ruta.Distancia;
-                    distancias[(ruta.EntidadFinal, ruta.EntidadInicio)] = ruta.Distancia; // Asegurarse de incluir ambas direcciones
                 }
-            }
 
-            return (grafo, distancias);
+                return (grafo, distancias);
         }
     }
 }

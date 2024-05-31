@@ -23,6 +23,19 @@ namespace InterRedBE.UTILS.Services
         {
             return PrimerNodo == null;
         }
+        public ListaEnlazadaDoble<T> ClonarListaEnlazadaDoble()
+        {
+            var clonada = new ListaEnlazadaDoble<T>();
+            NodoDobleLiga<T> actual = PrimerNodo;
+
+            while (actual != null)
+            {
+                clonada.InsertarAlFinal(actual.Dato);
+                actual = (NodoDobleLiga<T>)actual.LigaSiguiente;
+            }
+
+            return clonada;
+        }
 
         // Metodo para insertar un nodo al inicio de la lista
         public string InsertarAlInicio(T dato)

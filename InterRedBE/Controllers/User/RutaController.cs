@@ -21,7 +21,6 @@ namespace InterRedBE.Controllers
         private readonly IRutaBAO _rutaBAOService;
         private readonly InterRedContext _context;
         private readonly InterRedContext _context1;
-        private const int CapitalId = 5;
 
         public RutaController(IRutaBAO rutaBAOService, InterRedContext context, InterRedContext context1)
         {
@@ -76,38 +75,37 @@ namespace InterRedBE.Controllers
                 return StatusCode(StatusCodes.Status500InternalServerError, "Error al procesar la solicitud: " + ex.Message);
             }
         }
+        
 
-        [HttpGet("Top10Cercanos")]
-        public async Task<IActionResult> GetTop10CercanosALaCapital()
+        [HttpGet("Top10CercanosAGuatemala")]
+        public async Task<IActionResult> GetTop10CercanosAGuatemala()
         {
             try
             {
-                var departamentosCercanos = await _context.Departamento
-                    .OrderBy(depto => depto.Nombre)
-                    .Select(depto => new { depto.Id, depto.Nombre, depto.Descripcion, depto.Imagen })
-                    .ToListAsync();
+                var rutaService = new RutaService(_context);
+                var (grafoEntidades, distancias) = await rutaService.CargarRutasNuevoAsync();
 
-                var ordenDepartamentos = new List<string>
+                var nodoGuatemala = grafoEntidades.ObtenerNodos().Values.FirstOrDefault(n => n.Dato.IdX == "D1");
+                if (nodoGuatemala == null)
                 {
-                    "Baja Verapaz",
-                    "El Progreso",
-                    "Jalapa",
-                    "Santa Rosa",
-                    "Escuintla",
-                    "Sacatepéquez",
-                    "Chimaltenango",
-                    "Jutiapa",
-                    "Chiquimula",
-                    "Quiché"
-                };
+                    return NotFound("No se encontró el nodo de Guatemala (D1)");
+                }
 
-                var departamentosOrdenados = departamentosCercanos
-                    .Where(d => ordenDepartamentos.Contains(d.Nombre))
-                    .OrderBy(d => ordenDepartamentos.IndexOf(d.Nombre))
+                var todasLasRutas = grafoEntidades.BuscarTodasLasRutas(nodoGuatemala.Dato.IdX, null, distancias);
+
+                // Ordenar las rutas por distancia ascendente
+                var rutasOrdenadas = todasLasRutas.OrderBy(r => r.Item2).ToList();
+
+                var top10Cercanos = rutasOrdenadas
                     .Take(10)
+                    .Select(r => new
+                    {
+                        Nombre = string.Join(", ", r.Item1.Select(n => n.Nombre)),
+                        Distancia = r.Item2
+                    })
                     .ToList();
 
-                return Ok(departamentosOrdenados);
+                return Ok(top10Cercanos);
             }
             catch (Exception ex)
             {
@@ -115,41 +113,42 @@ namespace InterRedBE.Controllers
             }
         }
 
-        [HttpGet("Top10Lejanos")]
-        public async Task<IActionResult> GetTop10LejanosALaCapital()
+        [HttpGet("Top10LejanosAGuatemala")]
+        public async Task<IActionResult> GetTop10LejanosAGuatemala()
         {
             try
             {
-                var ordenDepartamentos = new List<string>
+                var rutaService = new RutaService(_context);
+                var (grafoEntidades, distancias) = await rutaService.CargarRutasNuevoAsync();
+
+                var nodoGuatemala = grafoEntidades.ObtenerNodos().Values.FirstOrDefault(n => n.Dato.IdX == "D1");
+                if (nodoGuatemala == null)
                 {
-                    "Petén",
-                    "Izabal",
-                    "Huehuetenango",
-                    "San Marcos",
-                    "Retalhuleu",
-                    "Sacatepéquez",
-                    "Quetzaltenango",
-                    "Totonicapán",
-                    "Sololá",
-                    "Zacapa"
-                };
+                    return NotFound("No se encontró el nodo de Guatemala (D1)");
+                }
 
-                var departamentosExistentes = await _context1.Departamento
-                    .Select(depto => new { depto.Id, depto.Nombre, depto.Descripcion, depto.Imagen })
-                    .ToListAsync();
+                var todasLasRutas = grafoEntidades.BuscarTodasLasRutas(nodoGuatemala.Dato.IdX, null, distancias);
 
-                var departamentosOrdenados = departamentosExistentes
-                    .Where(depto => ordenDepartamentos.Contains(depto.Nombre))
-                    .OrderBy(depto => ordenDepartamentos.IndexOf(depto.Nombre))
+                // Ordenar las rutas por distancia descendente
+                var rutasOrdenadas = todasLasRutas.OrderByDescending(r => r.Item2).ToList();
+
+                var top10Lejanos = rutasOrdenadas
+                    .Take(10)
+                    .Select(r => new
+                    {
+                        Nombre = string.Join(", ", r.Item1.Select(n => n.Nombre)),
+                        Distancia = r.Item2
+                    })
                     .ToList();
 
-                return Ok(departamentosOrdenados);
+                return Ok(top10Lejanos);
             }
             catch (Exception ex)
             {
                 return StatusCode(StatusCodes.Status500InternalServerError, "Error al procesar la solicitud: " + ex.Message);
             }
         }
-
     }
 }
+
+

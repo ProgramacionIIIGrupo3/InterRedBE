@@ -61,36 +61,22 @@ namespace InterRedBE.UTILS.Services
         public ListaEnlazadaDoble<(ListaEnlazadaDoble<T>, double)> BuscarTodasLasRutas(string idInicio, string idFin, Dictionary<(string, string), double> distancias)
         {
             var todasLasRutas = new ListaEnlazadaDoble<(ListaEnlazadaDoble<T>, double)>();
-            var rutaActual = new ListaEnlazadaDoble<string>();
+            var rutaActual = new ListaEnlazadaDoble<T>();
             var distanciaAcumulada = 0.0;
-            var visitados = new ListaEnlazadaDoble<string>();
+            var visitados = new HashSet<T>();
 
             var nodoInicio = ObtenerNodoPorIdX(idInicio);
             BuscarRutasDFS(nodoInicio, idFin, visitados, rutaActual, distanciaAcumulada, todasLasRutas, distancias);
 
             return todasLasRutas;
         }
-
-        private void BuscarRutasDFS(NodoGrafo<T> actual, string destino, ListaEnlazadaDoble<string> visitados, ListaEnlazadaDoble<string> rutaActual, double distanciaAcumulada, ListaEnlazadaDoble<(ListaEnlazadaDoble<T>, double)> todasLasRutas, Dictionary<(string, string), double> distancias)
+        private void BuscarRutasDFS(NodoGrafo<T> actual, string destino, HashSet<T> visitados, ListaEnlazadaDoble<T> rutaActual, double distanciaAcumulada, ListaEnlazadaDoble<(ListaEnlazadaDoble<T>, double)> todasLasRutas, Dictionary<(string, string), double> distancias)
         {
-            // Verifica si el nodo actual ya fue visitado en esta ruta
-            if (visitados.Contains(actual.Dato.IdX))
-            {
-                return; // Evita ciclos dentro de la misma ruta de exploración
-            }
-
-            // Agrega el nodo actual a la ruta y marca como visitado
-            rutaActual.InsertarAlFinal(actual.Dato.IdX);
-            visitados.InsertarAlFinal(actual.Dato.IdX);
+            // ...
 
             if (actual.Dato.IdX == destino)
             {
-                var ruta = new ListaEnlazadaDoble<T>();
-                foreach (var id in rutaActual)
-                {
-                    ruta.InsertarAlFinal(ObtenerNodoPorIdX(id).Dato);
-                }
-                todasLasRutas.InsertarAlFinal((ruta, distanciaAcumulada));
+                todasLasRutas.InsertarAlFinal((rutaActual.ClonarListaEnlazadaDoble(), distanciaAcumulada));
             }
             else
             {
@@ -98,29 +84,16 @@ namespace InterRedBE.UTILS.Services
                 foreach (var arista in actual.Adyacentes)
                 {
                     var vecino = arista.Nodo;
-                    if (!visitados.Contains(vecino.Dato.IdX))
+                    if (!visitados.Contains(vecino.Dato))
                     {
                         var edgeKey = (actual.Dato.IdX, vecino.Dato.IdX);
-                        var nuevosVisitados = new ListaEnlazadaDoble<string>();
-                        foreach (var visitado in visitados)
-                        {
-                            nuevosVisitados.InsertarAlFinal(visitado);
-                        }
-                        var nuevaRutaActual = new ListaEnlazadaDoble<string>();
-                        foreach (var nodo in rutaActual)
-                        {
-                            nuevaRutaActual.InsertarAlFinal(nodo);
-                        }
-                        BuscarRutasDFS(vecino, destino, nuevosVisitados, nuevaRutaActual, distanciaAcumulada + distancias[edgeKey], todasLasRutas, distancias);
+                        BuscarRutasDFS(vecino, destino, new HashSet<T>(visitados), rutaActual.ClonarListaEnlazadaDoble(), distanciaAcumulada + distancias[edgeKey], todasLasRutas, distancias);
                     }
                 }
             }
 
-            // Elimina el nodo actual de rutaActual y desmarca como visitado
-            rutaActual.EliminarDatoX(actual.Dato.IdX);
-            visitados.EliminarDatoX(actual.Dato.IdX);
+            // ...
         }
-
 
         public ListaEnlazadaDoble<(ListaEnlazadaDoble<T>, double)> EncontrarKRutasMasCortas(int idInicio, int idFin, int k, Dictionary<(int, int), double> distancias)
         {
@@ -256,8 +229,5 @@ namespace InterRedBE.UTILS.Services
             }
             throw new KeyNotFoundException("El nodo con el IdX proporcionado no existe.");
         }
-
-
-
     }
 }
