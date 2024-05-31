@@ -25,32 +25,29 @@ namespace InterRedBE.BAL.Services
         {
             var (grafoEntidades, distancias) = await _rutaService.CargarRutasNuevoAsync();
 
-            var nodoInicio = grafoEntidades.ObtenerNodos().Values.FirstOrDefault(n => n.Dato.IdX == idXInicio);
-            var nodoFin = grafoEntidades.ObtenerNodos().Values.FirstOrDefault(n => n.Dato.IdX == idXFin);
+            var nodoInicio = grafoEntidades.ObtenerNodos().Values.FirstOrDefault(n => n.IdX == idXInicio);
+            var nodoFin = grafoEntidades.ObtenerNodos().Values.FirstOrDefault(n => n.IdX == idXFin);
 
             if (nodoInicio == null || nodoFin == null)
             {
                 return new ListaEnlazadaDoble<(ListaEnlazadaDoble<IIdentificable>, double)>(); // Retorna vacío si no se encuentran los nodos
             }
 
-            var todasLasRutas = grafoEntidades.BuscarTodasLasRutas(nodoInicio.Dato.IdX, nodoFin.Dato.IdX, distancias);
+            var todasLasRutas = grafoEntidades.BuscarTodasLasRutas(nodoInicio.IdX, nodoFin.IdX, distancias);
 
-            // Crear un diccionario para almacenar las rutas únicas
             var rutasUnicas = new Dictionary<string, (ListaEnlazadaDoble<IIdentificable>, double)>();
 
             foreach (var ruta in todasLasRutas)
             {
-                var rutaStr = string.Join(",", ruta.Item1.Select(d => d.Id));
+                var rutaStr = string.Join(",", ruta.Item1.Select(d => d.IdX));
                 if (!rutasUnicas.ContainsKey(rutaStr))
                 {
                     rutasUnicas[rutaStr] = ruta;
                 }
             }
 
-            // Ordenar las rutas únicas por distancia
             var rutasOrdenadasUnicas = rutasUnicas.Values.OrderBy(r => r.Item2);
 
-            // Tomar las primeras numeroDeRutas rutas únicas
             var resultado = new ListaEnlazadaDoble<(ListaEnlazadaDoble<IIdentificable>, double)>();
             foreach (var ruta in rutasOrdenadasUnicas.Take(numeroDeRutas))
             {
@@ -60,10 +57,49 @@ namespace InterRedBE.BAL.Services
             return resultado;
         }
 
+        public async Task<ListaEnlazadaDoble<(ListaEnlazadaDoble<IIdentificable>, double)>> EncontrarRutaMasCortaAsync(string idXInicio, string idXFin)
+        {
+            var (grafoEntidades, distancias) = await _rutaService.CargarRutasNuevoAsync();
+
+            var nodoInicio = grafoEntidades.ObtenerNodos().Values.FirstOrDefault(n => n.IdX == idXInicio);
+            var nodoFin = grafoEntidades.ObtenerNodos().Values.FirstOrDefault(n => n.IdX == idXFin);
+
+            if (nodoInicio == null || nodoFin == null)
+            {
+                return new ListaEnlazadaDoble<(ListaEnlazadaDoble<IIdentificable>, double)>(); // Retorna vacío si no se encuentran los nodos
+            }
+
+            var rutaMasCorta = grafoEntidades.EncontrarRutaMasCorta(nodoInicio.IdX, nodoFin.IdX, distancias);
+            return rutaMasCorta;
+        }
+
         public async Task<ListaEnlazadaDoble<(ListaEnlazadaDoble<Departamento>, double)>> EncontrarKRutasMasCortasAsync(int idDepartamentoInicio, int idDepartamentoFin, int k)
         {
             throw new System.NotImplementedException();
-
+            //var (grafoDepartamentos, distancias) = await _rutaService.CargarRutasAsync();
+            //var rutasMasCortas = grafoDepartamentos.EncontrarKRutasMasCortas(idDepartamentoInicio, idDepartamentoFin, k, distancias);
+            //return rutasMasCortas;
         }
+
+        public async Task<ListaEnlazadaDoble<(ListaEnlazadaDoble<IIdentificable>, double)>> EncontrarKRutasMasCortasAsync(string idXInicio, string idXFin, int k)
+        {
+            var (grafoEntidades, distancias) = await _rutaService.CargarRutasNuevoAsync();
+
+            var nodoInicio = grafoEntidades.ObtenerNodos().Values.FirstOrDefault(n => n.IdX == idXInicio);
+            var nodoFin = grafoEntidades.ObtenerNodos().Values.FirstOrDefault(n => n.IdX == idXFin);
+
+            if (nodoInicio == null || nodoFin == null)
+            {
+                return new ListaEnlazadaDoble<(ListaEnlazadaDoble<IIdentificable>, double)>(); // Retorna vacío si no se encuentran los nodos
+            }
+
+            var rutasMasCortas = grafoEntidades.EncontrarKRutasMasCortas(nodoInicio.IdX, nodoFin.IdX, k, distancias);
+            return rutasMasCortas;
+        }
+
+
+
+
+
     }
 }

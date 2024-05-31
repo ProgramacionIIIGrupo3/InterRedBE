@@ -1,24 +1,25 @@
-﻿using InterRedBE.UTILS.Interfaces;
-using InterRedBE.UTILS.Models;
+﻿using System;
 using System.Collections.Generic;
+using InterRedBE.UTILS.Interfaces;
+using InterRedBE.UTILS.Models;
 
 namespace InterRedBE.UTILS.Services
 {
     public class Grafo<T> where T : IIdentificable
     {
-        private Dictionary<int, NodoGrafo<T>> nodos;
+        private Dictionary<string, NodoGrafo<T>> nodos;
 
         public Grafo()
         {
-            nodos = new Dictionary<int, NodoGrafo<T>>();
+            nodos = new Dictionary<string, NodoGrafo<T>>();
         }
 
-        public NodoGrafo<T> AgregarNodo(int id, T dato)
+        public NodoGrafo<T> AgregarNodo(string idX, T dato)
         {
-            if (!nodos.ContainsKey(id))
+            if (!nodos.ContainsKey(idX))
             {
-                var nuevoNodo = new NodoGrafo<T>(id, dato);
-                nodos.Add(id, nuevoNodo);
+                var nuevoNodo = new NodoGrafo<T>(idX, dato);
+                nodos.Add(idX, nuevoNodo);
                 return nuevoNodo;
             }
             else
@@ -27,33 +28,28 @@ namespace InterRedBE.UTILS.Services
             }
         }
 
-        public void Conectar(int idInicio, int idFin, double distancia)
+        public void ConectarPorIdX(string idInicio, string idFin, double distancia)
         {
-            if (!nodos.ContainsKey(idInicio) || !nodos.ContainsKey(idFin))
-            {
-                throw new KeyNotFoundException("Uno de los IDs proporcionados no existe en el grafo.");
-            }
-
-            NodoGrafo<T> nodoInicio = nodos[idInicio];
-            NodoGrafo<T> nodoFin = nodos[idFin];
+            var nodoInicio = ObtenerNodoPorIdX(idInicio);
+            var nodoFin = ObtenerNodoPorIdX(idFin);
 
             nodoInicio.Adyacentes.InsertarAlFinal(new Arista<T>(nodoFin, distancia));
             nodoFin.Adyacentes.InsertarAlFinal(new Arista<T>(nodoInicio, distancia)); // Si el grafo es no dirigido.
         }
 
-        public NodoGrafo<T> ObtenerNodo(int id)
+        public NodoGrafo<T> ObtenerNodoPorIdX(string idX)
         {
-            if (nodos.ContainsKey(id))
+            if (nodos.ContainsKey(idX))
             {
-                return nodos[id];
+                return nodos[idX];
             }
             else
             {
-                throw new KeyNotFoundException("El nodo con el ID proporcionado no existe.");
+                throw new KeyNotFoundException("El nodo con el IdX proporcionado no existe.");
             }
         }
 
-        public Dictionary<int, NodoGrafo<T>> ObtenerNodos()
+        public Dictionary<string, NodoGrafo<T>> ObtenerNodos()
         {
             return nodos;
         }
@@ -73,13 +69,11 @@ namespace InterRedBE.UTILS.Services
 
         private void BuscarRutasDFS(NodoGrafo<T> actual, string destino, ListaEnlazadaDoble<string> visitados, ListaEnlazadaDoble<string> rutaActual, double distanciaAcumulada, ListaEnlazadaDoble<(ListaEnlazadaDoble<T>, double)> todasLasRutas, Dictionary<(string, string), double> distancias)
         {
-            // Verifica si el nodo actual ya fue visitado en esta ruta
             if (visitados.Contains(actual.Dato.IdX))
             {
                 return; // Evita ciclos dentro de la misma ruta de exploración
             }
 
-            // Agrega el nodo actual a la ruta y marca como visitado
             rutaActual.InsertarAlFinal(actual.Dato.IdX);
             visitados.InsertarAlFinal(actual.Dato.IdX);
 
@@ -94,68 +88,162 @@ namespace InterRedBE.UTILS.Services
             }
             else
             {
-                // Continúa con la exploración
                 foreach (var arista in actual.Adyacentes)
                 {
                     var vecino = arista.Nodo;
                     if (!visitados.Contains(vecino.Dato.IdX))
                     {
                         var edgeKey = (actual.Dato.IdX, vecino.Dato.IdX);
-                        var nuevosVisitados = new ListaEnlazadaDoble<string>();
-                        foreach (var visitado in visitados)
-                        {
-                            nuevosVisitados.InsertarAlFinal(visitado);
-                        }
-                        var nuevaRutaActual = new ListaEnlazadaDoble<string>();
-                        foreach (var nodo in rutaActual)
-                        {
-                            nuevaRutaActual.InsertarAlFinal(nodo);
-                        }
+                        var nuevosVisitados = CopiarLista(visitados);
+                        var nuevaRutaActual = CopiarLista(rutaActual);
                         BuscarRutasDFS(vecino, destino, nuevosVisitados, nuevaRutaActual, distanciaAcumulada + distancias[edgeKey], todasLasRutas, distancias);
                     }
                 }
             }
 
-            // Elimina el nodo actual de rutaActual y desmarca como visitado
             rutaActual.EliminarDatoX(actual.Dato.IdX);
             visitados.EliminarDatoX(actual.Dato.IdX);
         }
 
+        private ListaEnlazadaDoble<T> CopiarLista(ListaEnlazadaDoble<T> lista)
+        {
+            var nuevaLista = new ListaEnlazadaDoble<T>();
+            foreach (var item in lista)
+            {
+                nuevaLista.InsertarAlFinal(item);
+            }
+            return nuevaLista;
+        }
 
-        public ListaEnlazadaDoble<(ListaEnlazadaDoble<T>, double)> EncontrarKRutasMasCortas(int idInicio, int idFin, int k, Dictionary<(int, int), double> distancias)
+        private ListaEnlazadaDoble<string> CopiarLista(ListaEnlazadaDoble<string> lista)
+        {
+            var nuevaLista = new ListaEnlazadaDoble<string>();
+            foreach (var item in lista)
+            {
+                nuevaLista.InsertarAlFinal(item);
+            }
+            return nuevaLista;
+        }
+
+        public ListaEnlazadaDoble<(ListaEnlazadaDoble<T>, double)> EncontrarRutaMasCorta(string idInicio, string idFin, Dictionary<(string, string), double> distancias)
+        {
+            var distanciasDesdeInicio = new Dictionary<string, double>();
+            var nodoPrevio = new Dictionary<string, string?>();
+            var visitados = new ListaEnlazadaDoble<string>();
+            var rutaMasCorta = new ListaEnlazadaDoble<(ListaEnlazadaDoble<T>, double)>();
+
+            foreach (var nodo in nodos.Values)
+            {
+                distanciasDesdeInicio[nodo.Dato.IdX] = double.PositiveInfinity;
+                nodoPrevio[nodo.Dato.IdX] = null;
+            }
+
+            distanciasDesdeInicio[idInicio] = 0;
+
+            var cola = new ListaEnlazadaDoble<(string, double)>();
+            cola.InsertarAlFinal((idInicio, 0));
+
+            while (!cola.ListaVacia())
+            {
+                var nodoActual = cola.PrimerNodo.Dato;
+                cola.EliminarAlInicio();
+
+                if (visitados.Contains(nodoActual.Item1)) continue;
+                visitados.InsertarAlFinal(nodoActual.Item1);
+
+                var nodoId = nodoActual.Item1;
+                var distanciaActual = nodoActual.Item2;
+
+                if (nodoId == idFin)
+                {
+                    var ruta = new ListaEnlazadaDoble<T>();
+                    double distanciaTotal = distanciaActual;
+
+                    string? actual = nodoId;
+                    while (actual != null)
+                    {
+                        ruta.InsertarAlInicio(nodos[actual].Dato);
+                        actual = nodoPrevio[actual];
+                    }
+
+                    rutaMasCorta.InsertarAlFinal((ruta, distanciaTotal));
+                    break;
+                }
+
+                foreach (var arista in nodos[nodoId].Adyacentes)
+                {
+                    var vecino = arista.Nodo.Dato.IdX;
+                    var distancia = arista.Distancia;
+                    var distanciaTentativa = distanciaActual + distancia;
+
+                    if (distanciaTentativa < distanciasDesdeInicio[vecino])
+                    {
+                        distanciasDesdeInicio[vecino] = distanciaTentativa;
+                        nodoPrevio[vecino] = nodoId;
+
+                        var iterador = cola.PrimerNodo;
+                        while (iterador != null && iterador.Dato.Item2 < distanciaTentativa)
+                        {
+                            iterador = (NodoDobleLiga<(string, double)>)iterador.LigaSiguiente;
+                        }
+
+                        if (iterador == null)
+                        {
+                            cola.InsertarAlFinal((vecino, distanciaTentativa));
+                        }
+                        else
+                        {
+                            var nuevoNodo = new NodoDobleLiga<(string, double)>((vecino, distanciaTentativa));
+                            nuevoNodo.LigaSiguiente = iterador;
+                            nuevoNodo.LigaAnterior = iterador.LigaAnterior;
+                            if (iterador.LigaAnterior != null)
+                            {
+                                iterador.LigaAnterior.LigaSiguiente = nuevoNodo;
+                            }
+                            iterador.LigaAnterior = nuevoNodo;
+
+                            if (iterador == cola.PrimerNodo)
+                            {
+                                cola.PrimerNodo = nuevoNodo;
+                            }
+                        }
+                    }
+                }
+            }
+
+            return rutaMasCorta;
+        }
+
+        public ListaEnlazadaDoble<(ListaEnlazadaDoble<T>, double)> EncontrarKRutasMasCortas(string idInicio, string idFin, int k, Dictionary<(string, string), double> distancias)
         {
             var rutasMasCortas = new ListaEnlazadaDoble<(ListaEnlazadaDoble<T>, double)>();
-            var nodosExcluidos = new HashSet<int>();
 
             for (int i = 0; i < k; i++)
             {
-                var distanciasDesdeInicio = new Dictionary<int, double>();
-                var nodoPrevio = new Dictionary<int, int?>();
-                var visitados = new HashSet<int>();
+                var distanciasDesdeInicio = new Dictionary<string, double>();
+                var nodoPrevio = new Dictionary<string, string?>();
+                var visitados = new ListaEnlazadaDoble<string>();
 
-                // Inicializar distancias y nodos previos
                 foreach (var nodo in nodos.Values)
                 {
-                    distanciasDesdeInicio[nodo.Id] = double.PositiveInfinity;
-                    nodoPrevio[nodo.Id] = null;
+                    distanciasDesdeInicio[nodo.Dato.IdX] = double.PositiveInfinity;
+                    nodoPrevio[nodo.Dato.IdX] = null;
                 }
 
                 distanciasDesdeInicio[idInicio] = 0;
 
-                // Cola de prioridad usando ListaEnlazadaDoble
-                var cola = new ListaEnlazadaDoble<(int, double)>();
+                var cola = new ListaEnlazadaDoble<(string, double)>();
                 cola.InsertarAlFinal((idInicio, 0));
 
                 bool rutaEncontrada = false;
 
                 while (!cola.ListaVacia())
                 {
-                    // Extraer el nodo con la menor distancia
                     var nodoActual = cola.PrimerNodo.Dato;
                     cola.EliminarAlInicio();
 
-                    if (visitados.Contains(nodoActual.Item1) || nodosExcluidos.Contains(nodoActual.Item1)) continue;
-                    visitados.Add(nodoActual.Item1);
+                    if (visitados.Contains(nodoActual.Item1)) continue;
+                    visitados.InsertarAlFinal(nodoActual.Item1);
 
                     var nodoId = nodoActual.Item1;
                     var distanciaActual = nodoActual.Item2;
@@ -165,12 +253,11 @@ namespace InterRedBE.UTILS.Services
                         var ruta = new ListaEnlazadaDoble<T>();
                         double distanciaTotal = distanciaActual;
 
-                        // Construir la ruta desde el destino al inicio
-                        int? actual = nodoId;
+                        string? actual = nodoId;
                         while (actual != null)
                         {
-                            ruta.InsertarAlInicio(nodos[(int)actual].Dato);
-                            actual = nodoPrevio[(int)actual];
+                            ruta.InsertarAlInicio(nodos[actual].Dato);
+                            actual = nodoPrevio[actual];
                         }
 
                         rutasMasCortas.InsertarAlFinal((ruta, distanciaTotal));
@@ -180,20 +267,19 @@ namespace InterRedBE.UTILS.Services
 
                     foreach (var arista in nodos[nodoId].Adyacentes)
                     {
-                        var vecino = arista.Nodo.Id;
-                        var distancia = arista.Distancia;
+                        var vecino = arista.Nodo.Dato.IdX;
+                        var distancia = arista.DistanciaConPenalizacion; // Usamos la distancia con penalización
                         var distanciaTentativa = distanciaActual + distancia;
 
-                        if (distanciaTentativa < distanciasDesdeInicio[vecino] && !nodosExcluidos.Contains(vecino))
+                        if (distanciaTentativa < distanciasDesdeInicio[vecino])
                         {
                             distanciasDesdeInicio[vecino] = distanciaTentativa;
                             nodoPrevio[vecino] = nodoId;
 
-                            // Inserción ordenada en la cola
                             var iterador = cola.PrimerNodo;
                             while (iterador != null && iterador.Dato.Item2 < distanciaTentativa)
                             {
-                                iterador = (NodoDobleLiga<(int, double)>)iterador.LigaSiguiente;
+                                iterador = (NodoDobleLiga<(string, double)>)iterador.LigaSiguiente;
                             }
 
                             if (iterador == null)
@@ -202,7 +288,7 @@ namespace InterRedBE.UTILS.Services
                             }
                             else
                             {
-                                var nuevoNodo = new NodoDobleLiga<(int, double)>((vecino, distanciaTentativa));
+                                var nuevoNodo = new NodoDobleLiga<(string, double)>((vecino, distanciaTentativa));
                                 nuevoNodo.LigaSiguiente = iterador;
                                 nuevoNodo.LigaAnterior = iterador.LigaAnterior;
                                 if (iterador.LigaAnterior != null)
@@ -225,37 +311,27 @@ namespace InterRedBE.UTILS.Services
                     break;
                 }
 
-                // Excluir los nodos de la última ruta encontrada
+                // Penalizar las aristas de la última ruta encontrada para buscar nuevas rutas
                 var ultimaRuta = rutasMasCortas.UltimoNodo.Dato.Item1;
                 foreach (var nodo in ultimaRuta)
                 {
-                    nodosExcluidos.Add(nodo.Id);
+                    var nodoGrafo = nodos[nodo.IdX];
+                    foreach (var arista in nodoGrafo.Adyacentes)
+                    {
+                        if (ultimaRuta.Contains(arista.Nodo.Dato))
+                        {
+                            arista.Penalizacion += 1000; // Penalización alta para desincentivar esta arista
+                        }
+                    }
                 }
             }
 
             return rutasMasCortas;
         }
 
-        public void ConectarPorIdX(string idInicio, string idFin, double distancia)
-        {
-            var nodoInicio = ObtenerNodoPorIdX(idInicio);
-            var nodoFin = ObtenerNodoPorIdX(idFin);
 
-            nodoInicio.Adyacentes.InsertarAlFinal(new Arista<T>(nodoFin, distancia));
-            nodoFin.Adyacentes.InsertarAlFinal(new Arista<T>(nodoInicio, distancia)); // Si el grafo es no dirigido.
-        }
 
-        private NodoGrafo<T> ObtenerNodoPorIdX(string idX)
-        {
-            foreach (var nodo in nodos.Values)
-            {
-                if (nodo.Dato.IdX == idX)
-                {
-                    return nodo;
-                }
-            }
-            throw new KeyNotFoundException("El nodo con el IdX proporcionado no existe.");
-        }
+
 
 
 

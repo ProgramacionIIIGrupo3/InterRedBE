@@ -18,65 +18,64 @@ namespace InterRedBE.DAL.Services
 
         public async Task<(Grafo<IIdentificable>, Dictionary<(int, int), double>)> CargarRutasAsync()
         {
-            Grafo<IIdentificable> grafo = new Grafo<IIdentificable>();
-            Dictionary<(int, int), double> distancias = new Dictionary<(int, int), double>();
+            throw new System.NotImplementedException();
+            //Grafo<IIdentificable> grafo = new Grafo<IIdentificable>();
+            //Dictionary<(int, int), double> distancias = new Dictionary<(int, int), double>();
 
-            var rutas = await _context.Ruta
-                                      .Include(r => r.DepartamentoInicio)
-                                      .Include(r => r.DepartamentoFin)
-                                      .Include(r => r.MunicipioInicio)
-                                      .Include(r => r.MunicipioFin)
-                                      .ToListAsync();
+            //var rutas = await _context.Ruta
+            //                          .Include(r => r.DepartamentoInicio)
+            //                          .Include(r => r.DepartamentoFin)
+            //                          .Include(r => r.MunicipioInicio)
+            //                          .Include(r => r.MunicipioFin)
+            //                          .ToListAsync();
 
-            foreach (var ruta in rutas)
-            {
-                IIdentificable entidadInicio = null;
-                IIdentificable entidadFin = null;
+            //foreach (var ruta in rutas)
+            //{
+            //    IIdentificable entidadInicio = null;
+            //    IIdentificable entidadFin = null;
 
-                if (ruta.TipoInicio == TipoEntidad.Departamento)
-                {
-                    entidadInicio = ruta.DepartamentoInicio;
-                }
-                else if (ruta.TipoInicio == TipoEntidad.Municipio)
-                {
-                    entidadInicio = ruta.MunicipioInicio;
-                }
+            //    if (ruta.TipoInicio == TipoEntidad.Departamento)
+            //    {
+            //        entidadInicio = ruta.DepartamentoInicio;
+            //    }
+            //    else if (ruta.TipoInicio == TipoEntidad.Municipio)
+            //    {
+            //        entidadInicio = ruta.MunicipioInicio;
+            //    }
 
-                if (ruta.TipoFin == TipoEntidad.Departamento)
-                {
-                    entidadFin = ruta.DepartamentoFin;
-                }
-                else if (ruta.TipoFin == TipoEntidad.Municipio)
-                {
-                    entidadFin = ruta.MunicipioFin;
-                }
+            //    if (ruta.TipoFin == TipoEntidad.Departamento)
+            //    {
+            //        entidadFin = ruta.DepartamentoFin;
+            //    }
+            //    else if (ruta.TipoFin == TipoEntidad.Municipio)
+            //    {
+            //        entidadFin = ruta.MunicipioFin;
+            //    }
 
-                if (entidadInicio != null && entidadFin != null)
-                {
-                    // Agregar nodos al grafo si no existen
-                    if (!grafo.ObtenerNodos().ContainsKey(ruta.IdEntidadInicio))
-                    {
-                        grafo.AgregarNodo(ruta.IdEntidadInicio, entidadInicio);
-                    }
+            //    if (entidadInicio != null && entidadFin != null)
+            //    {
+            //        // Agregar nodos al grafo si no existen
+            //        if (!grafo.ObtenerNodos().ContainsKey(ruta.IdEntidadInicio))
+            //        {
+            //            grafo.AgregarNodo(ruta.IdEntidadInicio, entidadInicio);
+            //        }
 
-                    if (!grafo.ObtenerNodos().ContainsKey(ruta.IdEntidadFin))
-                    {
-                        grafo.AgregarNodo(ruta.IdEntidadFin, entidadFin);
-                    }
+            //        if (!grafo.ObtenerNodos().ContainsKey(ruta.IdEntidadFin))
+            //        {
+            //            grafo.AgregarNodo(ruta.IdEntidadFin, entidadFin);
+            //        }
 
-                    // Conectar los nodos en el grafo
-                    grafo.Conectar(ruta.IdEntidadInicio, ruta.IdEntidadFin, ruta.Distancia);
+            //        // Conectar los nodos en el grafo
+            //        grafo.Conectar(ruta.IdEntidadInicio, ruta.IdEntidadFin, ruta.Distancia);
 
-                    // Guardar la distancia en el diccionario para uso posterior
-                    distancias[(ruta.IdEntidadInicio, ruta.IdEntidadFin)] = ruta.Distancia;
-                    distancias[(ruta.IdEntidadFin, ruta.IdEntidadInicio)] = ruta.Distancia; // Asegurarse de incluir ambas direcciones
-                }
-            }
+            //        // Guardar la distancia en el diccionario para uso posterior
+            //        distancias[(ruta.IdEntidadInicio, ruta.IdEntidadFin)] = ruta.Distancia;
+            //        distancias[(ruta.IdEntidadFin, ruta.IdEntidadInicio)] = ruta.Distancia; // Asegurarse de incluir ambas direcciones
+            //    }
+            //}
 
-            return (grafo, distancias);
+            //return (grafo, distancias);
         }
-
-        // Método para cargar la nueva estructura de rutas
         public async Task<(Grafo<IIdentificable>, Dictionary<(string, string), double>)> CargarRutasNuevoAsync()
         {
             Grafo<IIdentificable> grafo = new Grafo<IIdentificable>();
@@ -86,35 +85,37 @@ namespace InterRedBE.DAL.Services
 
             foreach (var ruta in rutas)
             {
-                var entidadInicio = _context.Departamento.FirstOrDefault(d => d.IdX == ruta.EntidadInicio) as IIdentificable
-                                    ?? _context.Municipio.FirstOrDefault(m => m.IdX == ruta.EntidadInicio) as IIdentificable;
-
-                var entidadFin = _context.Departamento.FirstOrDefault(d => d.IdX == ruta.EntidadFinal) as IIdentificable
-                                 ?? _context.Municipio.FirstOrDefault(m => m.IdX == ruta.EntidadFinal) as IIdentificable;
+                var entidadInicio = await ObtenerEntidadPorIdX(ruta.EntidadInicio);
+                var entidadFin = await ObtenerEntidadPorIdX(ruta.EntidadFinal);
 
                 if (entidadInicio != null && entidadFin != null)
                 {
-                    // Agregar nodos al grafo si no existen
-                    if (!grafo.ObtenerNodos().Values.Any(n => n.Dato.IdX == ruta.EntidadInicio))
+                    if (!grafo.ObtenerNodos().ContainsKey(ruta.EntidadInicio))
                     {
-                        grafo.AgregarNodo(entidadInicio.Id, entidadInicio);
+                        grafo.AgregarNodo(ruta.EntidadInicio, entidadInicio);
                     }
 
-                    if (!grafo.ObtenerNodos().Values.Any(n => n.Dato.IdX == ruta.EntidadFinal))
+                    if (!grafo.ObtenerNodos().ContainsKey(ruta.EntidadFinal))
                     {
-                        grafo.AgregarNodo(entidadFin.Id, entidadFin);
+                        grafo.AgregarNodo(ruta.EntidadFinal, entidadFin);
                     }
 
-                    // Conectar los nodos en el grafo
                     grafo.ConectarPorIdX(ruta.EntidadInicio, ruta.EntidadFinal, ruta.Distancia);
-
-                    // Guardar la distancia en el diccionario para uso posterior
                     distancias[(ruta.EntidadInicio, ruta.EntidadFinal)] = ruta.Distancia;
-                    distancias[(ruta.EntidadFinal, ruta.EntidadInicio)] = ruta.Distancia; // Asegurarse de incluir ambas direcciones
                 }
             }
 
             return (grafo, distancias);
         }
+
+        private async Task<IIdentificable> ObtenerEntidadPorIdX(string idX)
+        {
+            var departamento = await _context.Departamento.FirstOrDefaultAsync(d => d.IdX == idX);
+            if (departamento != null) return departamento;
+
+            var municipio = await _context.Municipio.FirstOrDefaultAsync(m => m.IdX == idX);
+            return municipio;
+        }
+
     }
 }

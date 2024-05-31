@@ -53,7 +53,7 @@ namespace InterRedBE.Controllers
                                 Nombre = entidad.Nombre
                             });
                         }
-                        var rutaStr = string.Join("->", ruta.Item1.Select(e => e.Id)); // Ruta como string única
+                        var rutaStr = string.Join("->", ruta.Item1.Select(e => e.IdX)); // Ruta como string única
                         if (!rutasUnicas.Contains(rutaStr))
                         {
                             rutas.InsertarAlFinal(new
@@ -76,6 +76,81 @@ namespace InterRedBE.Controllers
                 return StatusCode(StatusCodes.Status500InternalServerError, "Error al procesar la solicitud: " + ex.Message);
             }
         }
+
+        [HttpGet("ruta/dijkstra/{idXInicio}/{idXFin}")]
+        public async Task<IActionResult> GetRutaMasCorta(string idXInicio, string idXFin)
+        {
+            try
+            {
+                var rutaMasCorta = await _rutaBAOService.EncontrarRutaMasCortaAsync(idXInicio, idXFin);
+                if (!rutaMasCorta.ListaVacia())
+                {
+                    var rutaDTO = new ListaEnlazadaDoble<object>();
+                    foreach (var (ruta, distanciaTotal) in rutaMasCorta)
+                    {
+                        var rutaDetalleDTO = new ListaEnlazadaDoble<EntidadRutaDTO>();
+                        foreach (var entidad in ruta)
+                        {
+                            rutaDetalleDTO.InsertarAlFinal(new EntidadRutaDTO
+                            {
+                                Id = entidad.Id,
+                                Nombre = entidad.Nombre
+                            });
+                        }
+                        rutaDTO.InsertarAlFinal(new { Ruta = rutaDetalleDTO, DistanciaTotal = distanciaTotal });
+                    }
+                    return Ok(new { Ruta = rutaDTO });
+                }
+                else
+                {
+                    return NotFound("No se encontraron rutas entre las entidades especificadas.");
+                }
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, "Error al procesar la solicitud: " + ex.Message);
+            }
+        }
+
+        [HttpGet("ruta/dijkstra-multiples/{idXInicio}/{idXFin}/{k}")]
+        public async Task<IActionResult> GetKRutasMasCortas(string idXInicio, string idXFin, int k)
+        {
+            try
+            {
+                var rutasMasCortas = await _rutaBAOService.EncontrarKRutasMasCortasAsync(idXInicio, idXFin, k);
+                if (!rutasMasCortas.ListaVacia())
+                {
+                    var rutasDTO = new ListaEnlazadaDoble<object>();
+                    foreach (var (ruta, distanciaTotal) in rutasMasCortas)
+                    {
+                        var rutaDetalleDTO = new ListaEnlazadaDoble<EntidadRutaDTO>();
+                        foreach (var entidad in ruta)
+                        {
+                            rutaDetalleDTO.InsertarAlFinal(new EntidadRutaDTO
+                            {
+                                Id = entidad.Id,
+                                Nombre = entidad.Nombre
+                            });
+                        }
+                        rutasDTO.InsertarAlFinal(new { Ruta = rutaDetalleDTO, DistanciaTotal = distanciaTotal });
+                    }
+                    return Ok(new { Rutas = rutasDTO });
+                }
+                else
+                {
+                    return NotFound("No se encontraron rutas entre las entidades especificadas.");
+                }
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, "Error al procesar la solicitud: " + ex.Message);
+            }
+        }
+
+
+
+
+
 
         [HttpGet("Top10Cercanos")]
         public async Task<IActionResult> GetTop10CercanosALaCapital()

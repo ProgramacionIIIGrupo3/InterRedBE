@@ -4,15 +4,23 @@ namespace InterRedBE.UTILS.Models
 {
     public class NodoGrafo<T>
     {
-        public int Id { get; }
+        public string IdX { get; }
         public T Dato { get; }
-        public ListaEnlazadaDoble<Arista<T>> Adyacentes { get; }
+        public ListaEnlazadaDoble<Arista<T>> Adyacentes { get; private set; }
 
-        public NodoGrafo(int id, T dato)
+        public NodoGrafo(string idX, T dato)
         {
-            Id = id;
+            IdX = idX;
             Dato = dato;
             Adyacentes = new ListaEnlazadaDoble<Arista<T>>();
         }
+
+        public void SetAdyacentes(ListaEnlazadaDoble<Arista<T>> nuevaLista)
+        {
+            Adyacentes = nuevaLista;
+        }
     }
+
+
+
 }
