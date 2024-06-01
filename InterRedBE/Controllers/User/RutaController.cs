@@ -129,7 +129,8 @@ namespace InterRedBE.Controllers
                             rutaDetalleDTO.InsertarAlFinal(new EntidadRutaDTO
                             {
                                 Id = entidad.Id,
-                                Nombre = entidad.Nombre
+                                Nombre = entidad.Nombre,
+                                IdX = entidad.IdX
                             });
                         }
                         rutasDTO.InsertarAlFinal(new { Ruta = rutaDetalleDTO, DistanciaTotal = distanciaTotal });
