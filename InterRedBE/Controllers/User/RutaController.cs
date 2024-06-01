@@ -75,7 +75,7 @@ namespace InterRedBE.Controllers
                 return StatusCode(StatusCodes.Status500InternalServerError, "Error al procesar la solicitud: " + ex.Message);
             }
         }
-        
+
 
         [HttpGet("Top10CercanosAGuatemala")]
         public async Task<IActionResult> GetTop10CercanosAGuatemala()
@@ -96,14 +96,25 @@ namespace InterRedBE.Controllers
                 // Ordenar las rutas por distancia ascendente
                 var rutasOrdenadas = todasLasRutas.OrderBy(r => r.Item2).ToList();
 
-                var top10Cercanos = rutasOrdenadas
-                    .Take(10)
-                    .Select(r => new
+                var top10Cercanos = new List<object>();
+
+                foreach (var ruta in rutasOrdenadas.Take(10))
+                {
+                    var nodoIdX = ruta.Item1.Last().IdX;
+                    var relaciones = await _context.Rutaa
+                        .Where(r => r.EntidadInicio == nodoIdX || r.EntidadFinal == nodoIdX)
+                        .Select(r => r.EntidadInicio == nodoIdX ? r.EntidadFinal : r.EntidadInicio)
+                        .Distinct()
+                        .Take(10)
+                        .ToListAsync();
+
+                    top10Cercanos.Add(new
                     {
-                        Nombre = string.Join(", ", r.Item1.Select(n => n.Nombre)),
-                        Distancia = r.Item2
-                    })
-                    .ToList();
+                        Nombre = string.Join(", ", ruta.Item1.Select(n => n.Nombre)),
+                        Distancia = ruta.Item2,
+                        Relaciones = relaciones
+                    });
+                }
 
                 return Ok(top10Cercanos);
             }
@@ -132,14 +143,25 @@ namespace InterRedBE.Controllers
                 // Ordenar las rutas por distancia descendente
                 var rutasOrdenadas = todasLasRutas.OrderByDescending(r => r.Item2).ToList();
 
-                var top10Lejanos = rutasOrdenadas
-                    .Take(10)
-                    .Select(r => new
+                var top10Lejanos = new List<object>();
+
+                foreach (var ruta in rutasOrdenadas.Take(10))
+                {
+                    var nodoIdX = ruta.Item1.Last().IdX;
+                    var relaciones = await _context.Rutaa
+                        .Where(r => r.EntidadInicio == nodoIdX || r.EntidadFinal == nodoIdX)
+                        .Select(r => r.EntidadInicio == nodoIdX ? r.EntidadFinal : r.EntidadInicio)
+                        .Distinct()
+                        .Take(10)
+                        .ToListAsync();
+
+                    top10Lejanos.Add(new
                     {
-                        Nombre = string.Join(", ", r.Item1.Select(n => n.Nombre)),
-                        Distancia = r.Item2
-                    })
-                    .ToList();
+                        Nombre = string.Join(", ", ruta.Item1.Select(n => n.Nombre)),
+                        Distancia = ruta.Item2,
+                        Relaciones = relaciones
+                    });
+                }
 
                 return Ok(top10Lejanos);
             }
@@ -148,6 +170,7 @@ namespace InterRedBE.Controllers
                 return StatusCode(StatusCodes.Status500InternalServerError, "Error al procesar la solicitud: " + ex.Message);
             }
         }
+
     }
 }
 

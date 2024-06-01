@@ -23,9 +23,10 @@ namespace InterRedBE.UTILS.Services
             }
             else
             {
-                throw new InvalidOperationException("Un nodo con el mismo ID ya existe.");
+                return nodos[id]; // Retorna el nodo existente en lugar de lanzar una excepción
             }
         }
+
 
         public void Conectar(int idInicio, int idFin, double distancia)
         {
