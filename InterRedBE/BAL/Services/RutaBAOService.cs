@@ -1,57 +1,105 @@
-﻿using System.Threading.Tasks;
-using InterRedBE.BAL.Bao;
+﻿using InterRedBE.BAL.Bao;
 using InterRedBE.DAL.Dao;
 using InterRedBE.DAL.Models;
-using InterRedBE.UTILS.Models;
+using InterRedBE.UTILS.Interfaces;
 using InterRedBE.UTILS.Services;
-using System.Linq;
-using InterRedBE.DAL.Services;
-using InterRedBE.DAL.DTO;
 
 namespace InterRedBE.BAL.Services
 {
     public class RutaBAOService : IRutaBAO
     {
         private readonly IRuta _rutaService;
-        private readonly int _Id;
 
         public RutaBAOService(IRuta rutaService)
         {
             _rutaService = rutaService;
- 
         }
 
-        public async Task<ListaEnlazadaDoble<(ListaEnlazadaDoble<Departamento>, double)>> EncontrarTodasLasRutasAsync(int idDepartamentoInicio, int idDepartamentoFin, int numeroDeRutas = 5)
+        public async Task<ListaEnlazadaDoble<(ListaEnlazadaDoble<IIdentificable>, double)>> EncontrarTodasLasRutasAsync(int idInicio, TipoEntidad tipoInicio, int idFin, TipoEntidad tipoFin, int numeroDeRutas = 5)
         {
-            var (redDepartamentos, distancias) = await _rutaService.CargarRutasAsync();
-            var todasLasRutas = redDepartamentos.BuscarTodasLasRutas(idDepartamentoInicio, idDepartamentoFin, distancias);
+            throw new System.NotImplementedException();
+   
+        }
 
-            // Ordenar las rutas por distancia y tomar las primeras rutas
-            var rutasOrdenadas = todasLasRutas.OrderBy(r => r.Item2);
-            var resultado = new ListaEnlazadaDoble<(ListaEnlazadaDoble<Departamento>, double)>();
+        public async Task<ListaEnlazadaDoble<(ListaEnlazadaDoble<IIdentificable>, double)>> EncontrarTodasLasRutasNuevoAsync(string idXInicio, string idXFin, int numeroDeRutas = 5)
+        {
+            var (grafoEntidades, distancias) = await _rutaService.CargarRutasNuevoAsync();
 
-            // Verificar si el número de rutas disponibles es menor que el número solicitado
-            int numeroDeRutasDisponibles = todasLasRutas.Count();
-            if (numeroDeRutasDisponibles < numeroDeRutas)
+            var nodoInicio = grafoEntidades.ObtenerNodos().Values.FirstOrDefault(n => n.IdX == idXInicio);
+            var nodoFin = grafoEntidades.ObtenerNodos().Values.FirstOrDefault(n => n.IdX == idXFin);
+
+            if (nodoInicio == null || nodoFin == null)
             {
-                // Si hay menos rutas disponibles que las solicitadas, ajustar el número de rutas a devolver
-                numeroDeRutas = numeroDeRutasDisponibles;
+                return new ListaEnlazadaDoble<(ListaEnlazadaDoble<IIdentificable>, double)>(); // Retorna vacío si no se encuentran los nodos
             }
 
-            var contador = 0;
-            foreach (var ruta in rutasOrdenadas)
+            var todasLasRutas = grafoEntidades.BuscarTodasLasRutas(nodoInicio.IdX, nodoFin.IdX, distancias);
+
+            var rutasUnicas = new Dictionary<string, (ListaEnlazadaDoble<IIdentificable>, double)>();
+
+            foreach (var ruta in todasLasRutas)
             {
-                resultado.InsertarAlFinal(ruta);
-                contador++;
-                if (contador == numeroDeRutas)
+                var rutaStr = string.Join(",", ruta.Item1.Select(d => d.IdX));
+                if (!rutasUnicas.ContainsKey(rutaStr))
                 {
-                    break;
+                    rutasUnicas[rutaStr] = ruta;
                 }
             }
+
+            var rutasOrdenadasUnicas = rutasUnicas.Values.OrderBy(r => r.Item2);
+
+            var resultado = new ListaEnlazadaDoble<(ListaEnlazadaDoble<IIdentificable>, double)>();
+            foreach (var ruta in rutasOrdenadasUnicas.Take(numeroDeRutas))
+            {
+                resultado.InsertarAlFinal(ruta);
+            }
+
             return resultado;
         }
 
+        public async Task<ListaEnlazadaDoble<(ListaEnlazadaDoble<IIdentificable>, double)>> EncontrarRutaMasCortaAsync(string idXInicio, string idXFin)
+        {
+            var (grafoEntidades, distancias) = await _rutaService.CargarRutasNuevoAsync();
+
+            var nodoInicio = grafoEntidades.ObtenerNodos().Values.FirstOrDefault(n => n.IdX == idXInicio);
+            var nodoFin = grafoEntidades.ObtenerNodos().Values.FirstOrDefault(n => n.IdX == idXFin);
+
+            if (nodoInicio == null || nodoFin == null)
+            {
+                return new ListaEnlazadaDoble<(ListaEnlazadaDoble<IIdentificable>, double)>(); // Retorna vacío si no se encuentran los nodos
+            }
+
+            var rutaMasCorta = grafoEntidades.EncontrarRutaMasCorta(nodoInicio.IdX, nodoFin.IdX, distancias);
+            return rutaMasCorta;
+        }
+
+        public async Task<ListaEnlazadaDoble<(ListaEnlazadaDoble<Departamento>, double)>> EncontrarKRutasMasCortasAsync(int idDepartamentoInicio, int idDepartamentoFin, int k)
+        {
+            throw new System.NotImplementedException();
+            //var (grafoDepartamentos, distancias) = await _rutaService.CargarRutasAsync();
+            //var rutasMasCortas = grafoDepartamentos.EncontrarKRutasMasCortas(idDepartamentoInicio, idDepartamentoFin, k, distancias);
+            //return rutasMasCortas;
+        }
+
+        public async Task<ListaEnlazadaDoble<(ListaEnlazadaDoble<IIdentificable>, double)>> EncontrarKRutasMasCortasAsync(string idXInicio, string idXFin, int k)
+        {
+            var (grafoEntidades, distancias) = await _rutaService.CargarRutasNuevoAsync();
+
+            var nodoInicio = grafoEntidades.ObtenerNodos().Values.FirstOrDefault(n => n.IdX == idXInicio);
+            var nodoFin = grafoEntidades.ObtenerNodos().Values.FirstOrDefault(n => n.IdX == idXFin);
+
+            if (nodoInicio == null || nodoFin == null)
+            {
+                return new ListaEnlazadaDoble<(ListaEnlazadaDoble<IIdentificable>, double)>(); // Retorna vacío si no se encuentran los nodos
+            }
+
+            var rutasMasCortas = grafoEntidades.EncontrarKRutasMasCortas(nodoInicio.IdX, nodoFin.IdX, k, distancias);
+            return rutasMasCortas;
+        }
+
+
+
+
 
     }
-
 }

@@ -27,7 +27,8 @@ namespace InterRedBE.AUTH.Service
             new Claim(JwtRegisteredClaimNames.Sub, user.Correo),
             new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
             new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
-            new Claim(ClaimTypes.Email, user.Correo)
+            new Claim(ClaimTypes.Email, user.Correo),
+            new Claim (ClaimTypes.Role, user.Rol)
         };
                 var token = new JwtSecurityToken(
                     issuer: _config["Jwt:Issuer"],

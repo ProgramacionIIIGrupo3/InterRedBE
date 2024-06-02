@@ -1,42 +1,96 @@
 ﻿using InterRedBE.DAL.Context;
 using InterRedBE.DAL.Dao;
 using InterRedBE.DAL.Models;
+using InterRedBE.UTILS.Interfaces;
 using InterRedBE.UTILS.Services;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Caching.Memory;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace InterRedBE.DAL.Services
 {
     public class RutaService : IRuta
     {
+        private readonly IDbContextFactory<InterRedContext> _contextFactory;
+        private readonly IMemoryCache _cache;
 
-        public readonly InterRedContext _context;
-
-        public RutaService(InterRedContext context)
+        public RutaService(IDbContextFactory<InterRedContext> contextFactory, IMemoryCache cache)
         {
-            _context = context;
+            _contextFactory = contextFactory;
+            _cache = cache;
         }
 
-        public async Task<(ListaCuadruple<Departamento>, Dictionary<(int, int), double>)> CargarRutasAsync()
+        public Task<(Grafo<IIdentificable>, Dictionary<(int, int), double>)> CargarRutasAsync()
         {
-            ListaCuadruple<Departamento> lista = new ListaCuadruple<Departamento>();
-            Dictionary<(int, int), double> distancias = new Dictionary<(int, int), double>();
+            throw new NotImplementedException();
+        }
 
-            var rutas = await _context.Ruta.Include(r => r.DepartamentoInicio).Include(r => r.DepartamentoFin).ToListAsync();
-
-            foreach (var ruta in rutas)
+        public async Task<(Grafo<IIdentificable>, Dictionary<(string, string), double>)> CargarRutasNuevoAsync()
+        {
+            return await _cache.GetOrCreateAsync<(Grafo<IIdentificable>, Dictionary<(string, string), double>)>("grafo_rutas", async entry =>
             {
-                lista.AgregarNodoSiNoExiste(ruta.IdDepartamentoInicio, ruta.DepartamentoInicio);
-                lista.AgregarNodoSiNoExiste(ruta.IdDepartamentoFin, ruta.DepartamentoFin);
-                lista.Conectar(ruta.IdDepartamentoInicio, ruta.IdDepartamentoFin, ruta.Direccion);
+                entry.AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(60); // Caché por 30 minutos
 
-                // Guardar la distancia en el diccionario para uso posterior en BAO
-                distancias[(ruta.IdDepartamentoInicio, ruta.IdDepartamentoFin)] = ruta.Distancia;
-            }
+                Grafo<IIdentificable> grafo = new Grafo<IIdentificable>();
+                Dictionary<(string, string), double> distancias = new Dictionary<(string, string), double>();
 
-            return (lista, distancias);
+                using (var context = _contextFactory.CreateDbContext())
+                {
+                    var rutas = await context.Rutaa.AsNoTracking().ToListAsync();
+
+                    var tasks = rutas.Select(async ruta =>
+                    {
+                        var entidadInicio = await ObtenerEntidadPorIdX(ruta.EntidadInicio);
+                        var entidadFin = await ObtenerEntidadPorIdX(ruta.EntidadFinal);
+
+                        if (entidadInicio != null && entidadFin != null)
+                        {
+                            lock (grafo)
+                            {
+                                if (!grafo.ObtenerNodos().ContainsKey(ruta.EntidadInicio))
+                                {
+                                    grafo.AgregarNodo(ruta.EntidadInicio, entidadInicio);
+                                }
+
+                                if (!grafo.ObtenerNodos().ContainsKey(ruta.EntidadFinal))
+                                {
+                                    grafo.AgregarNodo(ruta.EntidadFinal, entidadFin);
+                                }
+                            }
+
+                            lock (distancias)
+                            {
+                                grafo.ConectarPorIdX(ruta.EntidadInicio, ruta.EntidadFinal, ruta.Distancia);
+                                distancias[(ruta.EntidadInicio, ruta.EntidadFinal)] = ruta.Distancia;
+                            }
+                        }
+                    });
+
+                    await Task.WhenAll(tasks);
+                }
+
+                return (grafo, distancias);
+            });
         }
-      
+
+        private async Task<IIdentificable> ObtenerEntidadPorIdX(string idX)
+        {
+            return await _cache.GetOrCreateAsync<IIdentificable>($"entidad_{idX}", async entry =>
+            {
+                entry.AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(60); // Caché por 30 minutos
+
+                using (var context = _contextFactory.CreateDbContext())
+                {
+                    var departamento = await context.Departamento.AsNoTracking().FirstOrDefaultAsync(d => d.IdX == idX);
+                    if (departamento != null) return departamento;
+
+                    var municipio = await context.Municipio.AsNoTracking().FirstOrDefaultAsync(m => m.IdX == idX);
+                    return municipio;
+                }
+            });
+        }
     }
 
 }
-

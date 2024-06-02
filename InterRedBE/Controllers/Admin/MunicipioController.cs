@@ -32,25 +32,40 @@ namespace InterRedBE.Controllers.Admin
         }
 
         [HttpPost]
-        public async Task<IActionResult> CreateOne([FromBody] MunicipioDTO municipioDto)
+        public async Task<IActionResult> CreateOne([FromForm] MunicipioDTO municipioDto)
         {
             try
             {
+                if (municipioDto.ImagenFile == null || municipioDto.ImagenFile.Length == 0)
+                {
+                    return BadRequest("An image file is required.");
+                }
+
+                var fileName = Path.GetFileName(municipioDto.ImagenFile.FileName);
+                var filePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/images", fileName);
+                using (var stream = new FileStream(filePath, FileMode.Create))
+                {
+                    await municipioDto.ImagenFile.CopyToAsync(stream);
+                }
+
+                municipioDto.Imagen = Path.Combine("/images", fileName);
+
                 var municipio = new Municipio
                 {
                     Nombre = municipioDto.Nombre,
                     Descripcion = municipioDto.Descripcion,
                     Poblacion = municipioDto.Poblacion,
-                    IdDepartamento = municipioDto.IdDepartamento
-
+                    IdDepartamento = municipioDto.IdDepartamento,
+                    Imagen = municipioDto.Imagen
                 };
-                
+
                 var result = await _municipioBAO.CreateOne(municipio);
-                if(result.Data!=null)
+                if (result.Data != null)
                 {
-                    return StatusCode (StatusCodes.Status201Created, result.Data);
+                    return StatusCode(StatusCodes.Status201Created, result.Data);
                 }
-                else {
+                else
+                {
                     return BadRequest(result.Message);
                 }
             }
@@ -65,7 +80,6 @@ namespace InterRedBE.Controllers.Admin
         {
             try
             {
-                // Asegúrate de usar `await` aquí para esperar la tarea
                 var result = await _municipioBAO.DeleteOne(id);
                 return Ok(result);
             }
@@ -75,10 +89,7 @@ namespace InterRedBE.Controllers.Admin
             }
         }
 
-   
-
-    [HttpGet("{id}")]
-
+        [HttpGet("{id}")]
         public async Task<IActionResult> GetOneInt(int id)
         {
             try
@@ -94,39 +105,58 @@ namespace InterRedBE.Controllers.Admin
                     return NotFound(result.Message);
                 }
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
             }
-            
-
         }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateOne(int id, [FromBody]MunicipioDTO municipioDTO)
+        public async Task<IActionResult> UpdateOne(int id, [FromForm] MunicipioDTO municipioDTO)
         {
             try
             {
+                var municipioExistente = await _municipioBAO.GetOneInt(id);
+                if (municipioExistente == null || municipioExistente.Data == null)
+                {
+                    return NotFound($"Municipio with Id = {id} not found.");
+                }
+
+                if (municipioDTO.ImagenFile != null && municipioDTO.ImagenFile.Length > 0)
+                {
+                    var fileName = Path.GetFileName(municipioDTO.ImagenFile.FileName);
+                    var filePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/images", fileName);
+                    using (var stream = new FileStream(filePath, FileMode.Create))
+                    {
+                        await municipioDTO.ImagenFile.CopyToAsync(stream);
+                    }
+                    municipioDTO.Imagen = Path.Combine("/images", fileName);
+                }
+                else
+                {
+                    municipioDTO.Imagen = municipioExistente.Data.Imagen;
+                }
+
                 var municipio = new Municipio
                 {
                     Id = id,
                     Nombre = municipioDTO.Nombre,
                     Descripcion = municipioDTO.Descripcion,
                     Poblacion = municipioDTO.Poblacion,
-                    IdDepartamento = municipioDTO.IdDepartamento
+                    IdDepartamento = municipioDTO.IdDepartamento,
+                    Imagen = municipioDTO.Imagen
                 };
+
                 var result = await _municipioBAO.UpdateOne(municipio);
-                
+
                 if (result.Data != null)
                 {
-                    return Ok(result.Data);    
+                    return Ok(result.Data);
                 }
                 else
                 {
                     return BadRequest(result.Message);
                 }
-
-                
             }
             catch (Exception ex)
             {
@@ -154,6 +184,5 @@ namespace InterRedBE.Controllers.Admin
                 return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
             }
         }
-
     }
 }
