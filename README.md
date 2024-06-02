@@ -9,7 +9,7 @@
 
 # Links Importantes
 <h3>Enlace hacia la carpeta de Google Drive con archivos importantes</h3>
-<a href="https://drive.google.com/drive/folders/1OugaCjQvwLq1EpyTLwinGOVF-A8pCkMe?usp=sharing">Google Drive</a>
+<a href="https://drive.google.com/drive/folders/1hUdRJpuC8Iithh3w8HAxOys8gRWyKhfK?usp=sharing">Google Drive</a>
 
 <h3>Enlace hacia el frontend</h3>
 <a href="https://github.com/ProgramacionIIIGrupo3/InterRedFE">Frontend</a>
