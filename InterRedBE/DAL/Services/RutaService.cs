@@ -31,7 +31,7 @@ namespace InterRedBE.DAL.Services
         {
             return await _cache.GetOrCreateAsync<(Grafo<IIdentificable>, Dictionary<(string, string), double>)>("grafo_rutas", async entry =>
             {
-                entry.AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(30); // Caché por 30 minutos
+                entry.AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(60); // Caché por 30 minutos
 
                 Grafo<IIdentificable> grafo = new Grafo<IIdentificable>();
                 Dictionary<(string, string), double> distancias = new Dictionary<(string, string), double>();
@@ -79,7 +79,7 @@ namespace InterRedBE.DAL.Services
         {
             return await _cache.GetOrCreateAsync<IIdentificable>($"entidad_{idX}", async entry =>
             {
-                entry.AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(30); // Caché por 30 minutos
+                entry.AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(60); // Caché por 30 minutos
 
                 using (var context = _contextFactory.CreateDbContext())
                 {
